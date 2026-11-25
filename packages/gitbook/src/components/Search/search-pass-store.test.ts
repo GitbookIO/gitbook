@@ -3,25 +3,23 @@ import { afterEach, describe, expect, it, spyOn } from 'bun:test';
 import { createSearchPassStore } from './search-pass-store';
 import type { DirectSearchProps } from '@/lib/search-results';
 
-const endpoint = 'https://api.gitbook.com/v1/orgs/org_1/sites/site_1/search';
+const endpoint = '/docs/~gitbook/search-direct/orgs/org_1/sites/site_1';
 const directSearch: DirectSearchProps = {
-    apiURL: 'https://api.gitbook.com',
-    organizationId: 'org_1',
-    siteId: 'site_1',
+    searchURL: endpoint,
     linker: {
         urlMode: 'url-host',
         siteHost: 'docs.example.com',
-        siteBasePath: '/',
-        spaceBasePath: '/',
+        siteBasePath: '/docs/',
+        spaceBasePath: '/docs/api/',
         gitbookURL: undefined,
     },
     spaces: {},
-    passURL: '/~gitbook/search-pass',
+    passURL: '/docs/~gitbook/search-pass',
 };
 
 /** Answer each pass request with a new pass, and each API search with the next status. */
 function mockFetch(apiStatuses: number[], passLifetimesMs: number[] = []) {
-    const authorizations: (string | null)[] = [];
+    const searchPasses: (string | null)[] = [];
     let passes = 0;
     const fetchSpy = spyOn(globalThis, 'fetch').mockImplementation((async (
         input: RequestInfo | URL,
@@ -30,7 +28,7 @@ function mockFetch(apiStatuses: number[], passLifetimesMs: number[] = []) {
         if (init?.signal?.aborted) {
             throw new DOMException('Aborted', 'AbortError');
         }
-        if (String(input) === '/~gitbook/search-pass') {
+        if (String(input) === directSearch.passURL) {
             passes += 1;
             return Response.json({
                 token: `pass-${passes}`,
@@ -39,12 +37,12 @@ function mockFetch(apiStatuses: number[], passLifetimesMs: number[] = []) {
         }
 
         expect(String(input)).toBe(endpoint);
-        authorizations.push(new Headers(init?.headers).get('authorization'));
+        searchPasses.push(new Headers(init?.headers).get('x-gitbook-search-pass'));
         const status = apiStatuses.shift() ?? 200;
         return status === 200 ? Response.json({ items: [] }) : new Response(null, { status });
     }) as typeof fetch);
 
-    return { authorizations, fetchSpy };
+    return { searchPasses, fetchSpy };
 }
 
 function search(store: ReturnType<typeof createSearchPassStore>, signal?: AbortSignal) {
@@ -60,8 +58,66 @@ describe('createSearchPassStore', () => {
     let restore: (() => void) | undefined;
     afterEach(() => restore?.());
 
+    it('posts the search pass and query to the same-origin site endpoint', async () => {
+        const fetchSpy = spyOn(globalThis, 'fetch')
+            .mockResolvedValueOnce(Response.json({ token: 'pass-1', expiresIn: 300_000 }))
+            .mockResolvedValueOnce(Response.json({ items: [] }));
+        restore = () => fetchSpy.mockRestore();
+        const store = createSearchPassStore(directSearch);
+        await store.requestPass();
+
+        const scope = { mode: 'all' } as const;
+        expect(
+            await store.search({
+                query: 'tokens',
+                searchId: 'search-1',
+                scope,
+                signal: new AbortController().signal,
+                asEmbeddable: false,
+            })
+        ).toEqual({ type: 'results', results: [] });
+        const [url, init] = fetchSpy.mock.calls[1] ?? [];
+        expect(url).toBe(endpoint);
+        expect(init).toMatchObject({
+            method: 'POST',
+            credentials: 'omit',
+            mode: 'same-origin',
+            body: JSON.stringify({ query: 'tokens', searchId: 'search-1', ...scope }),
+        });
+        const headers = new Headers(init?.headers);
+        expect(headers.get('content-type')).toBe('application/json');
+        expect(headers.get('x-gitbook-search-pass')).toBe('pass-1');
+        expect(headers.has('authorization')).toBe(false);
+    });
+
+    it('uses bearer authentication for the renderer URL mode', async () => {
+        const fetchSpy = spyOn(globalThis, 'fetch')
+            .mockResolvedValueOnce(Response.json({ token: 'pass-1', expiresIn: 300_000 }))
+            .mockResolvedValueOnce(Response.json({ items: [] }));
+        restore = () => fetchSpy.mockRestore();
+        const searchURL = 'https://api.gitbook.com/v1/orgs/org_1/sites/site_1/search';
+        const store = createSearchPassStore({
+            ...directSearch,
+            searchURL,
+            linker: {
+                ...directSearch.linker,
+                urlMode: 'url',
+                gitbookURL: 'http://localhost:3000',
+            },
+        });
+        await store.requestPass();
+
+        expect(await search(store)).toEqual({ type: 'results', results: [] });
+        const [url, init] = fetchSpy.mock.calls[1] ?? [];
+        expect(url).toBe(searchURL);
+        expect(init?.mode).toBe('cors');
+        const headers = new Headers(init?.headers);
+        expect(headers.get('authorization')).toBe('Bearer pass-1');
+        expect(headers.has('x-gitbook-search-pass')).toBe(false);
+    });
+
     it('stays on the route for the rest of the page after a 403', async () => {
-        const { authorizations, fetchSpy } = mockFetch([403]);
+        const { searchPasses, fetchSpy } = mockFetch([403]);
         restore = () => fetchSpy.mockRestore();
         const store = createSearchPassStore(directSearch);
         await store.requestPass();
@@ -69,16 +125,16 @@ describe('createSearchPassStore', () => {
         expect(await search(store)).toEqual({ type: 'route', reason: '403' });
         await store.requestPass();
         expect(await search(store)).toEqual({ type: 'route', reason: '403' });
-        expect(authorizations).toHaveLength(1);
+        expect(searchPasses).toHaveLength(1);
     });
 
     it.each([
-        ['an expired pass', [], [1_000], 'expired', ['Bearer pass-2']],
-        ['a 401', [401], [], '401', ['Bearer pass-1', 'Bearer pass-2']],
+        ['an expired pass', [], [1_000], 'expired', ['pass-2']],
+        ['a 401', [401], [], '401', ['pass-1', 'pass-2']],
     ])(
         'sends the search to the route on %s and searches directly again with a new pass',
         async (_name, apiStatuses, passLifetimesMs, reason, sent) => {
-            const { authorizations, fetchSpy } = mockFetch(apiStatuses, passLifetimesMs);
+            const { searchPasses, fetchSpy } = mockFetch(apiStatuses, passLifetimesMs);
             restore = () => fetchSpy.mockRestore();
             const store = createSearchPassStore(directSearch);
             await store.requestPass();
@@ -86,12 +142,12 @@ describe('createSearchPassStore', () => {
             expect(await search(store)).toEqual({ type: 'route', reason });
             await new Promise((resolve) => setTimeout(resolve, 0));
             expect(await search(store)).toEqual({ type: 'results', results: [] });
-            expect(authorizations).toEqual(sent);
+            expect(searchPasses).toEqual(sent);
 
             const refresh = store.requestPass();
             expect(await search(store)).toEqual({ type: 'route', reason: undefined });
             await refresh;
-            expect(authorizations).toEqual(sent);
+            expect(searchPasses).toEqual(sent);
         }
     );
 
@@ -104,7 +160,7 @@ describe('createSearchPassStore', () => {
         const fetchSpy = spyOn(globalThis, 'fetch').mockImplementation((async (
             input: RequestInfo | URL
         ) => {
-            if (String(input) === '/~gitbook/search-pass') {
+            if (String(input) === directSearch.passURL) {
                 passRequests += 1;
                 return passRequests === 2
                     ? replies.pass.promise
@@ -130,7 +186,7 @@ describe('createSearchPassStore', () => {
     });
 
     it('neither retries nor falls back when the search is aborted', async () => {
-        const { authorizations, fetchSpy } = mockFetch([]);
+        const { searchPasses, fetchSpy } = mockFetch([]);
         restore = () => fetchSpy.mockRestore();
         const store = createSearchPassStore(directSearch);
         await store.requestPass();
@@ -139,7 +195,7 @@ describe('createSearchPassStore', () => {
         controller.abort();
         await expect(search(store, controller.signal)).rejects.toThrow();
         expect(await search(store)).toEqual({ type: 'results', results: [] });
-        expect(authorizations).toHaveLength(1);
+        expect(searchPasses).toHaveLength(1);
     });
 
     it('falls back for an unknown space without latching later searches to the route', async () => {
@@ -147,7 +203,7 @@ describe('createSearchPassStore', () => {
         const fetchSpy = spyOn(globalThis, 'fetch').mockImplementation((async (
             input: RequestInfo | URL
         ) => {
-            if (String(input) === '/~gitbook/search-pass') {
+            if (String(input) === directSearch.passURL) {
                 return Response.json({ token: 'pass-1', expiresIn: 300_000 });
             }
             searchCalls += 1;

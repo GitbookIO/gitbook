@@ -1,5 +1,3 @@
-import ReactDOM from 'react-dom';
-
 import type { SearchRecordResult, SearchSpaceResult } from '@gitbook/api';
 
 import type { OrderedComputedResult, SearchSiteContentScope } from './search-types';
@@ -77,7 +75,6 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
                         (current.status === 'none' && current.reason === '401') ||
                         (current.status === 'ready' && current.replacesRejectedPass),
                 };
-                ReactDOM.preconnect(directSearch.apiURL, { crossOrigin: 'anonymous' });
             } else if (current.status === 'ready') {
                 state = { status: 'none' };
             }
@@ -147,7 +144,14 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
         }
 
         const { token, replacesRejectedPass } = state;
-        const { apiURL, organizationId, siteId } = directSearch;
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        let mode: RequestMode = 'same-origin';
+        if (directSearch.linker.urlMode === 'url') {
+            headers.Authorization = `Bearer ${token}`;
+            mode = 'cors';
+        } else {
+            headers['x-gitbook-search-pass'] = token;
+        }
         // A request dropped on the way to the API never settles, so it gets its own time limit.
         // The browser targets predate `AbortSignal.any`.
         const request = new AbortController();
@@ -158,14 +162,12 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
         const timeout = setTimeout(() => request.abort(), DIRECT_SEARCH_TIMEOUT_MS);
         let response: Response;
         try {
-            response = await fetch(`${apiURL}/v1/orgs/${organizationId}/sites/${siteId}/search`, {
+            response = await fetch(directSearch.searchURL, {
                 method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
+                headers,
                 body: JSON.stringify(toSearchSiteContentBody(query, scope, searchId)),
                 credentials: 'omit',
+                mode,
                 signal: request.signal,
             });
         } catch (error) {

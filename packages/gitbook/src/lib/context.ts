@@ -285,15 +285,18 @@ export function getBaseContext(input: {
         linker: linker,
     });
 
-    const directSearch: GitBookBaseContext['directSearch'] =
-        !siteURLData.revision && !siteURLData.changeRequest && !siteURLData.preview
-            ? {
-                  apiURL: GITBOOK_API_PUBLIC_URL,
-                  organizationId: siteURLData.organization,
-                  siteId: siteURLData.site,
-                  linker: linkerInput,
-              }
-            : undefined;
+    let directSearch: GitBookBaseContext['directSearch'];
+    if (!siteURLData.revision && !siteURLData.changeRequest && !siteURLData.preview) {
+        const { organization, site } = siteURLData;
+        let searchURL = linker.toPathInSite(
+            `~gitbook/search-direct/orgs/${organization}/sites/${site}`
+        );
+        // The renderer's /url/ routes bypass the content worker.
+        if (urlMode === 'url') {
+            searchURL = `${GITBOOK_API_PUBLIC_URL}/v1/orgs/${organization}/sites/${site}/search`;
+        }
+        directSearch = { searchURL, linker: linkerInput };
+    }
 
     return {
         dataFetcher,

@@ -10,6 +10,7 @@ import type {
 
 import { getBaseContext } from './context';
 import { getEmbeddableLinker } from './embeddable-linker';
+import { GITBOOK_API_PUBLIC_URL } from './env';
 import { createSiteLinker } from './links';
 import { getSearchSpaceLookup, transformSitePageResult } from './search';
 import { computePublishedSearchResults, computeSearchResults } from './search-results';
@@ -216,5 +217,30 @@ describe('computePublishedSearchResults', () => {
         expect(
             computePublishedSearchResults({ asEmbeddable: false, linker, searchResults, spaces })
         ).toBeNull();
+    });
+});
+
+describe('direct search URL', () => {
+    it.each([
+        ['url-host', '/', '/~gitbook/search-direct/orgs/org_1/sites/site_1'],
+        ['url-host', '/docs/', '/docs/~gitbook/search-direct/orgs/org_1/sites/site_1'],
+        ['url', '/docs/', `${GITBOOK_API_PUBLIC_URL}/v1/orgs/org_1/sites/site_1/search`],
+    ] as const)('uses the search endpoint for %s at %s', (urlMode, siteBasePath, searchURL) => {
+        const context = getBaseContext({
+            siteURL: 'https://docs.example.com',
+            siteURLData: {
+                organization: 'org_1',
+                site: 'site_1',
+                siteSpace: 'ss_v2',
+                space: 'space_v2',
+                siteBasePath,
+                basePath: `${siteBasePath}api/`,
+                apiToken: 'page-token',
+                imagesContextId: 'images',
+            },
+            urlMode,
+        });
+
+        expect(context.directSearch?.searchURL).toBe(searchURL);
     });
 });
