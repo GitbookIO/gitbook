@@ -44,7 +44,7 @@ export type SearchPassStore = ReturnType<typeof createSearchPassStore>;
  */
 export function createSearchPassStore(directSearch: DirectSearchProps | undefined) {
     let state: SearchPassState = { status: 'none' };
-    let useProxy = Boolean(directSearch?.sameDomain && directSearch.proxyURL);
+    let useProxy = false;
     let pendingRequest: Promise<void> | null = null;
 
     const sendPassRequest = async () => {
@@ -83,7 +83,7 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
                         (current.status === 'none' && current.reason === '401') ||
                         (current.status === 'ready' && current.replacesRejectedPass),
                 };
-                if (!useProxy && !directSearch.sameDomain) {
+                if (!useProxy) {
                     ReactDOM.preconnect(directSearch.apiURL, { crossOrigin: 'anonymous' });
                 }
             } else if (current.status === 'ready') {

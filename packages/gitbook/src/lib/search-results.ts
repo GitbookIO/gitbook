@@ -42,7 +42,6 @@ export type DirectSearchProps = {
     organizationId: string;
     siteId: string;
     proxyURL?: string;
-    sameDomain?: boolean;
     linker: SiteLinkerInput;
     spaces: SearchSpaceLookup;
     /** Site route that hands out a search pass. */

@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, spyOn } from 'bun:test';
-import ReactDOM from 'react-dom';
 
 import { createSearchPassStore } from './search-pass-store';
 import type { DirectSearchProps } from '@/lib/search-results';
@@ -104,29 +103,6 @@ describe('createSearchPassStore', () => {
             endpoint,
             proxyURL,
         ]);
-    });
-
-    it('uses the site proxy immediately and skips preconnect when sameDomain is true', async () => {
-        const preconnectSpy = spyOn(ReactDOM, 'preconnect').mockImplementation(() => undefined);
-        const fetchSpy = spyOn(globalThis, 'fetch')
-            .mockResolvedValueOnce(Response.json({ token: 'pass-1', expiresIn: 300_000 }))
-            .mockResolvedValueOnce(Response.json({ items: [] }));
-        restore = () => {
-            fetchSpy.mockRestore();
-            preconnectSpy.mockRestore();
-        };
-
-        const store = createSearchPassStore({ ...directSearch, sameDomain: true });
-        await store.requestPass();
-
-        expect(preconnectSpy).not.toHaveBeenCalled();
-        expect(await search(store)).toEqual({ type: 'results', results: [] });
-        expect(fetchSpy.mock.calls.map(([url]) => url)).toEqual([directSearch.passURL, proxyURL]);
-        const init = fetchSpy.mock.calls[1]?.[1];
-        expect(init).toMatchObject({ mode: 'same-origin', credentials: 'omit' });
-        const headers = new Headers(init?.headers);
-        expect(headers.get('x-gitbook-search-pass')).toBe('pass-1');
-        expect(headers.has('authorization')).toBe(false);
     });
 
     it('stays on the route for the rest of the page after a 403', async () => {
