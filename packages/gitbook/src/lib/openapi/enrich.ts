@@ -8,19 +8,21 @@ import { parseMarkdown } from '../markdown';
 export async function enrichFilesystem(filesystem: Filesystem) {
     const parseMarkdownWithCache = createMarkdownParser();
     return traverse(filesystem, async (node, path) => {
+        // Examples included: a `$ref` can render an example value as a schema.
+        delete node['x-gitbook-description-html'];
+        delete node['x-gitbook-description-document'];
+
         if (
             path !== undefined &&
             'description' in node &&
             typeof node.description === 'string' &&
             node.description
         ) {
-            const key = path[path.length - 1];
-            // Avoid parsing descriptions in examples.
-            if (key !== 'example') {
-                const description = node.description.trim();
-                if (description) {
-                    node['x-gitbook-description-html'] = await parseMarkdownWithCache(description);
-                }
+            const description = node.description.trim();
+            // Examples stay as written, except where their raw description could render a tag.
+            const isExample = path[path.length - 1] === 'example';
+            if (description && (!isExample || description.includes('<'))) {
+                node['x-gitbook-description-html'] = await parseMarkdownWithCache(description);
             }
         }
         return node;
