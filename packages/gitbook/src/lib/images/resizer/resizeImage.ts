@@ -9,12 +9,14 @@ import type {
     CloudflareImageOptions,
     CloudflareResizeImageOptions,
 } from './types';
+import { cache } from '@/lib/cache';
 import { getLogger } from '@/lib/logger';
 
 /**
  * Get the size of an image.
+ * Memoized per request so the site page plan's early call is reused by the render.
  */
-export async function getImageSize(
+export const getImageSize = cache(async function getImageSize(
     input: string,
     defaultSize: Partial<CloudflareImageOptions> = {}
 ): Promise<{ width: number; height: number } | null> {
@@ -43,7 +45,7 @@ export async function getImageSize(
         logger.warn(`Error getting image size for ${input}:`, error);
         return null;
     }
-}
+});
 
 /**
  * Execute a Cloudflare Image Resize operation on an image.

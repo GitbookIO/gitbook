@@ -6,6 +6,7 @@ import {
     SITE_REDIRECT_SOURCE_PATH_PATTERN,
 } from '@gitbook/api';
 
+import { runSitePagePlan } from './plan';
 import { type GitBookSiteContext, fetchSiteContextForSiteSpace } from '@/lib/context';
 import { getDataOrNull } from '@/lib/data';
 import { type ResolvedPagePath, resolvePageId } from '@/lib/pages';
@@ -38,6 +39,17 @@ export async function fetchPageData(context: GitBookSiteContext, params: PagePar
         },
         pageTarget,
     };
+}
+
+/**
+ * Start the site page plan from `generateViewport`, which Next runs before the page itself.
+ */
+export function startSitePagePlan(context: GitBookSiteContext, params: PagePathParams) {
+    const pathname = getPathnameParam(params).toLowerCase();
+    const resolved = resolveSiteSpacePagePath(context.siteSpace, context.revision.pages, pathname);
+    if (resolved) {
+        void runSitePagePlan(context, resolved.page);
+    }
 }
 
 /**

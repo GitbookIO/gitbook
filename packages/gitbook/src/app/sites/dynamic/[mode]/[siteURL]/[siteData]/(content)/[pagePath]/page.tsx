@@ -5,6 +5,7 @@ import {
     SitePage,
     generateSitePageMetadata,
     generateSitePageViewport,
+    startSitePagePlan,
 } from '@/components/SitePage';
 
 type PageProps = {
@@ -21,7 +22,9 @@ export default async function Page(props: PageProps) {
 }
 
 export async function generateViewport(props: PageProps): Promise<Viewport> {
-    const { context } = await getDynamicSiteContext(await props.params);
+    const params = await props.params;
+    const { context } = await getDynamicSiteContext(params);
+    startSitePagePlan(context, { pathname: getPagePathFromParams(params) });
     return generateSitePageViewport(context);
 }
 
