@@ -53,6 +53,8 @@ const PARAMETER_SECTIONS: { in: TryItParameterLocation; label: TranslationKey }[
     { in: 'cookie', label: 'cookie_parameters' },
 ];
 
+let unscopedDialogs = 0;
+
 /** Loaded only after a reader opens Try it. */
 export function OpenAPITryItDialog(props: OpenAPITryItDialogProps) {
     const { operation, securities, servers, withProxy, context, onClose } = props;
@@ -78,7 +80,8 @@ export function OpenAPITryItDialog(props: OpenAPITryItDialogProps) {
     });
 
     const [saved] = useState(() => {
-        const scope = getTryItApiScope(servers);
+        // Without a concrete host, use a scope of its own so nothing is shared or restored.
+        const scope = getTryItApiScope(servers) ?? `unscoped:${++unscopedDialogs}`;
         const savedOperation = getTryItOperationSession(scope, operation);
         const savedMediaTypeIndex =
             operation.body?.mediaTypes.findIndex(
