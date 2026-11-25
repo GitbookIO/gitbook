@@ -449,8 +449,7 @@ async function serveSiteRequest(requestURL: URL, request: NextRequest, match: UR
             basePath: siteURLData.basePath,
             space: siteURLData.space,
             organization: siteURLData.organization,
-            changeRequest: siteURLData.changeRequest,
-            revision: siteURLData.revision,
+            ...getPreviewedContent(siteURLData),
             shareKey: siteURLData.shareKey,
             preview: siteURLData.preview,
             apiToken: siteURLData.apiToken,
@@ -965,7 +964,7 @@ function encodePathInSiteContent(
         siteSpace: siteURLData.siteSpace,
         siteShareKey: siteURLData.shareKey,
         space: siteURLData.space,
-        revision: siteURLData.revision,
+        revision: getPreviewedContent(siteURLData).revision,
         displayContext: SiteInsightsDisplayContext.Server,
     };
 
@@ -1228,4 +1227,22 @@ function acceptsMarkdown(request: Request): boolean {
 
     const htmlIndex = mediaTypes.findIndex((type) => type === 'text/html' || type === '*/*');
     return htmlIndex === -1 || markdownIndex < htmlIndex;
+}
+
+/**
+ * The revision, change request or site revision a URL previews: at most one of them.
+ */
+function getPreviewedContent(
+    content: PublishedSiteContent
+): Pick<SiteURLData, 'revision' | 'changeRequest' | 'siteRevision'> {
+    if ('revision' in content) {
+        return { revision: content.revision };
+    }
+    if ('changeRequest' in content) {
+        return { changeRequest: content.changeRequest };
+    }
+    if ('siteRevision' in content) {
+        return { siteRevision: content.siteRevision };
+    }
+    return {};
 }

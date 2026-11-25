@@ -15,8 +15,6 @@ export function computeRemoteSearchScope(
     }
 
     switch (scope) {
-        case 'all':
-            return { mode: 'all' };
         case 'default':
             return { mode: 'current', siteSpaceId };
         case 'extended':

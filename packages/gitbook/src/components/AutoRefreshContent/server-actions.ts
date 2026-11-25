@@ -14,6 +14,11 @@ export async function hasContentBeenUpdated(props: { revisionId: string }) {
         const context = await getServerActionBaseContext();
         const siteURLData = await getSiteURLDataFromMiddleware();
 
+        // A site revision never changes what it shows.
+        if (siteURLData.siteRevision) {
+            return false;
+        }
+
         if (siteURLData.changeRequest) {
             const changeRequest = await getDataOrNull(
                 context.dataFetcher.getChangeRequest({
