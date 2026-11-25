@@ -37,6 +37,7 @@ import {
     throwIfDataError,
 } from '@/lib/data';
 import { getLogger } from '@/lib/logger';
+import { measureDataFetcher, measureImageResizer } from '@/lib/plan-stats';
 import type { DirectSearchProps } from '@/lib/search-results';
 import {
     findSiteSpaceBy,
@@ -248,9 +249,12 @@ export function getBaseContext(input: {
     const { urlMode, siteURLData } = input;
     const siteURL = typeof input.siteURL === 'string' ? new URL(input.siteURL) : input.siteURL;
 
-    const dataFetcher = createDataFetcher({
-        apiToken: siteURLData.apiToken ?? null,
-    });
+    // TEMP: measured to log what the site page plan saves (lib/plan-stats.ts).
+    const dataFetcher = measureDataFetcher(
+        createDataFetcher({
+            apiToken: siteURLData.apiToken ?? null,
+        })
+    );
 
     const linkerInput: SiteLinkerInput = {
         urlMode,
@@ -261,12 +265,14 @@ export function getBaseContext(input: {
     };
     const linker = createSiteLinker(linkerInput);
 
-    const imageResizer = createImageResizer({
-        imagesContextId: siteURLData.imagesContextId,
-        // To ensure image resizing work for proxied sites,
-        // we serve images from the root of the site.
-        linker: linker,
-    });
+    const imageResizer = measureImageResizer(
+        createImageResizer({
+            imagesContextId: siteURLData.imagesContextId,
+            // To ensure image resizing work for proxied sites,
+            // we serve images from the root of the site.
+            linker: linker,
+        })
+    );
 
     const directSearch: GitBookBaseContext['directSearch'] =
         !siteURLData.revision && !siteURLData.changeRequest && !siteURLData.preview

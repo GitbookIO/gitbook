@@ -1,4 +1,5 @@
 import { permanentRedirect, redirect } from 'next/navigation';
+import { after } from 'next/server';
 
 import {
     type RevisionPageDocument,
@@ -11,6 +12,7 @@ import { type GitBookSiteContext, fetchSiteContextForSiteSpace } from '@/lib/con
 import { getDataOrNull } from '@/lib/data';
 import { type ResolvedPagePath, resolvePageId } from '@/lib/pages';
 import { withLeadingSlash } from '@/lib/paths';
+import { getRequestPlanStats, logPlanStats, markPlanStart, planScope } from '@/lib/plan-stats';
 import { findSiteSpaceByUrl, resolveSiteSpacePagePath } from '@/lib/sites';
 
 const MAX_PAGE_URL_REDIRECTS = 5;
@@ -48,7 +50,15 @@ export function startSitePagePlan(context: GitBookSiteContext, params: PagePathP
     const pathname = getPathnameParam(params).toLowerCase();
     const resolved = resolveSiteSpacePagePath(context.siteSpace, context.revision.pages, pathname);
     if (resolved) {
-        void runSitePagePlan(context, resolved.page);
+        // TEMP: the scope marks the plan's calls, and the stats are logged once the response is sent.
+        const stats = getRequestPlanStats();
+        markPlanStart(stats);
+        planScope.run(true, () => void runSitePagePlan(context, resolved.page));
+        try {
+            after(() => logPlanStats(stats));
+        } catch {
+            // Outside a request (tests, build), there is nothing to log.
+        }
     }
 }
 
