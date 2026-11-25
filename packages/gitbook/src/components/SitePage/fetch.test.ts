@@ -343,6 +343,17 @@ describe('resolveMissingPagePath', () => {
         });
     });
 
+    it('resolves a page ID path to the page, keeping the ID case', async () => {
+        const context = createRedirectContext({});
+        const idPage = { ...page, id: 'wwCLFQyPl9cctUGxdLZm' };
+        context.revision.pages = [page, idPage];
+
+        expect(await resolveMissingPagePath(context, 'pages/wwCLFQyPl9cctUGxdLZm')).toEqual({
+            type: 'page',
+            page: { page: idPage, ancestors: [] },
+        });
+    });
+
     it('returns undefined when nothing matches', async () => {
         const context = createRedirectContext({});
 

@@ -11,6 +11,7 @@ import { type GitBookSiteContext, fetchSiteContextForSiteSpace } from '@/lib/con
 import { getDataOrNull } from '@/lib/data';
 import { type ResolvedPagePath, resolvePageId } from '@/lib/pages';
 import { withLeadingSlash } from '@/lib/paths';
+import { resolveStringContentRef } from '@/lib/references';
 import {
     findSiteSpaceBy,
     findSiteSpaceByUrl,
@@ -167,6 +168,15 @@ export async function resolveMissingPagePath(
                     isPublicLiveContext
                 ),
             };
+        }
+    }
+
+    // Content-ref page links (`/pages/<pageId>`) can reach visitors; IDs are case-sensitive, so match the raw pathname.
+    const contentRef = resolveStringContentRef(redirectPathname);
+    if (contentRef?.kind === 'page' && !contentRef.space) {
+        const page = resolvePageId(revision.pages, contentRef.page);
+        if (page) {
+            return { type: 'page', page };
         }
     }
 
