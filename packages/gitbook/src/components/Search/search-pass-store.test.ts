@@ -80,7 +80,7 @@ describe('createSearchPassStore', () => {
             proxyURL,
         ]);
         const init = fetchSpy.mock.calls[2]?.[1];
-        expect(init).toMatchObject({ mode: 'same-origin', credentials: 'omit' });
+        expect(init).toMatchObject({ mode: 'same-origin', credentials: 'same-origin' });
         expect(init?.body).toBe(JSON.stringify({ query: 'tokens', mode: 'all' }));
         const headers = new Headers(init?.headers);
         expect(headers.get('x-gitbook-search-pass')).toBe('pass-1');
@@ -89,6 +89,103 @@ describe('createSearchPassStore', () => {
         expect(new Headers(fetchSpy.mock.calls[3]?.[1]?.headers).has(SEARCH_FALLBACK_HEADER)).toBe(
             false
         );
+    });
+
+    it('switches to the site proxy after an API timeout', async () => {
+        const originalSetTimeout = globalThis.setTimeout;
+        const timeoutSpy = spyOn(globalThis, 'setTimeout').mockImplementation(((
+            fn: (...args: unknown[]) => void,
+            ms?: number,
+            ...args: unknown[]
+        ) => {
+            let delay = ms;
+            if (ms === 5_000) {
+                delay = 0;
+            }
+            return originalSetTimeout(fn, delay, ...args);
+        }) as typeof setTimeout);
+        const fetchSpy = spyOn(globalThis, 'fetch')
+            .mockResolvedValueOnce(Response.json({ token: 'pass-1', expiresIn: 300_000 }))
+            .mockImplementationOnce(
+                (_url, init) =>
+                    new Promise((_, reject) => {
+                        init?.signal?.addEventListener(
+                            'abort',
+                            () => reject(new DOMException('Aborted', 'AbortError')),
+                            { once: true }
+                        );
+                    })
+            )
+            .mockResolvedValueOnce(Response.json({ items: [] }));
+        restore = () => {
+            timeoutSpy.mockRestore();
+            fetchSpy.mockRestore();
+        };
+        const store = createSearchPassStore(directSearch);
+        await store.requestPass();
+
+        expect(await search(store)).toEqual({ type: 'results', results: [] });
+        expect(fetchSpy.mock.calls.map(([url]) => url)).toEqual([
+            directSearch.passURL,
+            endpoint,
+            proxyURL,
+        ]);
+        expect(new Headers(fetchSpy.mock.calls[2]?.[1]?.headers).get(SEARCH_FALLBACK_HEADER)).toBe(
+            'timeout'
+        );
+    });
+
+    it('refreshes the pass on a 401 from the site proxy', async () => {
+        const fetchSpy = spyOn(globalThis, 'fetch')
+            .mockResolvedValueOnce(Response.json({ token: 'pass-1', expiresIn: 300_000 }))
+            .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+            .mockResolvedValueOnce(new Response(null, { status: 401 }))
+            .mockResolvedValueOnce(Response.json({ token: 'pass-2', expiresIn: 300_000 }))
+            .mockResolvedValueOnce(Response.json({ items: [] }));
+        restore = () => fetchSpy.mockRestore();
+        const store = createSearchPassStore(directSearch);
+        await store.requestPass();
+
+        expect(await search(store)).toEqual({ type: 'route', reason: '401' });
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        expect(await search(store)).toEqual({ type: 'results', results: [] });
+        expect(fetchSpy.mock.calls.map(([url]) => url)).toEqual([
+            directSearch.passURL,
+            endpoint,
+            proxyURL,
+            directSearch.passURL,
+            proxyURL,
+        ]);
+        expect(new Headers(fetchSpy.mock.calls[4]?.[1]?.headers).get('x-gitbook-search-pass')).toBe(
+            'pass-2'
+        );
+    });
+
+    it('honors rate-limit headers on a 429 from the site proxy', async () => {
+        const resetAtSeconds = Math.ceil((Date.now() + 30_000) / 1000);
+        const fetchSpy = spyOn(globalThis, 'fetch')
+            .mockResolvedValueOnce(Response.json({ token: 'pass-1', expiresIn: 300_000 }))
+            .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+            .mockResolvedValueOnce(
+                new Response(null, {
+                    status: 429,
+                    headers: {
+                        'x-ratelimit-scope': 'site',
+                        'x-ratelimit-reset': String(resetAtSeconds),
+                    },
+                })
+            );
+        restore = () => fetchSpy.mockRestore();
+        const store = createSearchPassStore(directSearch);
+        await store.requestPass();
+
+        await expect(search(store)).rejects.toThrow('Search is rate limited');
+        await expect(search(store)).rejects.toThrow('Search is rate limited');
+        expect(fetchSpy.mock.calls.map(([url]) => url)).toEqual([
+            directSearch.passURL,
+            endpoint,
+            proxyURL,
+        ]);
     });
 
     it('uses the server route after the site proxy also fails', async () => {

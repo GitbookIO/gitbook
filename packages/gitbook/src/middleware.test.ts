@@ -48,6 +48,7 @@ describe('direct site search middleware', () => {
                 'x-gitbook-ip': '192.0.2.1',
                 'cf-connecting-ip': '192.0.2.2',
                 'x-forwarded-for': '192.0.2.3',
+                'content-type': 'text/plain',
                 'user-agent': 'Mozilla/5.0',
                 [PASS_HEADER]: SEARCH_PASS,
                 'x-gitbook-search-fallback': 'network',
@@ -73,6 +74,8 @@ describe('direct site search middleware', () => {
         });
         expect(response.status).toBe(429);
         expect(response.headers.get('cache-control')).toBe('no-store');
+        expect(response.headers.get('x-content-type-options')).toBe('nosniff');
+        expect(response.headers.get('server-timing')).toMatch(/^api;dur=\d+$/);
         expect(response.headers.get('set-cookie')).toBeNull();
         expect(response.headers.get('retry-after')).toBe('3');
         expect(response.headers.get('x-ratelimit-scope')).toBe('site');
@@ -112,6 +115,8 @@ describe('direct site search middleware', () => {
 
         expect(response.status).toBe(502);
         expect(response.headers.get('cache-control')).toBe('no-store');
+        expect(response.headers.get('x-content-type-options')).toBe('nosniff');
+        expect(response.headers.get('server-timing')).toMatch(/^api;dur=\d+$/);
         expect(fetchSpy).toHaveBeenCalledTimes(1);
     });
 
@@ -131,6 +136,24 @@ describe('direct site search middleware', () => {
 
         expect(response.status).toBe(502);
         expect(response.headers.get('cache-control')).toBe('no-store');
+        expect(response.headers.get('x-content-type-options')).toBe('nosniff');
+        expect(response.headers.get('server-timing')).toMatch(/^api;dur=\d+$/);
         expect(fetchSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('passes through null-body statuses without throwing', async () => {
+        fetchSpy.mockResolvedValueOnce(new Response(null, { status: 204 }));
+        const response = await middleware(
+            new NextRequest(`https://origin.example.com${PATH}`, {
+                method: 'POST',
+                headers: { 'x-forwarded-host': 'docs.example.com', [PASS_HEADER]: SEARCH_PASS },
+            })
+        );
+
+        expect(response.status).toBe(204);
+        expect(response.body).toBeNull();
+        expect(response.headers.get('cache-control')).toBe('no-store');
+        expect(response.headers.get('x-content-type-options')).toBe('nosniff');
+        expect(response.headers.get('server-timing')).toMatch(/^api;dur=\d+$/);
     });
 });

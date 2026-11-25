@@ -156,16 +156,17 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
 
         let pass = state;
         const { apiURL, organizationId, siteId, proxyURL } = directSearch;
-        const usingProxy = useProxy && Boolean(proxyURL);
+        const usingProxy = useProxy;
         let url = `${apiURL}/v1/orgs/${organizationId}/sites/${siteId}/search`;
-        if (usingProxy && proxyURL) {
+        if (usingProxy) {
             url = proxyURL;
         }
         const body = JSON.stringify(toSearchSiteContentBody(query, scope, searchId));
         let attempt = await sendSearch(url, usingProxy, pass.token, body, signal);
 
-        if (attempt.type === 'failure' && !usingProxy && proxyURL) {
+        if (attempt.type === 'failure' && !usingProxy) {
             const current = state as SearchPassState;
+            // TODO: timeout can mean a slow API rather than a blocked host, so consider not sticking to the proxy for the session.
             if (current.status === 'ready') {
                 useProxy = true;
                 pass = current;
@@ -245,8 +246,10 @@ async function sendSearch(
 ): Promise<SearchAttempt> {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     let mode: RequestMode | undefined;
+    let credentials: RequestCredentials = 'omit';
     if (useProxy) {
         mode = 'same-origin';
+        credentials = 'same-origin';
         headers['x-gitbook-search-pass'] = token;
         if (fallbackReason) {
             headers[SEARCH_FALLBACK_HEADER] = fallbackReason;
@@ -267,7 +270,7 @@ async function sendSearch(
             method: 'POST',
             headers,
             body,
-            credentials: 'omit',
+            credentials,
             mode,
             signal: request.signal,
         });

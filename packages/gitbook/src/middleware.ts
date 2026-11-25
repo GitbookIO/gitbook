@@ -96,7 +96,7 @@ const DIRECT_SEARCH_PATH = /\/~gitbook\/search-direct\/orgs\/([^/]*)\/sites\/([^
 const DIRECT_SEARCH_ID = /^[a-zA-Z0-9_-]+$/;
 const DIRECT_SEARCH_PASS =
     /^[a-zA-Z0-9_-]+\.\.[a-zA-Z0-9_-]{16}\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]{22}$/;
-const DIRECT_SEARCH_TIMEOUT_MS = 10_000;
+const DIRECT_SEARCH_TIMEOUT_MS = 5_000;
 
 export async function middleware(request: NextRequest) {
     try {
@@ -195,7 +195,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest, match: URL
 }
 
 async function serveDirectSearch(request: NextRequest, organizationId = '', siteId = '') {
-    const responseHeaders = new Headers({ 'Cache-Control': 'no-store' });
+    const responseHeaders = new Headers({
+        'Cache-Control': 'no-store',
+        'X-Content-Type-Options': 'nosniff',
+    });
     if (request.method !== 'POST') {
         responseHeaders.set('Allow', 'POST');
         return new Response(null, { status: 405, headers: responseHeaders });
@@ -210,7 +213,7 @@ async function serveDirectSearch(request: NextRequest, organizationId = '', site
 
     const headers = new Headers({
         Authorization: `Bearer ${pass}`,
-        'Content-Type': request.headers.get('Content-Type') ?? 'application/json',
+        'Content-Type': 'application/json',
     });
     const userAgent = request.headers.get('User-Agent');
     if (userAgent) headers.set('User-Agent', userAgent);
@@ -224,6 +227,7 @@ async function serveDirectSearch(request: NextRequest, organizationId = '', site
     }
     request.signal.addEventListener('abort', abort, { once: true });
     const timeout = setTimeout(abort, DIRECT_SEARCH_TIMEOUT_MS);
+    const startedAt = performance.now();
     try {
         const upstream = await fetch(
             `${removeTrailingSlash(GITBOOK_API_URL)}/v1/orgs/${organizationId}/sites/${siteId}/search`,
@@ -236,7 +240,14 @@ async function serveDirectSearch(request: NextRequest, organizationId = '', site
                 duplex: 'half',
             } as RequestInit
         );
-        const responseBody = await upstream.arrayBuffer();
+        let responseBody: ArrayBuffer | null = null;
+        if (upstream.status !== 204 && upstream.status !== 205 && upstream.status !== 304) {
+            responseBody = await upstream.arrayBuffer();
+        }
+        responseHeaders.set(
+            'Server-Timing',
+            `api;dur=${Math.round(performance.now() - startedAt)}`
+        );
         for (const name of [
             'Content-Type',
             'Retry-After',
@@ -256,6 +267,10 @@ async function serveDirectSearch(request: NextRequest, organizationId = '', site
         }
         return new Response(responseBody, { status: upstream.status, headers: responseHeaders });
     } catch {
+        responseHeaders.set(
+            'Server-Timing',
+            `api;dur=${Math.round(performance.now() - startedAt)}`
+        );
         getLogger().subLogger('directSiteSearch').warn('Direct search upstream failed', {
             status: 502,
             organizationId,
