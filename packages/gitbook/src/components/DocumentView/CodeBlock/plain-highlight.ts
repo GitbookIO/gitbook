@@ -1,5 +1,3 @@
-import { bundledThemesInfo } from 'shiki/themes';
-
 import type { CustomizationThemedCodeTheme, DocumentBlockCode } from '@gitbook/api';
 
 import { customThemes } from './customThemes';
@@ -11,6 +9,7 @@ import {
     parseDiffNotation,
     truncateHighlightTokens,
 } from './highlight-tokens';
+import { SHIKI_THEMES } from './shiki-catalog';
 import { getNodeText } from '@/lib/document';
 
 /**
@@ -29,11 +28,11 @@ export function plainHighlight(
     // Resolve theme objects: first check bundled Shiki themes, then custom themes, finally fallback to type-only
     // The type-only fallback ensures HighlightTheme always has valid theme objects even when theme names don't match
     const themes = {
-        light: bundledThemesInfo.find((theme) => theme.id === options?.themes?.light) ??
+        light: getBundledThemeInfo(options?.themes?.light) ??
             Object.values(customThemes).find((theme) => theme.name === options?.themes?.light) ?? {
                 type: 'light',
             },
-        dark: bundledThemesInfo.find((theme) => theme.id === options?.themes?.dark) ??
+        dark: getBundledThemeInfo(options?.themes?.dark) ??
             Object.values(customThemes).find((theme) => theme.name === options?.themes?.dark) ?? {
                 type: 'dark',
             },
@@ -81,4 +80,9 @@ export function plainHighlight(
             };
         }),
     };
+}
+
+function getBundledThemeInfo(name: string | undefined) {
+    const info = name ? SHIKI_THEMES[name] : undefined;
+    return info ? { name, type: info.type } : undefined;
 }

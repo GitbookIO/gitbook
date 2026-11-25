@@ -1,6 +1,6 @@
 import { createSingletonShorthands, createdBundledHighlighter } from 'shiki/core';
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
-import { type BundledLanguage, bundledLanguages } from 'shiki/langs';
+import { bundledLanguages } from 'shiki/langs';
 import { bundledThemes } from 'shiki/themes';
 
 import type { CustomizationThemedCodeTheme, DocumentBlockCode } from '@gitbook/api';
@@ -18,6 +18,7 @@ import {
     truncateHighlightTokens,
 } from './highlight-tokens';
 import { plainHighlight } from './plain-highlight';
+import { SHIKI_LANGUAGES } from './shiki-catalog';
 
 export * from './highlight-tokens';
 
@@ -143,7 +144,8 @@ function getBlockLang(block: DocumentBlockCode): string | null {
     return block.data.syntax ? getLanguageForSyntax(block.data.syntax) : null;
 }
 
-const syntaxAliases: Record<string, BundledLanguage> = {
+// Syntaxes sent by GitBook that are not Shiki ids or aliases.
+const syntaxAliases: Record<string, string> = {
     // "Parser" language does not exist in Shiki, but it's used in GitBook
     // The closest language is "Blade"
     parser: 'blade',
@@ -152,27 +154,10 @@ const syntaxAliases: Record<string, BundledLanguage> = {
     objectivec: 'objective-c',
 };
 
-function checkIsBundledLanguage(lang: string): lang is BundledLanguage {
-    return lang in bundledLanguages;
-}
-
 /**
- * Validate a language name.
+ * Resolve a code block syntax to a canonical Shiki language id.
  */
-function getLanguageForSyntax(syntax: string): BundledLanguage | null {
-    // Normalize the syntax to lowercase.
-    syntax = syntax.toLowerCase();
-
-    // Check if the syntax is a bundled language.
-    if (checkIsBundledLanguage(syntax)) {
-        return syntax;
-    }
-
-    // Check if there is a valid alias for the syntax.
-    const alias = syntaxAliases[syntax];
-    if (alias && checkIsBundledLanguage(alias)) {
-        return alias;
-    }
-
-    return null;
+export function getLanguageForSyntax(syntax: string): string | null {
+    const normalized = syntax.toLowerCase();
+    return SHIKI_LANGUAGES[normalized] ?? SHIKI_LANGUAGES[syntaxAliases[normalized] ?? ''] ?? null;
 }
