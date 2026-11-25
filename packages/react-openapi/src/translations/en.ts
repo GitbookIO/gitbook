@@ -62,4 +62,11 @@ export const en = {
     tryit_truncated: 'Showing the first ${1} of the response.',
     tryit_download: 'Download',
     tryit_cookies_need_proxy: 'Cookies are only sent when requests go through the GitBook proxy.',
+    name: 'Name',
+    value: 'Value',
+    tryit_query: 'Query',
+    tryit_additional_parameters: 'Additional parameters',
+    tryit_add_header: 'Header',
+    tryit_add_query_parameter: 'Query parameter',
+    tryit_remove: 'Remove',
 };

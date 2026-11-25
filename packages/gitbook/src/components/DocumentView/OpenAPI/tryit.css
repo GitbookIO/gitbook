@@ -137,6 +137,31 @@
     @apply text-sm px-3 py-2 bg-danger text-danger border border-danger-subtle rounded-md straight-corners:rounded-none circular-corners:rounded-lg;
 }
 
+.openapi-tryit-extra {
+    @apply grid grid-cols-[1fr_1fr_auto] sm:grid-cols-[4.5rem_1fr_1fr_auto] gap-2 items-center;
+}
+
+.openapi-tryit-extra-location {
+    @apply col-span-3 sm:col-span-1 text-xs font-mono text-tint;
+}
+
+.openapi-tryit-extra-remove {
+    @apply cursor-pointer p-1.5 text-tint hover:text-tint-strong hover:bg-tint-hover rounded-md straight-corners:rounded-none circular-corners:rounded-full;
+}
+
+.openapi-tryit-extra-remove svg {
+    @apply size-3.5;
+}
+
+.openapi-tryit-extra-actions {
+    @apply flex flex-wrap gap-2;
+}
+
+.openapi-tryit-add {
+    @apply cursor-pointer px-2.5 py-1 text-xs text-tint-strong border border-dashed border-tint-subtle hover:bg-tint-hover;
+    @apply rounded-md straight-corners:rounded-none circular-corners:rounded-full;
+}
+
 /* Response */
 .openapi-tryit-response {
     @apply flex flex-col gap-3 p-4 min-h-48 md:overflow-y-auto bg-tint-subtle;

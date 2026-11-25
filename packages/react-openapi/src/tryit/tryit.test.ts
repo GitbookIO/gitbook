@@ -295,4 +295,25 @@ describe('buildTryItRequest', () => {
         );
         expect(request.headers['Content-Type']).toBeUndefined();
     });
+
+    it('adds reader-defined headers and query parameters, with auth taking precedence', () => {
+        const extra = operationData();
+        extra.operation.parameters = [];
+        extra.operation.requestBody = undefined;
+        const request = buildTryItRequest(
+            buildTryItOperation(extra),
+            values(extra, {
+                schemes: bearer ? [bearer] : [],
+                auth: { [authKey('bearer')]: 'secret' },
+                extraParameters: [
+                    { in: 'header', name: 'X-Api-Version', value: '2' },
+                    { in: 'header', name: 'authorization', value: 'manual' },
+                    { in: 'query', name: 'filter', value: 'a b' },
+                    { in: 'query', name: '', value: 'ignored' },
+                ],
+            })
+        );
+        expect(request.url).toBe('https://eu.example.com/v1/pets/{petId}?filter=a+b');
+        expect(request.headers).toEqual({ 'X-Api-Version': '2', Authorization: 'Bearer secret' });
+    });
 });

@@ -13,6 +13,7 @@ import { interpolateServerURL, isValidServerHost } from '../util/server';
 import { resolveTryItPrefillForOperation, resolveTryItServers } from '../util/tryit-prefill';
 import { getStatusCodeClassName } from '../utils';
 import {
+    type TryItExtraParameter,
     type TryItValues,
     authKey,
     buildTryItRequest,
@@ -22,6 +23,12 @@ import {
     toProxyRequest,
 } from './request';
 import { type TryItResponse, formatBytes, readTryItResponse } from './response';
+import {
+    getTryItApiScope,
+    getTryItApiSession,
+    getTryItOperationSession,
+    saveTryItOperationSession,
+} from './session';
 import type { TryItField, TryItOperation, TryItParameterLocation } from './types';
 
 export interface OpenAPITryItDialogProps {
@@ -70,25 +77,88 @@ export function OpenAPITryItDialog(props: OpenAPITryItDialogProps) {
         };
     });
 
-    const [serverIndex, setServerIndex] = useState(0);
+    const [saved] = useState(() => {
+        const scope = getTryItApiScope(servers);
+        const savedOperation = getTryItOperationSession(scope, operation);
+        const savedMediaTypeIndex =
+            operation.body?.mediaTypes.findIndex(
+                (item) => item.mediaType === savedOperation?.mediaType
+            ) ?? -1;
+        return {
+            scope,
+            api: getTryItApiSession(scope),
+            operation: savedOperation,
+            // Body values only apply to the media type they were typed for.
+            mediaTypeIndex: savedMediaTypeIndex >= 0 ? savedMediaTypeIndex : null,
+        };
+    });
+    const { api } = saved;
+
+    const [serverIndex, setServerIndex] = useState(() =>
+        Math.max(
+            0,
+            initial.servers.findIndex((item) => item.url === api.serverURL)
+        )
+    );
     const server = initial.servers[serverIndex];
-    const [serverVariables, setServerVariables] = useState<Record<string, string>>({});
+    const [serverVariables, setServerVariables] = useState<Record<string, string>>(
+        () => (server?.url ? api.serverVariables[server.url] : undefined) ?? {}
+    );
     const [securityIndex, setSecurityIndex] = useState(0);
-    const [auth, setAuth] = useState(initial.auth);
-    const [parameters, setParameters] = useState(() =>
-        Object.fromEntries(
+    // What the reader typed earlier wins over prefill.
+    const [auth, setAuth] = useState(() => ({ ...initial.auth, ...api.auth }));
+    const [parameters, setParameters] = useState(() => {
+        const defaults = Object.fromEntries(
             operation.parameters
                 .filter((parameter) => parameter.required && parameter.defaultValue !== undefined)
                 .map((parameter) => [fieldKey(parameter), parameter.defaultValue ?? ''])
-        )
-    );
-    const [mediaTypeIndex, setMediaTypeIndex] = useState(0);
+        );
+        return { ...defaults, ...saved.operation?.parameters };
+    });
+    const [mediaTypeIndex, setMediaTypeIndex] = useState(() => saved.mediaTypeIndex ?? 0);
     const mediaType = operation.body?.mediaTypes[mediaTypeIndex];
-    const [bodyText, setBodyText] = useState(mediaType?.examples[0]?.value ?? '');
+    const restoreBody = saved.mediaTypeIndex !== null;
+    const [bodyText, setBodyText] = useState(() =>
+        restoreBody && saved.operation
+            ? saved.operation.bodyText
+            : (mediaType?.examples[0]?.value ?? '')
+    );
     const [bodyFields, setBodyFields] = useState<Record<string, string>>(() =>
-        initialFieldValues(mediaType?.fields ?? [])
+        restoreBody && saved.operation
+            ? saved.operation.bodyFields
+            : initialFieldValues(mediaType?.fields ?? [])
     );
     const [bodyFiles, setBodyFiles] = useState<Record<string, File[]>>({});
+    const [extraParameters, setExtraParameters] = useState<TryItExtraParameter[]>(
+        () => saved.operation?.extraParameters ?? []
+    );
+
+    useEffect(() => {
+        saveTryItOperationSession(saved.scope, operation, {
+            parameters,
+            mediaType: mediaType?.mediaType ?? null,
+            bodyText,
+            bodyFields,
+            extraParameters,
+        });
+    }, [saved.scope, operation, parameters, mediaType, bodyText, bodyFields, extraParameters]);
+
+    // API-wide values are saved only when the reader changes them, so prefill and defaults
+    // never get frozen into the session.
+    const updateAuth = (key: string, value: string) => {
+        setAuth((current) => ({ ...current, [key]: value }));
+        if (value) {
+            api.auth[key] = value;
+        } else {
+            delete api.auth[key];
+        }
+    };
+    const updateServerVariables = (variables: Record<string, string>) => {
+        setServerVariables(variables);
+        if (server?.url) {
+            api.serverVariables[server.url] = variables;
+        }
+    };
     const [state, setState] = useState<ResponseState>({ type: 'idle' });
     const [showMissing, setShowMissing] = useState(false);
     const abortRef = useRef<AbortController | null>(null);
@@ -113,6 +183,7 @@ export function OpenAPITryItDialog(props: OpenAPITryItDialogProps) {
         bodyText,
         bodyFields,
         bodyFiles,
+        extraParameters,
     };
     const request = buildTryItRequest(operation, values);
 
@@ -264,8 +335,15 @@ export function OpenAPITryItDialog(props: OpenAPITryItDialogProps) {
                                         aria-label={String(t(translation, 'server'))}
                                         value={serverIndex}
                                         onChange={(event) => {
-                                            setServerIndex(Number(event.target.value));
-                                            setServerVariables({});
+                                            const index = Number(event.target.value);
+                                            const next = initial.servers[index];
+                                            setServerIndex(index);
+                                            api.serverURL = next?.url ?? null;
+                                            setServerVariables(
+                                                (next?.url
+                                                    ? api.serverVariables[next.url]
+                                                    : undefined) ?? {}
+                                            );
                                         }}
                                     >
                                         {initial.servers.map((item, index) => (
@@ -290,10 +368,10 @@ export function OpenAPITryItDialog(props: OpenAPITryItDialogProps) {
                                             serverVariables[name] ?? String(variable.default ?? '')
                                         }
                                         onChange={(value) =>
-                                            setServerVariables((current) => ({
-                                                ...current,
+                                            updateServerVariables({
+                                                ...serverVariables,
                                                 [name]: value,
-                                            }))
+                                            })
                                         }
                                     />
                                 ))}
@@ -325,9 +403,7 @@ export function OpenAPITryItDialog(props: OpenAPITryItDialogProps) {
                                         scheme={scheme}
                                         values={auth}
                                         translation={translation}
-                                        onChange={(key, value) =>
-                                            setAuth((current) => ({ ...current, [key]: value }))
-                                        }
+                                        onChange={updateAuth}
                                     />
                                 ))}
                             </Section>
@@ -361,6 +437,12 @@ export function OpenAPITryItDialog(props: OpenAPITryItDialogProps) {
                                 </Section>
                             );
                         })}
+
+                        <ExtraParameters
+                            items={extraParameters}
+                            translation={translation}
+                            onChange={setExtraParameters}
+                        />
 
                         {operation.body && mediaType ? (
                             <Section
@@ -505,6 +587,71 @@ function Section(props: {
             </div>
             {props.children}
         </section>
+    );
+}
+
+function ExtraParameters(props: {
+    items: TryItExtraParameter[];
+    translation: OpenAPIClientContext['translation'];
+    onChange: (items: TryItExtraParameter[]) => void;
+}) {
+    const { items, translation, onChange } = props;
+    const update = (index: number, patch: Partial<TryItExtraParameter>) =>
+        onChange(items.map((item, i) => (i === index ? { ...item, ...patch } : item)));
+    const add = (location: TryItExtraParameter['in']) =>
+        onChange([...items, { in: location, name: '', value: '' }]);
+
+    return (
+        <Section title={t(translation, 'tryit_additional_parameters')}>
+            {items.map((item, index) => (
+                <div key={index} className="openapi-tryit-extra">
+                    <span className="openapi-tryit-extra-location">
+                        {t(translation, item.in === 'header' ? 'header' : 'tryit_query')}
+                    </span>
+                    <input
+                        className="openapi-tryit-input"
+                        aria-label={String(t(translation, 'name'))}
+                        placeholder={String(t(translation, 'name'))}
+                        spellCheck={false}
+                        autoComplete="off"
+                        value={item.name}
+                        onChange={(event) => update(index, { name: event.target.value })}
+                    />
+                    <input
+                        className="openapi-tryit-input"
+                        aria-label={String(t(translation, 'value'))}
+                        placeholder={String(t(translation, 'value'))}
+                        spellCheck={false}
+                        autoComplete="off"
+                        value={item.value}
+                        onChange={(event) => update(index, { value: event.target.value })}
+                    />
+                    <button
+                        type="button"
+                        className="openapi-tryit-extra-remove"
+                        aria-label={String(t(translation, 'tryit_remove'))}
+                        onClick={() => onChange(items.filter((_, i) => i !== index))}
+                    >
+                        <svg aria-hidden="true" viewBox="0 0 16 16" fill="none">
+                            <path
+                                d="M4 4l8 8M12 4l-8 8"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                            />
+                        </svg>
+                    </button>
+                </div>
+            ))}
+            <div className="openapi-tryit-extra-actions">
+                <button type="button" className="openapi-tryit-add" onClick={() => add('header')}>
+                    + {t(translation, 'tryit_add_header')}
+                </button>
+                <button type="button" className="openapi-tryit-add" onClick={() => add('query')}>
+                    + {t(translation, 'tryit_add_query_parameter')}
+                </button>
+            </div>
+        </Section>
     );
 }
 

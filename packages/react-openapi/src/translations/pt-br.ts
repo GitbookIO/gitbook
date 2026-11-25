@@ -63,4 +63,11 @@ export const pt_br = {
     tryit_download: 'Baixar',
     tryit_cookies_need_proxy:
         'Os cookies só são enviados quando as requisições passam pelo proxy do GitBook.',
+    name: 'Nome',
+    value: 'Valor',
+    tryit_query: 'Consulta',
+    tryit_additional_parameters: 'Parâmetros adicionais',
+    tryit_add_header: 'Cabeçalho',
+    tryit_add_query_parameter: 'Parâmetro de consulta',
+    tryit_remove: 'Remover',
 };

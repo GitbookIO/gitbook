@@ -17,6 +17,14 @@ export interface TryItValues {
     bodyText: string;
     bodyFields: Record<string, string>;
     bodyFiles: Record<string, File[]>;
+    /** Headers and query parameters the spec doesn't declare, added by the reader. */
+    extraParameters?: TryItExtraParameter[];
+}
+
+export interface TryItExtraParameter {
+    in: 'header' | 'query';
+    name: string;
+    value: string;
 }
 
 export interface TryItRequest {
@@ -108,6 +116,18 @@ export function buildTryItRequest(operation: TryItOperation, values: TryItValues
             case 'cookie':
                 cookies.push(`${parameter.name}=${encodeURIComponent(value)}`);
                 break;
+        }
+    }
+
+    for (const extra of values.extraParameters ?? []) {
+        const name = extra.name.trim();
+        if (!name) {
+            continue;
+        }
+        if (extra.in === 'header') {
+            setHeader(headers, name, extra.value);
+        } else {
+            query.append(name, extra.value);
         }
     }
 

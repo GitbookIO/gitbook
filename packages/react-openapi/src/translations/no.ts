@@ -63,4 +63,11 @@ export const no = {
     tryit_download: 'Last ned',
     tryit_cookies_need_proxy:
         'Informasjonskapsler sendes bare når forespørsler går gjennom GitBook-proxyen.',
+    name: 'Navn',
+    value: 'Verdi',
+    tryit_query: 'Spørring',
+    tryit_additional_parameters: 'Flere parametere',
+    tryit_add_header: 'Header',
+    tryit_add_query_parameter: 'Spørringsparameter',
+    tryit_remove: 'Fjern',
 };

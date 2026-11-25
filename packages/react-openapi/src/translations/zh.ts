@@ -61,4 +61,11 @@ export const zh = {
     tryit_truncated: '显示响应的前 ${1}。',
     tryit_download: '下载',
     tryit_cookies_need_proxy: '仅当请求通过 GitBook 代理时才会发送 Cookie。',
+    name: '名称',
+    value: '值',
+    tryit_query: '查询',
+    tryit_additional_parameters: '附加参数',
+    tryit_add_header: '请求头',
+    tryit_add_query_parameter: '查询参数',
+    tryit_remove: '删除',
 };
