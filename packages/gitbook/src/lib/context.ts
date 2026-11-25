@@ -19,7 +19,7 @@ import type {
     TranslationLanguage,
 } from '@gitbook/api';
 
-import { GITBOOK_URL } from './env';
+import { GITBOOK_API_PUBLIC_URL, GITBOOK_URL } from './env';
 import { type ImageResizer, createImageResizer } from './images';
 import {
     type GitBookLinker,
@@ -288,10 +288,16 @@ export function getBaseContext(input: {
     let directSearch: GitBookBaseContext['directSearch'];
     if (!siteURLData.revision && !siteURLData.changeRequest && !siteURLData.preview) {
         const { organization, site } = siteURLData;
-        const searchURL = linker.toPathInSite(
+        const proxyURL = linker.toPathInSite(
             `~gitbook/search-direct/orgs/${organization}/sites/${site}`
         );
-        directSearch = { searchURL, linker: linkerInput };
+        directSearch = {
+            apiURL: GITBOOK_API_PUBLIC_URL,
+            organizationId: organization,
+            siteId: site,
+            proxyURL,
+            linker: linkerInput,
+        };
     }
 
     return {

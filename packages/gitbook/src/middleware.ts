@@ -1,5 +1,4 @@
 import { isAIAgent } from '@vercel/agent-readability';
-import { jwtDecode } from 'jwt-decode';
 import Negotiator from 'negotiator';
 import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
@@ -97,7 +96,6 @@ const DIRECT_SEARCH_PATH = /\/~gitbook\/search-direct\/orgs\/([^/]*)\/sites\/([^
 const DIRECT_SEARCH_ID = /^[a-zA-Z0-9_-]+$/;
 const DIRECT_SEARCH_PASS =
     /^[a-zA-Z0-9_-]+\.\.[a-zA-Z0-9_-]{16}\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]{22}$/;
-const DIRECT_SEARCH_BODY_LIMIT = 64 * 1024;
 
 export async function middleware(request: NextRequest) {
     try {
@@ -195,44 +193,18 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest, match: URL
     return response;
 }
 
-async function serveDirectSearch(
-    request: NextRequest,
-    organizationId: string | undefined,
-    siteId: string | undefined
-) {
+async function serveDirectSearch(request: NextRequest, organizationId = '', siteId = '') {
     const responseHeaders = new Headers({ 'Cache-Control': 'no-store' });
-    const log = getLogger().subLogger('directSiteSearch');
     if (request.method !== 'POST') {
         responseHeaders.set('Allow', 'POST');
-        log.info('Direct search rejected', { status: 405, reason: 'method' });
         return new Response(null, { status: 405, headers: responseHeaders });
     }
-    if (
-        !organizationId ||
-        !siteId ||
-        !DIRECT_SEARCH_ID.test(organizationId) ||
-        !DIRECT_SEARCH_ID.test(siteId)
-    ) {
-        log.info('Direct search rejected', { status: 400, reason: 'invalid_ids' });
+    if (!DIRECT_SEARCH_ID.test(organizationId) || !DIRECT_SEARCH_ID.test(siteId)) {
         return new Response(null, { status: 400, headers: responseHeaders });
     }
-
     const pass = request.headers.get('x-gitbook-search-pass');
-    if (!pass || !isDirectSearchPass(pass)) {
-        log.info('Direct search rejected', { status: 401, reason: 'invalid_pass' });
+    if (!pass || !DIRECT_SEARCH_PASS.test(pass)) {
         return new Response(null, { status: 401, headers: responseHeaders });
-    }
-
-    let body: Uint8Array<ArrayBuffer> | undefined | null;
-    try {
-        body = await readDirectSearchBody(request);
-    } catch {
-        log.info('Direct search rejected', { status: 400, reason: 'invalid_body' });
-        return new Response(null, { status: 400, headers: responseHeaders });
-    }
-    if (body === null) {
-        log.info('Direct search rejected', { status: 413, reason: 'body_limit' });
-        return new Response(null, { status: 413, headers: responseHeaders });
     }
 
     const headers = new Headers({
@@ -240,83 +212,34 @@ async function serveDirectSearch(
         'Content-Type': request.headers.get('Content-Type') ?? 'application/json',
     });
     const accept = request.headers.get('Accept');
-    if (accept) {
-        headers.set('Accept', accept);
-    }
-    const clientIp = request.headers.get('x-gitbook-ip') ?? getXForwardedFor(request.headers);
-    if (clientIp) {
-        headers.set('X-Forwarded-For', clientIp);
-    }
+    if (accept) headers.set('Accept', accept);
+    const ip = request.headers.get('x-gitbook-ip') ?? getXForwardedFor(request.headers);
+    if (ip) headers.set('X-Forwarded-For', ip);
 
-    const startedAt = Date.now();
-    let upstream: Response;
-    try {
-        upstream = await fetch(
-            new URL(`/v1/orgs/${organizationId}/sites/${siteId}/search`, GITBOOK_API_URL),
-            { method: 'POST', headers, body, redirect: 'manual', signal: request.signal }
-        );
-    } catch {
-        log.warn('Direct search upstream failed', {
+    const url = new URL(
+        `${removeTrailingSlash(GITBOOK_API_URL)}/v1/orgs/${organizationId}/sites/${siteId}/search`
+    );
+    const init = {
+        method: 'POST',
+        headers,
+        body: request.body,
+        redirect: 'manual',
+        signal: request.signal,
+        duplex: 'half',
+    } as const;
+    const upstream = await fetch(url, init).catch(() => {
+        getLogger().subLogger('directSiteSearch').warn('Direct search upstream failed', {
             status: 502,
-            durationMs: Date.now() - startedAt,
+            organizationId,
+            siteId,
         });
-        return new Response(null, { status: 502, headers: responseHeaders });
-    }
-
+        return new Response(null, { status: 502 });
+    });
     for (const name of ['Content-Type', 'Retry-After', 'X-RateLimit-Scope', 'X-RateLimit-Reset']) {
         const value = upstream.headers.get(name);
-        if (value !== null) {
-            responseHeaders.set(name, value);
-        }
+        if (value !== null) responseHeaders.set(name, value);
     }
-    log.info('Direct search upstream responded', {
-        status: upstream.status,
-        durationMs: Date.now() - startedAt,
-    });
     return new Response(upstream.body, { status: upstream.status, headers: responseHeaders });
-}
-
-function isDirectSearchPass(pass: string): boolean {
-    if (!DIRECT_SEARCH_PASS.test(pass)) {
-        return false;
-    }
-    try {
-        const { alg, enc, typ } = jwtDecode<{ alg?: unknown; enc?: unknown; typ?: unknown }>(pass, {
-            header: true,
-        });
-        return alg === 'dir' && enc === 'A256GCM' && typ === 'site-search-pass+jwt';
-    } catch {
-        return false;
-    }
-}
-
-async function readDirectSearchBody(request: NextRequest) {
-    if (Number(request.headers.get('Content-Length')) > DIRECT_SEARCH_BODY_LIMIT) {
-        return null;
-    }
-    const reader = request.body?.getReader();
-    if (!reader) {
-        return undefined;
-    }
-
-    const body = new Uint8Array(DIRECT_SEARCH_BODY_LIMIT);
-    let size = 0;
-    try {
-        for (;;) {
-            const chunk = await reader.read();
-            if (chunk.done) {
-                return body.subarray(0, size);
-            }
-            if (size + chunk.value.byteLength > body.byteLength) {
-                void reader.cancel().catch(() => undefined);
-                return null;
-            }
-            body.set(chunk.value, size);
-            size += chunk.value.byteLength;
-        }
-    } finally {
-        reader.releaseLock();
-    }
 }
 
 async function serveSiteRequest(requestURL: URL, request: NextRequest, match: URLWithMode) {

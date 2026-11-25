@@ -244,6 +244,6 @@ describe('direct search URL', () => {
             urlMode,
         });
 
-        expect(context.directSearch?.searchURL).toBe(searchURL);
+        expect(context.directSearch?.proxyURL).toBe(searchURL);
     });
 });

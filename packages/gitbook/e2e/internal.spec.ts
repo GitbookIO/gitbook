@@ -781,7 +781,7 @@ const searchPassTestCases: Test[] = [
         },
     },
     {
-        name: 'Dropped API request: the search falls back to the route after its time limit',
+        name: 'Dropped API request: search uses the site proxy before falling back to the route',
         url: '',
         screenshot: false,
         run: async (page) => {
@@ -791,6 +791,18 @@ const searchPassTestCases: Test[] = [
             await page.route(SEARCH_API_URL, (route) => {
                 apiCalls.push(route.request());
             });
+            const proxyCalls: Request[] = [];
+            await page.route(
+                /\/~gitbook\/search-direct\/orgs\/[^/]+\/sites\/[^/]+$/,
+                async (route) => {
+                    proxyCalls.push(route.request());
+                    if (proxyCalls.length === 1) {
+                        await route.fulfill({ json: { items: [SEARCH_PASS_RECORD] } });
+                        return;
+                    }
+                    await route.fulfill({ status: 502 });
+                }
+            );
             const routeSearches = trackRouteSearches(page);
             await waitForCookiesDialog(page);
 
@@ -798,12 +810,24 @@ const searchPassTestCases: Test[] = [
             await typeSearch(page, 'gitbook');
             await expect.poll(() => apiCalls.length, { timeout: 30_000 }).toBe(1);
             await page.clock.fastForward(5_000);
-            await expect.poll(() => routeSearches.length, { timeout: 30_000 }).toBe(1);
-            expect(routeSearches[0]?.headers()['x-gitbook-search-fallback']).toBe('timeout');
-            expect((await routeSearches[0]?.response())?.status()).toBe(200);
+            await expect(
+                page
+                    .getByTestId('search-record-result')
+                    .filter({ hasText: SEARCH_PASS_RECORD.title })
+            ).toBeVisible({ timeout: 30_000 });
+            expect(routeSearches).toHaveLength(0);
+            expect((await proxyCalls[0]?.allHeaders())?.['x-gitbook-search-pass']).toBe(
+                'test-search-pass-1'
+            );
 
             await typeSearch(page, ' editor');
+            await expect.poll(() => routeSearches.length, { timeout: 30_000 }).toBe(1);
+            expect(routeSearches[0]?.headers()['x-gitbook-search-fallback']).toBe('502');
+            expect((await routeSearches[0]?.response())?.status()).toBe(200);
+
+            await typeSearch(page, ' blocks');
             await expect.poll(() => routeSearches.length, { timeout: 30_000 }).toBe(2);
+            expect(proxyCalls).toHaveLength(2);
             expect(apiCalls).toHaveLength(1);
         },
     },

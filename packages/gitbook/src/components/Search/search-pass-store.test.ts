@@ -3,9 +3,14 @@ import { afterEach, describe, expect, it, spyOn } from 'bun:test';
 import { createSearchPassStore } from './search-pass-store';
 import type { DirectSearchProps } from '@/lib/search-results';
 
-const endpoint = '/docs/~gitbook/search-direct/orgs/org_1/sites/site_1';
+const apiURL = 'https://api.gitbook.com';
+const endpoint = apiURL + '/v1/orgs/org_1/sites/site_1/search';
+const proxyURL = '/docs/~gitbook/search-direct/orgs/org_1/sites/site_1';
 const directSearch: DirectSearchProps = {
-    searchURL: endpoint,
+    apiURL,
+    organizationId: 'org_1',
+    siteId: 'site_1',
+    proxyURL,
     linker: {
         urlMode: 'url-host',
         siteHost: 'docs.example.com',
@@ -37,7 +42,7 @@ function mockFetch(apiStatuses: number[], passLifetimesMs: number[] = []) {
         }
 
         expect(String(input)).toBe(endpoint);
-        searchPasses.push(new Headers(init?.headers).get('x-gitbook-search-pass'));
+        searchPasses.push(new Headers(init?.headers).get('authorization'));
         const status = apiStatuses.shift() ?? 200;
         return status === 200 ? Response.json({ items: [] }) : new Response(null, { status });
     }) as typeof fetch);
@@ -58,7 +63,7 @@ describe('createSearchPassStore', () => {
     let restore: (() => void) | undefined;
     afterEach(() => restore?.());
 
-    it('posts the search pass and query to the same-origin site endpoint', async () => {
+    it('posts the query to the public API with bearer auth', async () => {
         const fetchSpy = spyOn(globalThis, 'fetch')
             .mockResolvedValueOnce(Response.json({ token: 'pass-1', expiresIn: 300_000 }))
             .mockResolvedValueOnce(Response.json({ items: [] }));
@@ -81,13 +86,138 @@ describe('createSearchPassStore', () => {
         expect(init).toMatchObject({
             method: 'POST',
             credentials: 'omit',
-            mode: 'same-origin',
             body: JSON.stringify({ query: 'tokens', searchId: 'search-1', ...scope }),
         });
         const headers = new Headers(init?.headers);
         expect(headers.get('content-type')).toBe('application/json');
-        expect(headers.get('x-gitbook-search-pass')).toBe('pass-1');
-        expect(headers.has('authorization')).toBe(false);
+        expect(headers.get('authorization')).toBe('Bearer pass-1');
+        expect(headers.has('x-gitbook-search-pass')).toBe(false);
+        expect(init?.mode).toBeUndefined();
+    });
+
+    it.each(['network', 'timeout'] as const)(
+        'switches to the site proxy after an API %s failure',
+        async (failure) => {
+            const fetchSpy = spyOn(globalThis, 'fetch')
+                .mockResolvedValueOnce(Response.json({ token: 'pass-1', expiresIn: 300_000 }))
+                .mockImplementationOnce(async (_url, init) => {
+                    if (failure === 'network') {
+                        throw new TypeError('Failed to fetch');
+                    }
+                    return new Promise((_, reject) => {
+                        init?.signal?.addEventListener(
+                            'abort',
+                            () => reject(new DOMException('Aborted', 'AbortError')),
+                            { once: true }
+                        );
+                    });
+                })
+                .mockImplementation(async () => Response.json({ items: [] }));
+            restore = () => fetchSpy.mockRestore();
+            const store = createSearchPassStore(directSearch);
+            await store.requestPass();
+
+            expect(await search(store)).toEqual({ type: 'results', results: [] });
+            expect(await search(store)).toEqual({ type: 'results', results: [] });
+            expect(fetchSpy.mock.calls.map(([url]) => url)).toEqual([
+                directSearch.passURL,
+                endpoint,
+                proxyURL,
+                proxyURL,
+            ]);
+            const init = fetchSpy.mock.calls[2]?.[1];
+            expect(init).toMatchObject({ mode: 'same-origin', credentials: 'omit' });
+            expect(init?.body).toBe(JSON.stringify({ query: 'tokens', mode: 'all' }));
+            const headers = new Headers(init?.headers);
+            expect(headers.get('x-gitbook-search-pass')).toBe('pass-1');
+            expect(headers.has('authorization')).toBe(false);
+        },
+        8_000
+    );
+
+    it('uses the server route after the site proxy also fails', async () => {
+        const fetchSpy = spyOn(globalThis, 'fetch')
+            .mockResolvedValueOnce(Response.json({ token: 'pass-1', expiresIn: 300_000 }))
+            .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+            .mockResolvedValueOnce(new Response(null, { status: 502 }));
+        restore = () => fetchSpy.mockRestore();
+        const store = createSearchPassStore(directSearch);
+        await store.requestPass();
+
+        expect(await search(store)).toEqual({ type: 'route', reason: '502' });
+        expect(await search(store)).toEqual({ type: 'route', reason: '502' });
+        expect(fetchSpy.mock.calls.map(([url]) => url)).toEqual([
+            directSearch.passURL,
+            endpoint,
+            proxyURL,
+        ]);
+    });
+
+    it('does not send a withdrawn pass to the proxy', async () => {
+        const pending = Promise.withResolvers<Response>();
+        const fetchSpy = spyOn(globalThis, 'fetch')
+            .mockResolvedValueOnce(Response.json({ token: 'pass-1', expiresIn: 300_000 }))
+            .mockImplementationOnce(() => pending.promise)
+            .mockResolvedValueOnce(new Response(null, { status: 204 }));
+        restore = () => fetchSpy.mockRestore();
+        const store = createSearchPassStore(directSearch);
+        await store.requestPass();
+
+        const inFlight = search(store);
+        await store.requestPass();
+        pending.reject(new TypeError('Failed to fetch'));
+
+        expect(await inFlight).toEqual({ type: 'route', reason: 'network' });
+        expect(fetchSpy.mock.calls.map(([url]) => url)).toEqual([
+            directSearch.passURL,
+            endpoint,
+            directSearch.passURL,
+        ]);
+    });
+
+    it('retries a broken response stream through the proxy', async () => {
+        const body = new ReadableStream({
+            start(controller) {
+                controller.error(new TypeError('Connection reset'));
+            },
+        });
+        const fetchSpy = spyOn(globalThis, 'fetch')
+            .mockResolvedValueOnce(Response.json({ token: 'pass-1', expiresIn: 300_000 }))
+            .mockResolvedValueOnce(new Response(body))
+            .mockResolvedValueOnce(Response.json({ items: [] }));
+        restore = () => fetchSpy.mockRestore();
+        const store = createSearchPassStore(directSearch);
+        await store.requestPass();
+
+        expect(await search(store)).toEqual({ type: 'results', results: [] });
+        expect(fetchSpy.mock.calls.map(([url]) => url)).toEqual([
+            directSearch.passURL,
+            endpoint,
+            proxyURL,
+        ]);
+    });
+
+    it('keeps the server route when an older API request fails after the proxy', async () => {
+        const pending = Promise.withResolvers<Response>();
+        const fetchSpy = spyOn(globalThis, 'fetch')
+            .mockResolvedValueOnce(Response.json({ token: 'pass-1', expiresIn: 300_000 }))
+            .mockImplementationOnce(() => pending.promise)
+            .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+            .mockResolvedValueOnce(new Response(null, { status: 403 }));
+        restore = () => fetchSpy.mockRestore();
+        const store = createSearchPassStore(directSearch);
+        await store.requestPass();
+
+        const olderSearch = search(store);
+        expect(await search(store)).toEqual({ type: 'route', reason: '403' });
+        pending.reject(new TypeError('Failed to fetch'));
+        expect(await olderSearch).toEqual({ type: 'route', reason: '403' });
+        expect(fetchSpy.mock.calls.map(([url]) => url)).toEqual([
+            directSearch.passURL,
+            endpoint,
+            endpoint,
+            proxyURL,
+        ]);
     });
 
     it('stays on the route for the rest of the page after a 403', async () => {
@@ -103,8 +233,8 @@ describe('createSearchPassStore', () => {
     });
 
     it.each([
-        ['an expired pass', [], [1_000], 'expired', ['pass-2']],
-        ['a 401', [401], [], '401', ['pass-1', 'pass-2']],
+        ['an expired pass', [], [1_000], 'expired', ['Bearer pass-2']],
+        ['a 401', [401], [], '401', ['Bearer pass-1', 'Bearer pass-2']],
     ])(
         'sends the search to the route on %s and searches directly again with a new pass',
         async (_name, apiStatuses, passLifetimesMs, reason, sent) => {

@@ -38,7 +38,10 @@ export type SearchSpaceLookup = Record<string, SearchSpaceEntry>;
  * Everything the browser needs, besides a search pass, to query the search API of a site directly.
  */
 export type DirectSearchProps = {
-    searchURL: string;
+    apiURL: string;
+    organizationId: string;
+    siteId: string;
+    proxyURL?: string;
     linker: SiteLinkerInput;
     spaces: SearchSpaceLookup;
     /** Site route that hands out a search pass. */
