@@ -342,7 +342,6 @@
   },
   "patchedDependencies": {
     "decode-named-character-reference@1.0.2": "patches/decode-named-character-reference@1.0.2.patch",
-    "@gitbook/api@0.214.0": "patches/@gitbook%2Fapi@0.214.0.patch",
     "@shikijs/langs@3.21.0": "patches/@shikijs%2Flangs@3.21.0.patch",
     "mermaid@11.16.1": "patches/mermaid@11.16.1.patch",
     "next@16.4.6": "patches/next@16.4.6.patch",
@@ -358,7 +357,7 @@
   },
   "catalog": {
     "@base-ui/react": "^1.7.0",
-    "@gitbook/api": "0.214.0",
+    "@gitbook/api": "0.215.0",
     "@scalar/api-client-react": "^1.3.46",
     "@tsconfig/node20": "^20.1.6",
     "@tsconfig/strictest": "^2.0.6",
@@ -726,7 +725,7 @@
 
     "@fortawesome/fontawesome-svg-core": ["@fortawesome/fontawesome-svg-core@7.2.0", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "7.2.0" } }, "sha512-6639htZMjEkwskf3J+e6/iar+4cTNM9qhoWuRfj9F3eJD6r7iCzV1SWnQr2Mdv0QT0suuqU8BoJCZUyCtP9R4Q=="],
 
-    "@gitbook/api": ["@gitbook/api@0.214.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-rNmnQIgg0mhdknDMc2/3dhoKk+XmCP1P5qTrhazI458WsqkPCSMV2o7B6cJADUzs9svH78y5z7bSRzrrOMmV4g=="],
+    "@gitbook/api": ["@gitbook/api@0.215.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-y9Xx3Xmls5A6C0PX24VYUdcb1CSFgjwlrnkPagq5ZpAYsDAx4xMu0SNiF/aoaqgJdeHlR+jtQkUx/5y0osAvGA=="],
 
     "@gitbook/browser-types": ["@gitbook/browser-types@workspace:packages/browser-types"],
 

@@ -48,7 +48,7 @@
             "@tsconfig/strictest": "^2.0.6",
             "@tsconfig/node20": "^20.1.6",
             "@base-ui/react": "^1.7.0",
-            "@gitbook/api": "0.214.0",
+            "@gitbook/api": "0.215.0",
             "@scalar/api-client-react": "^1.3.46",
             "@types/react": "^19.0.0",
             "@types/react-dom": "^19.0.0",
@@ -69,7 +69,6 @@
         "@vercel/next@4.4.2": "patches/@vercel%2Fnext@4.4.2.patch",
         "mermaid@11.16.1": "patches/mermaid@11.16.1.patch",
         "next@16.4.6": "patches/next@16.4.6.patch",
-        "@shikijs/langs@3.21.0": "patches/@shikijs%2Flangs@3.21.0.patch",
-        "@gitbook/api@0.214.0": "patches/@gitbook%2Fapi@0.214.0.patch"
+        "@shikijs/langs@3.21.0": "patches/@shikijs%2Flangs@3.21.0.patch"
     }
 }
