@@ -1,4 +1,5 @@
 import { isAIAgent } from '@vercel/agent-readability';
+import { jwtDecode } from 'jwt-decode';
 import Negotiator from 'negotiator';
 import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
@@ -18,6 +19,7 @@ import {
 
 import {
     type ServerInsightsEventInput,
+    getXForwardedFor,
     serveProxyAnalyticsEvent,
     trackServerInsightsEvents,
 } from './lib/tracking';
@@ -37,7 +39,12 @@ import {
     normalizeRequestURL,
     throwIfDataError,
 } from '@/lib/data';
-import { GITBOOK_DISABLE_INSIGHTS, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import {
+    GITBOOK_API_URL,
+    GITBOOK_DISABLE_INSIGHTS,
+    isGitBookAssetsHostURL,
+    isGitBookHostURL,
+} from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { isAITrainingOrIndexingRequest } from '@/lib/indexing-crawlers';
 import { getLogger } from '@/lib/logger';
@@ -86,10 +93,20 @@ export const config = {
 type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 
 const REVISION_ROBOTS_TAG = 'noindex, nofollow';
+const DIRECT_SEARCH_PATH = /\/~gitbook\/search-direct\/orgs\/([^/]*)\/sites\/([^/]*)\/?$/;
+const DIRECT_SEARCH_ID = /^[a-zA-Z0-9_-]+$/;
+const DIRECT_SEARCH_PASS =
+    /^[a-zA-Z0-9_-]+\.\.[a-zA-Z0-9_-]{16}\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]{22}$/;
+const DIRECT_SEARCH_BODY_LIMIT = 64 * 1024;
 
 export async function middleware(request: NextRequest) {
     try {
         const requestURL = new URL(request.url);
+        const siteURL = getSiteURLFromRequest(request);
+        const directSearch = siteURL?.url.pathname.match(DIRECT_SEARCH_PATH);
+        if (directSearch) {
+            return await serveDirectSearch(request, directSearch[1], directSearch[2]);
+        }
 
         // Reject malicious requests
         const rejectResponse = await validateServerActionRequest(request);
@@ -97,14 +114,10 @@ export async function middleware(request: NextRequest) {
             return rejectResponse;
         }
 
-        for (const handler of [serveSiteRoutes, serveSpacePDFRoutes]) {
-            const result = await handler(requestURL, request);
-            if (result) {
-                return result;
-            }
-        }
-
-        return NextResponse.next();
+        const siteResponse = await serveSiteRoutes(requestURL, request, siteURL);
+        return (
+            siteResponse ?? (await serveSpacePDFRoutes(requestURL, request)) ?? NextResponse.next()
+        );
     } catch (error) {
         return serveErrorResponse(error as Error);
     }
@@ -164,8 +177,7 @@ function shouldFilterMaliciousRequests(requestURL: URL): boolean {
 /**
  * Handle request that are targetting the site routes group.
  */
-async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
-    const match = getSiteURLFromRequest(request);
+async function serveSiteRoutes(requestURL: URL, request: NextRequest, match: URLWithMode | null) {
     if (!match) {
         return null;
     }
@@ -181,6 +193,130 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         return revisionResponse;
     }
     return response;
+}
+
+async function serveDirectSearch(
+    request: NextRequest,
+    organizationId: string | undefined,
+    siteId: string | undefined
+) {
+    const responseHeaders = new Headers({ 'Cache-Control': 'no-store' });
+    const log = getLogger().subLogger('directSiteSearch');
+    if (request.method !== 'POST') {
+        responseHeaders.set('Allow', 'POST');
+        log.info('Direct search rejected', { status: 405, reason: 'method' });
+        return new Response(null, { status: 405, headers: responseHeaders });
+    }
+    if (
+        !organizationId ||
+        !siteId ||
+        !DIRECT_SEARCH_ID.test(organizationId) ||
+        !DIRECT_SEARCH_ID.test(siteId)
+    ) {
+        log.info('Direct search rejected', { status: 400, reason: 'invalid_ids' });
+        return new Response(null, { status: 400, headers: responseHeaders });
+    }
+
+    const pass = request.headers.get('x-gitbook-search-pass');
+    if (!pass || !isDirectSearchPass(pass)) {
+        log.info('Direct search rejected', { status: 401, reason: 'invalid_pass' });
+        return new Response(null, { status: 401, headers: responseHeaders });
+    }
+
+    let body: Uint8Array<ArrayBuffer> | undefined | null;
+    try {
+        body = await readDirectSearchBody(request);
+    } catch {
+        log.info('Direct search rejected', { status: 400, reason: 'invalid_body' });
+        return new Response(null, { status: 400, headers: responseHeaders });
+    }
+    if (body === null) {
+        log.info('Direct search rejected', { status: 413, reason: 'body_limit' });
+        return new Response(null, { status: 413, headers: responseHeaders });
+    }
+
+    const headers = new Headers({
+        Authorization: `Bearer ${pass}`,
+        'Content-Type': request.headers.get('Content-Type') ?? 'application/json',
+    });
+    const accept = request.headers.get('Accept');
+    if (accept) {
+        headers.set('Accept', accept);
+    }
+    const clientIp = request.headers.get('x-gitbook-ip') ?? getXForwardedFor(request.headers);
+    if (clientIp) {
+        headers.set('X-Forwarded-For', clientIp);
+    }
+
+    const startedAt = Date.now();
+    let upstream: Response;
+    try {
+        upstream = await fetch(
+            new URL(`/v1/orgs/${organizationId}/sites/${siteId}/search`, GITBOOK_API_URL),
+            { method: 'POST', headers, body, redirect: 'manual', signal: request.signal }
+        );
+    } catch {
+        log.warn('Direct search upstream failed', {
+            status: 502,
+            durationMs: Date.now() - startedAt,
+        });
+        return new Response(null, { status: 502, headers: responseHeaders });
+    }
+
+    for (const name of ['Content-Type', 'Retry-After', 'X-RateLimit-Scope', 'X-RateLimit-Reset']) {
+        const value = upstream.headers.get(name);
+        if (value !== null) {
+            responseHeaders.set(name, value);
+        }
+    }
+    log.info('Direct search upstream responded', {
+        status: upstream.status,
+        durationMs: Date.now() - startedAt,
+    });
+    return new Response(upstream.body, { status: upstream.status, headers: responseHeaders });
+}
+
+function isDirectSearchPass(pass: string): boolean {
+    if (!DIRECT_SEARCH_PASS.test(pass)) {
+        return false;
+    }
+    try {
+        const { alg, enc, typ } = jwtDecode<{ alg?: unknown; enc?: unknown; typ?: unknown }>(pass, {
+            header: true,
+        });
+        return alg === 'dir' && enc === 'A256GCM' && typ === 'site-search-pass+jwt';
+    } catch {
+        return false;
+    }
+}
+
+async function readDirectSearchBody(request: NextRequest) {
+    if (Number(request.headers.get('Content-Length')) > DIRECT_SEARCH_BODY_LIMIT) {
+        return null;
+    }
+    const reader = request.body?.getReader();
+    if (!reader) {
+        return undefined;
+    }
+
+    const body = new Uint8Array(DIRECT_SEARCH_BODY_LIMIT);
+    let size = 0;
+    try {
+        for (;;) {
+            const chunk = await reader.read();
+            if (chunk.done) {
+                return body.subarray(0, size);
+            }
+            if (size + chunk.value.byteLength > body.byteLength) {
+                void reader.cancel().catch(() => undefined);
+                return null;
+            }
+            body.set(chunk.value, size);
+            size += chunk.value.byteLength;
+        }
+    } finally {
+        reader.releaseLock();
+    }
 }
 
 async function serveSiteRequest(requestURL: URL, request: NextRequest, match: URLWithMode) {

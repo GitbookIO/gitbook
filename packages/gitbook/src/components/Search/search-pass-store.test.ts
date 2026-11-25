@@ -90,32 +90,6 @@ describe('createSearchPassStore', () => {
         expect(headers.has('authorization')).toBe(false);
     });
 
-    it('uses bearer authentication for the renderer URL mode', async () => {
-        const fetchSpy = spyOn(globalThis, 'fetch')
-            .mockResolvedValueOnce(Response.json({ token: 'pass-1', expiresIn: 300_000 }))
-            .mockResolvedValueOnce(Response.json({ items: [] }));
-        restore = () => fetchSpy.mockRestore();
-        const searchURL = 'https://api.gitbook.com/v1/orgs/org_1/sites/site_1/search';
-        const store = createSearchPassStore({
-            ...directSearch,
-            searchURL,
-            linker: {
-                ...directSearch.linker,
-                urlMode: 'url',
-                gitbookURL: 'http://localhost:3000',
-            },
-        });
-        await store.requestPass();
-
-        expect(await search(store)).toEqual({ type: 'results', results: [] });
-        const [url, init] = fetchSpy.mock.calls[1] ?? [];
-        expect(url).toBe(searchURL);
-        expect(init?.mode).toBe('cors');
-        const headers = new Headers(init?.headers);
-        expect(headers.get('authorization')).toBe('Bearer pass-1');
-        expect(headers.has('x-gitbook-search-pass')).toBe(false);
-    });
-
     it('stays on the route for the rest of the page after a 403', async () => {
         const { searchPasses, fetchSpy } = mockFetch([403]);
         restore = () => fetchSpy.mockRestore();

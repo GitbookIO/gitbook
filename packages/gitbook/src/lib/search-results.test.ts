@@ -10,7 +10,6 @@ import type {
 
 import { getBaseContext } from './context';
 import { getEmbeddableLinker } from './embeddable-linker';
-import { GITBOOK_API_PUBLIC_URL } from './env';
 import { createSiteLinker } from './links';
 import { getSearchSpaceLookup, transformSitePageResult } from './search';
 import { computePublishedSearchResults, computeSearchResults } from './search-results';
@@ -224,7 +223,11 @@ describe('direct search URL', () => {
     it.each([
         ['url-host', '/', '/~gitbook/search-direct/orgs/org_1/sites/site_1'],
         ['url-host', '/docs/', '/docs/~gitbook/search-direct/orgs/org_1/sites/site_1'],
-        ['url', '/docs/', `${GITBOOK_API_PUBLIC_URL}/v1/orgs/org_1/sites/site_1/search`],
+        [
+            'url',
+            '/docs/',
+            '/url/docs.example.com/docs/~gitbook/search-direct/orgs/org_1/sites/site_1',
+        ],
     ] as const)('uses the search endpoint for %s at %s', (urlMode, siteBasePath, searchURL) => {
         const context = getBaseContext({
             siteURL: 'https://docs.example.com',
