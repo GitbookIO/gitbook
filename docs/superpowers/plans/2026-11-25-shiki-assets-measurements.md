@@ -42,3 +42,8 @@ Notes:
   unless used. The Cloudflare gain is script size (−37 % raw, −24 % gzip upload), not heap.
 - Cloudflare render verified on the split workers: quickstart page 200, 154 highlighted tokens
   (same as baseline), grammars read through the server worker's `ASSETS` binding.
+- Task 4 (browser check, headless Chromium on `next start`): the quickstart page fetches
+  `shiki/3.21.0/grammars/javascript.json` and `python.json` (200, `public, max-age=31536000,
+  immutable`) and highlights client-rendered blocks; no theme requests, since the default themes
+  are the custom ones kept in code. Cross-origin `GITBOOK_ASSETS_URL` not testable locally; static
+  assets already send `Access-Control-Allow-Origin: *`. Bundle numbers unchanged from Task 2.
