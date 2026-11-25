@@ -47,3 +47,18 @@ Notes:
   immutable`) and highlights client-rendered blocks; no theme requests, since the default themes
   are the custom ones kept in code. Cross-origin `GITBOOK_ASSETS_URL` not testable locally; static
   assets already send `Access-Control-Allow-Origin: *`. Bundle numbers unchanged from Task 2.
+
+## Summary (baseline → final)
+
+| Target | Baseline | Final | Change |
+|---|---|---|---|
+| Cloudflare server `handler.mjs` | 23.61 MB | 14.85 MB | −8.76 MB (−37 %) |
+| Cloudflare upload, gzip | 5 529 KiB | 4 184 KiB | −1 345 KiB (−24 %) |
+| Cloudflare server heap after first render | 53.3 MB | 52.9 MB | ≈ 0 (grammar modules were already lazy) |
+| Client JS chunks | 12.60 MB / 437 files | 3.59 MB / 142 files | −9.02 MB (−72 %), −295 files |
+| Client grammar chunks | 8.19 MB / 236 files | 0 | −100 % (grammars are fetched as JSON on demand, cached immutable) |
+| Vercel page function trace | 20.01 MB | 19.02 MB | −1.0 MB (−5 %): grammars still ship, as JSON |
+| Cold first highlight (3 langs) | 195 ms | 188 ms | ≈ 0 (no regression) |
+
+Grammar assets: 247 deduplicated grammar files (7.3 MB) + 60 themes (1.4 MB), versus 9.7 MB of
+language modules before; a flattened file per language would have been 39 MB.
