@@ -120,6 +120,11 @@ const nextConfig = {
         ],
     },
 
+    // Shiki grammars and themes are read from disk at runtime, see shiki-assets.server.ts.
+    outputFileTracingIncludes: {
+        '/**': ['./public/~gitbook/static/shiki/**/*'],
+    },
+
     webpack(config, { isServer }) {
         if (isServer) {
             // mcp-handler only needs redis for SSE, which we disable: keep the client out of the server bundle.

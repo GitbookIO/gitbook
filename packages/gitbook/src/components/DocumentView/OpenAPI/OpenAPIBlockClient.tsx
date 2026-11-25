@@ -39,6 +39,7 @@ export type OpenAPIBlockClientContextProps = {
     headingNode: React.ReactNode;
     descriptionNode: React.ReactNode;
     scalarRuntimeURL: string;
+    staticAssetsURL: string;
 };
 
 type OpenAPIBlockVariant =
@@ -65,7 +66,13 @@ export function OpenAPIBlockClient(props: OpenAPIBlockClientProps) {
         id: props.id,
         blockKey: props.blockKey,
         renderCodeBlock: ({ code, syntax }) => (
-            <ClientPlainCodeBlock code={code} syntax={syntax} mode={mode} themes={codeTheme} />
+            <ClientPlainCodeBlock
+                code={code}
+                syntax={syntax}
+                mode={mode}
+                themes={codeTheme}
+                staticAssetsURL={props.staticAssetsURL}
+            />
         ),
         renderDocument: () => descriptionNode,
         renderHeading: () => headingNode,

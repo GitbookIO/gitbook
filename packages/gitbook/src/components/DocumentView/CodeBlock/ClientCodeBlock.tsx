@@ -23,6 +23,8 @@ export type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'st
     evaluateInlineExpression?: (expression: string) => string;
     mode: BlockProps<DocumentBlockCode>['context']['mode'];
     themes?: CustomizationThemedCodeTheme;
+    /** Base URL of `~gitbook/static`, where the Shiki assets are loaded from. */
+    staticAssetsURL: string;
     embedded?: boolean;
     /** Node key for comments, set only where commenting is possible. */
     commentKey?: string;
@@ -35,8 +37,17 @@ export const CODE_BLOCK_DEFAULT_COLLAPSED_LINE_COUNT = 10;
  * It allows us to defer some load to avoid blocking the rendering of the whole page with block highlighting.
  */
 export function ClientCodeBlock(props: ClientBlockProps) {
-    const { block, mode, style, inlines, evaluateInlineExpression, themes, embedded, commentKey } =
-        props;
+    const {
+        block,
+        mode,
+        style,
+        inlines,
+        evaluateInlineExpression,
+        themes,
+        staticAssetsURL,
+        embedded,
+        commentKey,
+    } = props;
     const blockRef = useRef<HTMLDivElement>(null);
     const isInViewportRef = useRef(false);
     const [isInViewport, setIsInViewport] = useState(false);
@@ -50,8 +61,10 @@ export function ClientCodeBlock(props: ClientBlockProps) {
 
     // Preload the highlighter when the block is mounted.
     useEffect(() => {
-        import('./highlight').then(({ preloadHighlight }) => preloadHighlight(block, themes));
-    }, [block, themes]);
+        import('./highlight-client').then(({ getClientHighlight }) =>
+            getClientHighlight(staticAssetsURL).preloadHighlight(block, themes)
+        );
+    }, [block, themes, staticAssetsURL]);
 
     // When user scrolls, we need to wait for the scroll to finish before running the highlight
     const isScrollingRef = useRef(false);
@@ -99,7 +112,8 @@ export function ClientCodeBlock(props: ClientBlockProps) {
 
             if (typeof window !== 'undefined') {
                 setHighlighting(true);
-                import('./highlight').then(({ highlight }) => {
+                import('./highlight-client').then(({ getClientHighlight }) => {
+                    const { highlight } = getClientHighlight(staticAssetsURL);
                     highlight(block, inlines, { evaluateInlineExpression, themes }).then(
                         (theme) => {
                             if (cancelled) {
@@ -120,7 +134,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
 
         // Otherwise if the block is not in viewport, we reset to the plain lines
         setTheme(null);
-    }, [isInViewport, block, inlines, evaluateInlineExpression, themes]);
+    }, [isInViewport, block, inlines, evaluateInlineExpression, themes, staticAssetsURL]);
 
     const expandable = block.data.expandable;
 
