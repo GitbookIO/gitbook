@@ -171,15 +171,6 @@ export async function resolveMissingPagePath(
         }
     }
 
-    // Content-ref page links (`/pages/<pageId>`) can reach visitors; IDs are case-sensitive, so match the raw pathname.
-    const contentRef = resolveStringContentRef(redirectPathname);
-    if (contentRef?.kind === 'page' && !contentRef.space) {
-        const page = resolvePageId(revision.pages, contentRef.page);
-        if (page) {
-            return { type: 'page', page };
-        }
-    }
-
     // If page still can't be found, we try with the API, in case we have a redirect at space level.
     // We use the raw pathname to handle special/malformed redirects setup by users in the GitSync.
     // The page rendering will take care of redirecting to a normalized pathname.
@@ -190,8 +181,21 @@ export async function resolveMissingPagePath(
             path: rawPathname,
         })
     );
-    const page = resolved ? resolvePageId(revision.pages, resolved.id) : undefined;
-    return page ? { type: 'page', page } : undefined;
+    const redirectedPage = resolved ? resolvePageId(revision.pages, resolved.id) : undefined;
+    if (redirectedPage) {
+        return { type: 'page', page: redirectedPage };
+    }
+
+    // Content-ref page links (`/pages/<pageId>`) can reach visitors; IDs are case-sensitive, so match the raw pathname.
+    const contentRef = resolveStringContentRef(redirectPathname);
+    if (contentRef?.kind === 'page' && !contentRef.space) {
+        const page = resolvePageId(revision.pages, contentRef.page);
+        if (page) {
+            return { type: 'page', page };
+        }
+    }
+
+    return undefined;
 }
 
 /**

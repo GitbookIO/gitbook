@@ -354,6 +354,17 @@ describe('resolveMissingPagePath', () => {
         });
     });
 
+    it('keeps a space redirect from a page ID path over the page with that ID', async () => {
+        const context = createRedirectContext({ spaceRedirectPageId: page.id });
+        const idPage = { ...page, id: 'wwCLFQyPl9cctUGxdLZm' };
+        context.revision.pages = [page, idPage];
+
+        expect(await resolveMissingPagePath(context, 'pages/wwCLFQyPl9cctUGxdLZm')).toEqual({
+            type: 'page',
+            page: { page, ancestors: [] },
+        });
+    });
+
     it('returns undefined when nothing matches', async () => {
         const context = createRedirectContext({});
 
