@@ -21,7 +21,6 @@ const context: OpenAPIClientContext = {
         hashtag: null,
     },
     expandAllModelSections: true,
-    scalarRuntimeURL: '',
     $$isClientContext$$: true,
 };
 

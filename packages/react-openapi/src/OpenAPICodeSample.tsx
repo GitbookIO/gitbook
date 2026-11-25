@@ -8,16 +8,12 @@ import {
     OpenAPIMediaTypeExamplesSelector,
 } from './OpenAPICodeSampleInteractive';
 import { OpenAPICodeSampleBody } from './OpenAPICodeSampleSelector';
-import { ScalarApiButton } from './ScalarApiButton';
+import { OpenAPITryItButton } from './OpenAPITryItButton';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
+import { buildTryItOperation } from './tryit/buildTryItOperation';
 import type { OpenAPIOperationData } from './types';
 import { mergeHeaders } from './util/headers';
-import {
-    extractOrigin,
-    getAllServerOrigins,
-    getDefaultServerURL,
-    hasValidServerHost,
-} from './util/server';
+import { getAllServerOrigins, getDefaultServerURL, hasValidServerHost } from './util/server';
 import {
     resolvePrefillCodePlaceholderFromSecurityScheme,
     resolveURLWithPrefillCodePlaceholdersFromServer,
@@ -210,7 +206,7 @@ function OpenAPICodeSampleFooter(props: {
     context: OpenAPIContext;
 }) {
     const { data, context, renderers } = props;
-    const { method, path, securities, servers } = data;
+    const { method, securities, servers } = data;
     const { specUrl } = context;
     const hideTryItPanel = data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'];
     const hasMultipleMediaTypes =
@@ -241,14 +237,12 @@ function OpenAPICodeSampleFooter(props: {
                 <span />
             )}
             {!hideTryItPanel && hasValidHost && specUrl && (
-                <ScalarApiButton
-                    context={resolveScalarClientContext(context, servers, specUrl)}
+                <OpenAPITryItButton
+                    context={resolveTryItClientContext(context, servers)}
                     withProxy={Boolean(data.operation['x-enable-proxy'] ?? data['x-enable-proxy'])}
-                    method={method}
-                    path={path}
+                    operation={buildTryItOperation(data)}
                     securities={securities}
                     servers={servers}
-                    specUrl={specUrl}
                 />
             )}
         </div>
@@ -256,27 +250,17 @@ function OpenAPICodeSampleFooter(props: {
 }
 
 /**
- * Build the client context for ScalarApiButton, resolving the signed proxy URL
+ * Build the client context for the Try it button, resolving the signed proxy URL
  * with the allowed server hosts for SSRF protection.
  */
-function resolveScalarClientContext(
+function resolveTryItClientContext(
     context: OpenAPIContext,
-    servers: OpenAPIOperationData['servers'],
-    specUrl: string
+    servers: OpenAPIOperationData['servers']
 ) {
     const clientContext = getOpenAPIClientContext(context);
 
     if (context.resolveProxyUrl) {
-        // Collect all possible host+path entries from spec servers
-        const origins = getAllServerOrigins(servers);
-
-        // Add the spec URL so the proxy can resolve it
-        const specOrigin = extractOrigin(specUrl);
-        if (specOrigin) {
-            origins.push(specOrigin);
-        }
-
-        clientContext.proxyUrl = context.resolveProxyUrl(origins) ?? undefined;
+        clientContext.proxyUrl = context.resolveProxyUrl(getAllServerOrigins(servers)) ?? undefined;
     }
 
     return clientContext;

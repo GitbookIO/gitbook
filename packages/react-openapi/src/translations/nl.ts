@@ -46,4 +46,21 @@ export const nl = {
     and: 'en',
     possible_values: 'Mogelijke waarden',
     direct_link_to_model: 'Directe link naar ${1}',
+    server: 'Server',
+    cookie_parameters: 'Cookies',
+    send: 'Verzenden',
+    cancel: 'Annuleren',
+    close: 'Sluiten',
+    username: 'Gebruikersnaam',
+    password: 'Wachtwoord',
+    tryit_no_auth: 'Geen autorisatie',
+    tryit_no_response: 'Verzend het verzoek om het antwoord te zien.',
+    tryit_request_failed:
+        'Het verzoek kon niet worden verzonden. De API is mogelijk onbereikbaar of accepteert geen verzoeken van deze site.',
+    tryit_missing_required: 'Vul de verplichte velden in: ${1}',
+    tryit_binary_response: 'Binair antwoord, ${1}',
+    tryit_truncated: 'De eerste ${1} van het antwoord worden getoond.',
+    tryit_download: 'Downloaden',
+    tryit_cookies_need_proxy:
+        'Cookies worden alleen verzonden als verzoeken via de GitBook-proxy gaan.',
 };

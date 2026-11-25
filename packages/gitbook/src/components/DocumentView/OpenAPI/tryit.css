@@ -1,0 +1,200 @@
+@reference "../../RootLayout/globals.css";
+
+.openapi-tryit-activate {
+    @apply flex items-center w-fit;
+}
+
+.openapi-tryit-button {
+    @apply flex gap-2 items-center cursor-pointer;
+    @apply bg-primary-original text-contrast-primary-original hover:bg-primary-solid-hover hover:text-contrast-primary-solid-hover contrast-more:ring-1 rounded-lg straight-corners:rounded-none circular-corners:rounded-full circular-corners:px-3 place-self-start;
+    @apply depth-subtle:shadow-xs hover:depth-subtle:shadow-md focus-visible:depth-subtle:shadow-md active:depth-subtle:shadow-xs;
+    @apply contrast-more:ring-tint-12 contrast-more:hover:ring-2 contrast-more:hover:ring-tint-12;
+    @apply hover:depth-subtle:-translate-y-px focus-visible:depth-subtle:-translate-y-px active:depth-subtle:translate-y-0 transition-all;
+    @apply grow-0 shrink-0 truncate;
+    @apply text-[13px] leading-6 px-2 py-0.5 font-mono font-medium [word-spacing:-2px];
+}
+
+.openapi-tryit-button svg {
+    @apply size-2.5;
+}
+
+.openapi-tryit-button-spinner {
+    @apply animate-spin motion-reduce:animate-none;
+}
+
+/* Dialog */
+.openapi-tryit {
+    @apply m-auto p-0 w-[min(72rem,calc(100vw-2rem))] h-[min(48rem,calc(100dvh-2rem))] max-w-none max-h-none;
+    @apply bg-tint-base text-tint border border-tint-subtle shadow-2xl overflow-hidden;
+    @apply rounded-xl straight-corners:rounded-none circular-corners:rounded-2xl;
+}
+
+.openapi-tryit::backdrop {
+    @apply bg-tint-12/40 backdrop-blur-xs;
+}
+
+.openapi-tryit-layout {
+    @apply flex flex-col h-full;
+}
+
+.openapi-tryit-header {
+    @apply flex items-center gap-3 px-4 py-3 border-b border-tint-subtle;
+}
+
+.openapi-tryit-url {
+    @apply flex-1 min-w-0 truncate font-mono text-sm text-tint-strong;
+}
+
+.openapi-tryit-url-server {
+    @apply text-tint;
+}
+
+.openapi-tryit-send {
+    @apply shrink-0 cursor-pointer px-3 py-1 text-sm font-medium;
+    @apply bg-primary-original text-contrast-primary-original hover:bg-primary-solid-hover hover:text-contrast-primary-solid-hover;
+    @apply rounded-md straight-corners:rounded-none circular-corners:rounded-full transition-colors;
+}
+
+.openapi-tryit-close {
+    @apply shrink-0 cursor-pointer p-1.5 text-tint hover:text-tint-strong hover:bg-tint-hover rounded-md straight-corners:rounded-none circular-corners:rounded-full;
+}
+
+.openapi-tryit-close svg {
+    @apply size-4;
+}
+
+.openapi-tryit-body {
+    @apply flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 overflow-y-auto md:overflow-hidden;
+}
+
+.openapi-tryit-request {
+    @apply flex flex-col gap-5 p-4 md:overflow-y-auto border-b md:border-b-0 md:border-r border-tint-subtle;
+}
+
+.openapi-tryit-section {
+    @apply flex flex-col gap-2.5;
+}
+
+.openapi-tryit-section-header {
+    @apply flex items-center justify-between gap-3;
+}
+
+.openapi-tryit-section-title {
+    @apply text-xs font-semibold uppercase tracking-wide text-tint-strong;
+}
+
+.openapi-tryit-field {
+    @apply flex flex-col gap-1;
+}
+
+.openapi-tryit-field-label {
+    @apply flex flex-wrap items-baseline gap-x-1.5 text-[0.813rem];
+}
+
+.openapi-tryit-field-name {
+    @apply font-mono text-tint-strong;
+}
+
+.openapi-tryit-field-required {
+    @apply text-danger;
+}
+
+.openapi-tryit-field-description {
+    @apply text-xs text-tint line-clamp-2 basis-full;
+}
+
+.openapi-tryit-input {
+    @apply w-full min-w-0 px-2.5 py-1.5 text-sm font-mono bg-tint-base text-tint-strong border border-tint-subtle placeholder:text-tint/60;
+    @apply rounded-md straight-corners:rounded-none circular-corners:rounded-lg;
+    @apply outline-none focus:border-primary focus:ring-2 focus:ring-primary/20;
+}
+
+.openapi-tryit-input-small {
+    @apply w-auto py-1 text-xs;
+}
+
+.openapi-tryit-code {
+    @apply resize-y leading-5 whitespace-pre;
+}
+
+.openapi-tryit-invalid {
+    @apply border-danger;
+}
+
+.openapi-tryit-file {
+    @apply text-sm text-tint file:mr-3 file:px-2.5 file:py-1 file:border file:border-tint-subtle file:bg-tint file:text-tint-strong file:rounded-md file:cursor-pointer;
+}
+
+.openapi-tryit-auth {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-2.5;
+}
+
+.openapi-tryit-hint {
+    @apply text-xs text-tint;
+}
+
+.openapi-tryit-alert {
+    @apply text-sm px-3 py-2 bg-danger text-danger border border-danger-subtle rounded-md straight-corners:rounded-none circular-corners:rounded-lg;
+}
+
+/* Response */
+.openapi-tryit-response {
+    @apply flex flex-col gap-3 p-4 min-h-48 md:overflow-y-auto bg-tint-subtle;
+}
+
+.openapi-tryit-response-empty {
+    @apply items-center justify-center text-sm text-tint;
+}
+
+.openapi-tryit-spinner {
+    @apply size-5 rounded-full border-2 border-tint-subtle border-t-primary animate-spin motion-reduce:animate-none;
+}
+
+.openapi-tryit-response-meta {
+    @apply flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-tint font-mono;
+}
+
+.openapi-tryit-tabs {
+    @apply ml-auto flex gap-1;
+}
+
+.openapi-tryit-tab {
+    @apply cursor-pointer px-2 py-1 text-xs rounded-md straight-corners:rounded-none circular-corners:rounded-full text-tint hover:text-tint-strong;
+}
+
+.openapi-tryit-tab[aria-selected='true'] {
+    @apply bg-tint-active text-tint-strong;
+}
+
+.openapi-tryit-response-body {
+    @apply m-0 p-3 text-xs leading-5 font-mono whitespace-pre-wrap break-all text-tint-strong bg-tint-base border border-tint-subtle;
+    @apply rounded-md straight-corners:rounded-none circular-corners:rounded-lg;
+}
+
+.openapi-tryit-headers {
+    @apply m-0 flex flex-col text-xs font-mono;
+}
+
+.openapi-tryit-headers > div {
+    @apply grid grid-cols-[minmax(8rem,auto)_1fr] gap-3 py-1.5 border-b border-tint-subtle;
+}
+
+.openapi-tryit-headers dt {
+    @apply text-tint-strong;
+}
+
+.openapi-tryit-headers dd {
+    @apply m-0 text-tint break-all;
+}
+
+.openapi-tryit-binary {
+    @apply flex flex-col gap-3 text-sm;
+}
+
+.openapi-tryit-binary img {
+    @apply max-w-full max-h-96 self-start border border-tint-subtle;
+}
+
+.openapi-tryit-binary a {
+    @apply text-primary underline;
+}

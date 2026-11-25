@@ -1,5 +1,3 @@
-import type { ApiClientConfiguration } from '@scalar/types';
-
 import { ExpressionRuntime, type TemplatePart, parseTemplate } from '@gitbook/expr';
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 
@@ -10,15 +8,20 @@ import type {
     OpenAPIServerWithCustomProperties,
 } from '../types';
 
+export type TryItPrefillAuthValue =
+    | { token: string }
+    | { username: string | undefined; password: string | undefined }
+    | { name: string | undefined; in: string | undefined; value: string };
+
 export interface TryItPrefillConfiguration {
-    authentication?: ApiClientConfiguration['authentication'];
-    servers?: ApiClientConfiguration['servers'];
+    authentication?: { securitySchemes: Record<string, TryItPrefillAuthValue> };
+    servers?: OpenAPIV3.ServerObject[];
 }
 
 export const PREFILL_CUSTOM_PROPERTY = 'x-gitbook-prefill';
 
 /**
- * Resolve the Scalar API client prefill configuration for a given OpenAPI operation.
+ * Resolve the Try it prefill configuration for a given OpenAPI operation.
  */
 export function resolveTryItPrefillForOperation(args: {
     /**
@@ -35,18 +38,7 @@ export function resolveTryItPrefillForOperation(args: {
         prefillInputContext,
     } = args;
 
-    const resolveTryItPrefillExpression = prefillInputContext
-        ? (() => {
-              const runtime = new ExpressionRuntime();
-              return (expr: string) => {
-                  const parts = parseTemplate(expr);
-                  if (!parts.length) {
-                      return undefined;
-                  }
-                  return runtime.evaluateTemplate(expr, prefillInputContext);
-              };
-          })()
-        : undefined;
+    const resolveTryItPrefillExpression = createPrefillExpressionResolver(prefillInputContext);
 
     const prefillAuth = securities
         ? resolveTryItPrefillAuthForOperationSecurities({
@@ -68,15 +60,31 @@ export function resolveTryItPrefillForOperation(args: {
     };
 }
 
+function createPrefillExpressionResolver(
+    prefillInputContext: PrefillInputContextData | null
+): ((expr: string) => string | undefined) | undefined {
+    if (!prefillInputContext) {
+        return undefined;
+    }
+    const runtime = new ExpressionRuntime();
+    return (expr: string) => {
+        const parts = parseTemplate(expr);
+        if (!parts.length) {
+            return undefined;
+        }
+        return runtime.evaluateTemplate(expr, prefillInputContext);
+    };
+}
+
 /**
  * Resolve prefill authentication configuration for the security schemes defined for an operation.
  */
 function resolveTryItPrefillAuthForOperationSecurities(args: {
     securities: OpenAPIOperationData['securities'];
     resolveTryItPrefillExpression?: (expr: string) => string | undefined;
-}): ApiClientConfiguration['authentication'] | undefined {
+}): TryItPrefillConfiguration['authentication'] | undefined {
     const { securities, resolveTryItPrefillExpression } = args;
-    const prefillAuthConfig: ApiClientConfiguration['authentication']['securitySchemes'] = {};
+    const prefillAuthConfig: Record<string, TryItPrefillAuthValue> = {};
 
     for (const [schemeName, security] of Object.values(securities)) {
         const resolvedPrefill = security[PREFILL_CUSTOM_PROPERTY]
@@ -128,50 +136,63 @@ function resolveTryItPrefillAuthForOperationSecurities(args: {
 function resolveTryItPrefillServersForOperationServers(args: {
     servers: OpenAPIOperationData['servers'];
     resolveTryItPrefillExpression?: (expr: string) => string | undefined;
-}): ApiClientConfiguration['servers'] | undefined {
-    const { servers, resolveTryItPrefillExpression } = args;
-    const resolvedServers: ApiClientConfiguration['servers'] = [];
-
-    for (const server of servers) {
-        // Url-level prefill
-        const tryItPrefillServerUrlExpr = server[PREFILL_CUSTOM_PROPERTY];
-        const tryItPrefillServerUrlValue =
-            tryItPrefillServerUrlExpr && resolveTryItPrefillExpression
-                ? resolveTryItPrefillExpression(tryItPrefillServerUrlExpr)
-                : undefined;
-
-        const variables: { [variable: string]: OpenAPIV3.ServerVariableObject } = server.variables
-            ? { ...server.variables }
-            : {};
-
-        // Variable-level prefill
-        if (server.variables) {
-            for (const [varName, variable] of Object.entries(server.variables)) {
-                const { [PREFILL_CUSTOM_PROPERTY]: tryItPrefillVarExpr, ...variableProps } =
-                    variable;
-
-                const tryItPrefillVarValue = tryItPrefillVarExpr
-                    ? resolveTryItPrefillExpression?.(tryItPrefillVarExpr)
-                    : undefined;
-                variables[varName] = {
-                    ...variableProps,
-                    ...(tryItPrefillVarValue ? { default: String(tryItPrefillVarValue) } : {}),
-                };
-            }
-        }
-
-        const hasServerVariables = Object.keys(variables).length > 0;
-        if (server.url && (tryItPrefillServerUrlValue || hasServerVariables)) {
-            const resolvedServer: OpenAPIV3.ServerObject = {
-                url: tryItPrefillServerUrlValue ?? server.url,
-                ...(server.description ? { description: server.description } : {}),
-                ...(hasServerVariables ? { variables } : {}),
-            };
-            resolvedServers.push(resolvedServer);
-        }
-    }
+}): TryItPrefillConfiguration['servers'] | undefined {
+    const resolvedServers = args.servers
+        .map((server) => resolveTryItPrefillServer(server, args.resolveTryItPrefillExpression))
+        .filter((resolved) => resolved.prefilled)
+        .map((resolved) => resolved.server);
 
     return resolvedServers.length > 0 ? resolvedServers : undefined;
+}
+
+/**
+ * Resolve every server of an operation with its prefilled URL and variable defaults applied.
+ */
+export function resolveTryItServers(args: {
+    servers: OpenAPIOperationData['servers'];
+    prefillInputContext: PrefillInputContextData | null;
+}): OpenAPIV3.ServerObject[] {
+    const resolveExpression = createPrefillExpressionResolver(args.prefillInputContext);
+    return args.servers.map(
+        (server) => resolveTryItPrefillServer(server, resolveExpression).server
+    );
+}
+
+function resolveTryItPrefillServer(
+    server: OpenAPIOperationData['servers'][number],
+    resolveTryItPrefillExpression: ((expr: string) => string | undefined) | undefined
+): { server: OpenAPIV3.ServerObject; prefilled: boolean } {
+    // Url-level prefill
+    const tryItPrefillServerUrlExpr = server[PREFILL_CUSTOM_PROPERTY];
+    const tryItPrefillServerUrlValue =
+        tryItPrefillServerUrlExpr && resolveTryItPrefillExpression
+            ? resolveTryItPrefillExpression(tryItPrefillServerUrlExpr)
+            : undefined;
+
+    const variables: { [variable: string]: OpenAPIV3.ServerVariableObject } = {};
+
+    // Variable-level prefill
+    for (const [varName, variable] of Object.entries(server.variables ?? {})) {
+        const { [PREFILL_CUSTOM_PROPERTY]: tryItPrefillVarExpr, ...variableProps } = variable;
+
+        const tryItPrefillVarValue = tryItPrefillVarExpr
+            ? resolveTryItPrefillExpression?.(tryItPrefillVarExpr)
+            : undefined;
+        variables[varName] = {
+            ...variableProps,
+            ...(tryItPrefillVarValue ? { default: String(tryItPrefillVarValue) } : {}),
+        };
+    }
+
+    const hasServerVariables = Object.keys(variables).length > 0;
+    return {
+        server: {
+            url: tryItPrefillServerUrlValue ?? server.url ?? '',
+            ...(server.description ? { description: server.description } : {}),
+            ...(hasServerVariables ? { variables } : {}),
+        },
+        prefilled: Boolean(server.url && (tryItPrefillServerUrlValue || hasServerVariables)),
+    };
 }
 
 /**

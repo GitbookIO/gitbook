@@ -46,4 +46,21 @@ export const fr = {
     and: 'et',
     possible_values: 'Valeurs possibles',
     direct_link_to_model: 'Lien direct vers ${1}',
+    server: 'Serveur',
+    cookie_parameters: 'Cookies',
+    send: 'Envoyer',
+    cancel: 'Annuler',
+    close: 'Fermer',
+    username: 'Nom d’utilisateur',
+    password: 'Mot de passe',
+    tryit_no_auth: 'Aucune autorisation',
+    tryit_no_response: 'Envoyez la requête pour voir la réponse.',
+    tryit_request_failed:
+        'La requête n’a pas pu être envoyée. L’API est peut-être injoignable, ou n’accepte pas les requêtes depuis ce site.',
+    tryit_missing_required: 'Renseignez les champs obligatoires : ${1}',
+    tryit_binary_response: 'Réponse binaire, ${1}',
+    tryit_truncated: 'Affichage des premiers ${1} de la réponse.',
+    tryit_download: 'Télécharger',
+    tryit_cookies_need_proxy:
+        'Les cookies ne sont envoyés que lorsque les requêtes passent par le proxy GitBook.',
 };

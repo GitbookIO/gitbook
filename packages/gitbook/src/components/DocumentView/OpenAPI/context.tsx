@@ -6,7 +6,6 @@ import {
     type OpenAPISchemasData,
     type OpenAPIWebhookData,
     checkIsValidLocale,
-    extractOrigin,
     getAllServerOrigins,
     getOperationTitle,
     getSchemasHeading,
@@ -17,9 +16,7 @@ import { PlainCodeBlock } from '../CodeBlock';
 import { DocumentView } from '../DocumentView';
 import { Heading } from '../Heading';
 import type { OpenAPIBlockClientContextProps } from './OpenAPIBlockClient';
-import { SCALAR_RUNTIME_PATH } from './scalar-runtime-path';
 import { DEFAULT_LOCALE, getSpaceLocale } from '@/intl/server';
-import { getAssetURL } from '@/lib/assets';
 import type { GitBookAnyContext } from '@/lib/context';
 import { GITBOOK_URL } from '@/lib/env';
 import { buildSignedProxyUrl } from '@/lib/openapi/proxy-token';
@@ -124,7 +121,6 @@ export function getOpenAPIContext(args: {
         expandAllResponses: expandAllResponses || props.context.mode === 'print',
         expandAllModelSections: expandAllModelSections || props.context.mode === 'print',
         headless,
-        scalarRuntimeURL: getAssetURL(SCALAR_RUNTIME_PATH),
         id: block.meta?.id,
         blockKey: block.key,
         locale,
@@ -145,7 +141,7 @@ export function getOpenAPIBlockClientProps(args: {
     expandAllModelSections?: boolean;
     headless?: boolean;
 }): OpenAPIBlockClientContextProps {
-    const { props, data, schemas, specUrl, context } = args;
+    const { props, data, schemas, context } = args;
     const serverContext = getOpenAPIContext(args);
     const { renderCodeBlock, renderDocument, renderHeading, resolveProxyUrl, ...serializable } =
         serverContext;
@@ -158,10 +154,6 @@ export function getOpenAPIBlockClientProps(args: {
     const descriptionDocument = data?.operation['x-gitbook-description-document'];
 
     const origins = data ? getAllServerOrigins(data.servers) : [];
-    const specOrigin = specUrl ? extractOrigin(specUrl) : null;
-    if (specOrigin) {
-        origins.push(specOrigin);
-    }
 
     return {
         ...serializable,

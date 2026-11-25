@@ -47,7 +47,7 @@ const CORS_HEADERS = {
 } as const;
 
 // Neutralize active HTML: a navigated proxy response must never execute script, on any origin.
-// Scalar's fetch-based "Test it" is unaffected (the sandbox applies to documents, not fetch).
+// The fetch-based "Test it" panel is unaffected (the sandbox applies to documents, not fetch).
 const PROXY_SECURITY_HEADERS = {
     'content-security-policy': 'sandbox',
     'x-content-type-options': 'nosniff',
@@ -201,13 +201,13 @@ export async function handleOpenAPIProxyRequest(request: NextRequest): Promise<R
         }
     }
 
-    // Scalar sends cookies via X-Scalar-Cookie when using a proxy
+    // Browsers can't set Cookie on fetch, so Test it sends cookies via X-Scalar-Cookie
     const scalarCookie = request.headers.get('x-scalar-cookie');
     if (scalarCookie) {
         forwardedHeaders.set('cookie', scalarCookie);
     }
 
-    // Scalar sends user-agent via X-Scalar-User-Agent in some environments
+    // Kept for clients that override the user-agent this way
     const scalarUserAgent = request.headers.get('x-scalar-user-agent');
     if (scalarUserAgent) {
         forwardedHeaders.set('user-agent', scalarUserAgent);

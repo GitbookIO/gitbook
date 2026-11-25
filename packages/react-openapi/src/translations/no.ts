@@ -46,4 +46,21 @@ export const no = {
     and: 'og',
     possible_values: 'Mulige verdier',
     direct_link_to_model: 'Direktelenke til ${1}',
+    server: 'Server',
+    cookie_parameters: 'Informasjonskapsler',
+    send: 'Send',
+    cancel: 'Avbryt',
+    close: 'Lukk',
+    username: 'Brukernavn',
+    password: 'Passord',
+    tryit_no_auth: 'Ingen autorisasjon',
+    tryit_no_response: 'Send forespørselen for å se svaret.',
+    tryit_request_failed:
+        'Forespørselen kunne ikke sendes. API-et er kanskje utilgjengelig, eller godtar ikke forespørsler fra dette nettstedet.',
+    tryit_missing_required: 'Fyll ut de obligatoriske feltene: ${1}',
+    tryit_binary_response: 'Binært svar, ${1}',
+    tryit_truncated: 'Viser de første ${1} av svaret.',
+    tryit_download: 'Last ned',
+    tryit_cookies_need_proxy:
+        'Informasjonskapsler sendes bare når forespørsler går gjennom GitBook-proxyen.',
 };

@@ -43,12 +43,9 @@ export interface OpenAPIClientContext {
     id?: string;
 
     /**
-     * The URL for the Scalar proxy endpoint.
+     * The URL of the proxy used by Try it for APIs that don't allow CORS.
      */
     proxyUrl?: string;
-
-    /** URL of the lazily loaded Scalar browser runtime. */
-    scalarRuntimeURL: string;
 
     /**
      * Mark the context as a client context.
@@ -58,7 +55,7 @@ export interface OpenAPIClientContext {
 
 export interface OpenAPIContext extends Omit<
     OpenAPIClientContext,
-    '$$isClientContext$$' | 'proxyUrl' | 'scalarRuntimeURL'
+    '$$isClientContext$$' | 'proxyUrl'
 > {
     /**
      * Render a code block.
@@ -85,8 +82,7 @@ export interface OpenAPIContext extends Omit<
     headless?: boolean;
 
     /**
-     * Public specification URL, used by Scalar's "Test it" modal.
-     * When null, the "Test it" button is hidden.
+     * Public specification URL. When null, the "Test it" button is hidden.
      */
     specUrl: string | null;
 
@@ -95,9 +91,6 @@ export interface OpenAPIContext extends Omit<
      * Called at render time (server-side) with the server origins for an operation.
      */
     resolveProxyUrl?: (allowedOrigins: string[]) => string | null;
-
-    /** URL of the lazily loaded Scalar browser runtime. */
-    scalarRuntimeURL: string;
 }
 
 export type OpenAPIUniversalContext = OpenAPIClientContext | OpenAPIContext;
@@ -133,7 +126,6 @@ export function getOpenAPIClientContext(context: OpenAPIUniversalContext): OpenA
         blockKey: context.blockKey,
         id: context.id,
         proxyUrl: '$$isClientContext$$' in context ? context.proxyUrl : undefined,
-        scalarRuntimeURL: context.scalarRuntimeURL,
         $$isClientContext$$: true,
     };
 }

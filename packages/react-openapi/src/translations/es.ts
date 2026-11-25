@@ -46,4 +46,21 @@ export const es = {
     and: 'y',
     possible_values: 'Valores posibles',
     direct_link_to_model: 'Enlace directo a ${1}',
+    server: 'Servidor',
+    cookie_parameters: 'Cookies',
+    send: 'Enviar',
+    cancel: 'Cancelar',
+    close: 'Cerrar',
+    username: 'Usuario',
+    password: 'Contraseña',
+    tryit_no_auth: 'Sin autorización',
+    tryit_no_response: 'Envía la solicitud para ver la respuesta.',
+    tryit_request_failed:
+        'No se pudo enviar la solicitud. Es posible que la API no esté disponible o que no acepte solicitudes desde este sitio.',
+    tryit_missing_required: 'Completa los campos obligatorios: ${1}',
+    tryit_binary_response: 'Respuesta binaria, ${1}',
+    tryit_truncated: 'Mostrando los primeros ${1} de la respuesta.',
+    tryit_download: 'Descargar',
+    tryit_cookies_need_proxy:
+        'Las cookies solo se envían cuando las solicitudes pasan por el proxy de GitBook.',
 };
