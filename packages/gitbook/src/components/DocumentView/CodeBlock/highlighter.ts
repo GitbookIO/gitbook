@@ -24,10 +24,10 @@ import { plainHighlight } from './plain-highlight';
 import {
     SHIKI_LANGUAGES,
     SHIKI_LANGUAGE_GRAMMARS,
-    SHIKI_THEMES,
     getShikiGrammarAssetPath,
     getShikiThemeAssetPath,
 } from './shiki-catalog';
+import { SHIKI_THEMES } from './shiki-themes';
 
 /**
  * Read a Shiki asset (grammar or theme JSON) from its path relative to `~gitbook/static`.

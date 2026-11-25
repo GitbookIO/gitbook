@@ -9,7 +9,7 @@ import {
     parseDiffNotation,
     truncateHighlightTokens,
 } from './highlight-tokens';
-import { SHIKI_THEMES } from './shiki-catalog';
+import { SHIKI_THEMES } from './shiki-themes';
 import { getNodeText } from '@/lib/document';
 
 /**

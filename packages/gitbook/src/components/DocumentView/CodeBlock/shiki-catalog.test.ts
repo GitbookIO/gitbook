@@ -3,12 +3,13 @@ import { join } from 'node:path';
 
 import { getLanguageForSyntax } from './highlight';
 import {
+    SHIKI_ASSETS_PATH,
     SHIKI_LANGUAGES,
     SHIKI_LANGUAGE_GRAMMARS,
-    SHIKI_THEMES,
     getShikiGrammarAssetPath,
     getShikiThemeAssetPath,
 } from './shiki-catalog';
+import { SHIKI_THEMES } from './shiki-themes';
 
 const staticDir = join(import.meta.dir, '../../../../public/~gitbook/static');
 
@@ -38,6 +39,22 @@ describe('shiki catalog', () => {
         expect(
             await Bun.file(join(staticDir, getShikiThemeAssetPath('github-dark'))).exists()
         ).toBe(true);
+    });
+});
+
+describe('shiki assets path', () => {
+    it('changes with the generated content, not only the shiki version', () => {
+        // Assets are served immutable, so a format change must move them to a new URL.
+        expect(SHIKI_ASSETS_PATH).toMatch(/^shiki\/\d+\.\d+\.\d+-[0-9a-f]{8}$/);
+    });
+});
+
+describe('client bundle', () => {
+    it('keeps the language catalog out of plain highlighting', async () => {
+        // plain-highlight is in the eager ClientCodeBlock chunk; only theme types are needed there.
+        const source = await Bun.file(join(import.meta.dir, 'plain-highlight.ts')).text();
+        expect(source).not.toContain("'./shiki-catalog'");
+        expect(source).toContain("'./shiki-themes'");
     });
 });
 
