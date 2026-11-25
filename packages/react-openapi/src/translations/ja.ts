@@ -64,8 +64,6 @@ export const ja = {
     tryit_cookies_need_proxy: 'Cookie は GitBook プロキシ経由のリクエストでのみ送信されます。',
     name: '名前',
     value: '値',
-    tryit_query: 'クエリ',
-    tryit_additional_parameters: '追加パラメーター',
     tryit_add_header: 'ヘッダー',
     tryit_add_query_parameter: 'クエリパラメーター',
     tryit_remove: '削除',

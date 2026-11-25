@@ -137,28 +137,47 @@
     @apply text-sm px-3 py-2 bg-danger text-danger border border-danger-subtle rounded-md straight-corners:rounded-none circular-corners:rounded-lg;
 }
 
-.openapi-tryit-extra {
-    @apply grid grid-cols-[1fr_1fr_auto] sm:grid-cols-[4.5rem_1fr_1fr_auto] gap-2 items-center;
+.openapi-tryit-table {
+    @apply flex flex-col border border-tint-subtle divide-y divide-tint-subtle;
+    @apply rounded-md straight-corners:rounded-none circular-corners:rounded-lg;
 }
 
-.openapi-tryit-extra-location {
-    @apply col-span-3 sm:col-span-1 text-xs font-mono text-tint;
+.openapi-tryit-table:empty {
+    @apply hidden;
 }
 
-.openapi-tryit-extra-remove {
+/* Checkbox · name · value · remove, as a row of a key/value table. */
+.openapi-tryit-row {
+    @apply grid grid-cols-[auto_minmax(0,1fr)_minmax(0,1.3fr)_1.75rem] gap-x-2 items-center px-2 py-1.5;
+}
+
+.openapi-tryit-row .openapi-tryit-input {
+    @apply py-1 text-[0.813rem];
+}
+
+.openapi-tryit-row .openapi-tryit-field-label {
+    @apply min-w-0;
+}
+
+.openapi-tryit-row .openapi-tryit-field-name {
+    @apply truncate;
+}
+
+.openapi-tryit-check {
+    @apply size-3.5 cursor-pointer disabled:cursor-default disabled:opacity-60;
+    accent-color: rgb(var(--primary-9, 52 109 219));
+}
+
+.openapi-tryit-row-remove {
     @apply cursor-pointer p-1.5 text-tint hover:text-tint-strong hover:bg-tint-hover rounded-md straight-corners:rounded-none circular-corners:rounded-full;
 }
 
-.openapi-tryit-extra-remove svg {
+.openapi-tryit-row-remove svg {
     @apply size-3.5;
 }
 
-.openapi-tryit-extra-actions {
-    @apply flex flex-wrap gap-2;
-}
-
 .openapi-tryit-add {
-    @apply cursor-pointer px-2.5 py-1 text-xs text-tint-strong border border-dashed border-tint-subtle hover:bg-tint-hover;
+    @apply self-start cursor-pointer px-2.5 py-1 text-xs text-tint-strong border border-dashed border-tint-subtle hover:bg-tint-hover;
     @apply rounded-md straight-corners:rounded-none circular-corners:rounded-full;
 }
 

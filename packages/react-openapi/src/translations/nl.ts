@@ -65,8 +65,6 @@ export const nl = {
         'Cookies worden alleen verzonden als verzoeken via de GitBook-proxy gaan.',
     name: 'Naam',
     value: 'Waarde',
-    tryit_query: 'Query',
-    tryit_additional_parameters: 'Extra parameters',
     tryit_add_header: 'Header',
     tryit_add_query_parameter: 'Queryparameter',
     tryit_remove: 'Verwijderen',

@@ -13,6 +13,8 @@ export interface TryItValues {
     schemes: [string, OpenAPICustomSecurityScheme][];
     auth: Record<string, string>;
     parameters: Record<string, string>;
+    /** Checkbox state of optional parameters, by `fieldKey`; unset means checked. */
+    enabledParameters?: Record<string, boolean>;
     mediaType: TryItMediaType | undefined;
     bodyText: string;
     bodyFields: Record<string, string>;
@@ -22,9 +24,13 @@ export interface TryItValues {
 }
 
 export interface TryItExtraParameter {
+    /** Stable React key for the row. */
+    id?: number;
     in: 'header' | 'query';
     name: string;
     value: string;
+    /** Unset means checked. */
+    enabled?: boolean;
 }
 
 export interface TryItRequest {
@@ -90,7 +96,11 @@ export function buildTryItRequest(operation: TryItOperation, values: TryItValues
 
     let path = operation.path;
     for (const parameter of operation.parameters) {
-        const value = values.parameters[fieldKey(parameter)] ?? '';
+        const key = fieldKey(parameter);
+        if (!parameter.required && values.enabledParameters?.[key] === false) {
+            continue;
+        }
+        const value = values.parameters[key] ?? '';
         if (value === '') {
             if (parameter.required) {
                 missing.push(parameter.name);
@@ -121,7 +131,7 @@ export function buildTryItRequest(operation: TryItOperation, values: TryItValues
 
     for (const extra of values.extraParameters ?? []) {
         const name = extra.name.trim();
-        if (!name) {
+        if (!name || extra.enabled === false) {
             continue;
         }
         if (extra.in === 'header') {

@@ -11,6 +11,7 @@ import {
 const operation = { method: 'post', path: '/pets' };
 const values = {
     parameters: { 'query:limit': '5' },
+    enabledParameters: {},
     mediaType: 'application/json',
     bodyText: '{}',
     bodyFields: {},

@@ -65,8 +65,6 @@ export const es = {
         'Las cookies solo se envían cuando las solicitudes pasan por el proxy de GitBook.',
     name: 'Nombre',
     value: 'Valor',
-    tryit_query: 'Consulta',
-    tryit_additional_parameters: 'Parámetros adicionales',
     tryit_add_header: 'Encabezado',
     tryit_add_query_parameter: 'Parámetro de consulta',
     tryit_remove: 'Eliminar',

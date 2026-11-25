@@ -65,8 +65,6 @@ export const fr = {
         'Les cookies ne sont envoyés que lorsque les requêtes passent par le proxy GitBook.',
     name: 'Nom',
     value: 'Valeur',
-    tryit_query: 'Requête',
-    tryit_additional_parameters: 'Paramètres supplémentaires',
     tryit_add_header: 'En-tête',
     tryit_add_query_parameter: 'Paramètre de requête',
     tryit_remove: 'Supprimer',

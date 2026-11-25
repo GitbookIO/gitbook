@@ -29,7 +29,7 @@ import {
     getTryItOperationSession,
     saveTryItOperationSession,
 } from './session';
-import type { TryItField, TryItOperation, TryItParameterLocation } from './types';
+import type { TryItField, TryItOperation, TryItParameter, TryItParameterLocation } from './types';
 
 export interface OpenAPITryItDialogProps {
     operation: TryItOperation;
@@ -46,14 +46,9 @@ type ResponseState =
     | { type: 'error'; message: string }
     | { type: 'done'; response: TryItResponse };
 
-const PARAMETER_SECTIONS: { in: TryItParameterLocation; label: TranslationKey }[] = [
-    { in: 'path', label: 'path_parameters' },
-    { in: 'query', label: 'query_parameters' },
-    { in: 'header', label: 'header_parameters' },
-    { in: 'cookie', label: 'cookie_parameters' },
-];
-
 let unscopedDialogs = 0;
+let extraIds = 0;
+const nextExtraId = () => ++extraIds;
 
 /** Loaded only after a reader opens Try it. */
 export function OpenAPITryItDialog(props: OpenAPITryItDialogProps) {
@@ -113,11 +108,26 @@ export function OpenAPITryItDialog(props: OpenAPITryItDialogProps) {
     const [parameters, setParameters] = useState(() => {
         const defaults = Object.fromEntries(
             operation.parameters
-                .filter((parameter) => parameter.required && parameter.defaultValue !== undefined)
+                .filter((parameter) => parameter.defaultValue !== undefined)
                 .map((parameter) => [fieldKey(parameter), parameter.defaultValue ?? ''])
         );
         return { ...defaults, ...saved.operation?.parameters };
     });
+    // Optional parameters show their example but start unchecked, as in Scalar.
+    const [enabledParameters, setEnabledParameters] = useState<Record<string, boolean>>(
+        () =>
+            saved.operation?.enabledParameters ??
+            Object.fromEntries(
+                operation.parameters
+                    // Only the query and header tables have checkboxes to turn them back on.
+                    .filter(
+                        (parameter) =>
+                            !parameter.required &&
+                            (parameter.in === 'query' || parameter.in === 'header')
+                    )
+                    .map((parameter) => [fieldKey(parameter), false])
+            )
+    );
     const [mediaTypeIndex, setMediaTypeIndex] = useState(() => saved.mediaTypeIndex ?? 0);
     const mediaType = operation.body?.mediaTypes[mediaTypeIndex];
     const restoreBody = saved.mediaTypeIndex !== null;
@@ -133,18 +143,36 @@ export function OpenAPITryItDialog(props: OpenAPITryItDialogProps) {
     );
     const [bodyFiles, setBodyFiles] = useState<Record<string, File[]>>({});
     const [extraParameters, setExtraParameters] = useState<TryItExtraParameter[]>(
-        () => saved.operation?.extraParameters ?? []
+        () =>
+            saved.operation?.extraParameters ??
+            // A default Accept, as in Scalar, unless the operation declares its own.
+            (operation.parameters.some(
+                (parameter) =>
+                    parameter.in === 'header' && parameter.name.toLowerCase() === 'accept'
+            )
+                ? []
+                : [{ id: nextExtraId(), in: 'header', name: 'Accept', value: '*/*' }])
     );
 
     useEffect(() => {
         saveTryItOperationSession(saved.scope, operation, {
             parameters,
+            enabledParameters,
             mediaType: mediaType?.mediaType ?? null,
             bodyText,
             bodyFields,
             extraParameters,
         });
-    }, [saved.scope, operation, parameters, mediaType, bodyText, bodyFields, extraParameters]);
+    }, [
+        saved.scope,
+        operation,
+        parameters,
+        enabledParameters,
+        mediaType,
+        bodyText,
+        bodyFields,
+        extraParameters,
+    ]);
 
     // API-wide values are saved only when the reader changes them, so prefill and defaults
     // never get frozen into the session.
@@ -182,6 +210,7 @@ export function OpenAPITryItDialog(props: OpenAPITryItDialogProps) {
         schemes,
         auth,
         parameters,
+        enabledParameters,
         mediaType,
         bodyText,
         bodyFields,
@@ -247,8 +276,63 @@ export function OpenAPITryItDialog(props: OpenAPITryItDialogProps) {
         }
     };
 
-    const updateParameter = (key: string, value: string) =>
+    const updateParameter = (key: string, value: string) => {
         setParameters((current) => ({ ...current, [key]: value }));
+        // Typing into an unchecked optional parameter means the reader wants it sent.
+        if (value) {
+            setEnabledParameters((current) =>
+                current[key] === false ? { ...current, [key]: true } : current
+            );
+        }
+    };
+    const toggleParameter = (key: string, enabled: boolean) =>
+        setEnabledParameters((current) => ({ ...current, [key]: enabled }));
+
+    const renderFieldSection = (location: TryItParameterLocation, label: TranslationKey) => {
+        const items = operation.parameters.filter((parameter) => parameter.in === location);
+        if (items.length === 0) {
+            return null;
+        }
+        return (
+            <Section title={t(translation, label)}>
+                {location === 'cookie' && !(withProxy && context.proxyUrl) ? (
+                    <p className="openapi-tryit-hint">
+                        {t(translation, 'tryit_cookies_need_proxy')}
+                    </p>
+                ) : null}
+                {items.map((parameter) => (
+                    <Field
+                        key={fieldKey(parameter)}
+                        field={parameter}
+                        invalid={showMissing}
+                        value={parameters[fieldKey(parameter)] ?? ''}
+                        onChange={(value) => updateParameter(fieldKey(parameter), value)}
+                    />
+                ))}
+            </Section>
+        );
+    };
+
+    const renderParameterTable = (
+        location: 'query' | 'header',
+        label: TranslationKey,
+        addLabel: TranslationKey
+    ) => (
+        <ParameterTable
+            title={t(translation, label)}
+            addLabel={t(translation, addLabel)}
+            location={location}
+            declared={operation.parameters.filter((parameter) => parameter.in === location)}
+            values={parameters}
+            enabled={enabledParameters}
+            extras={extraParameters}
+            showMissing={showMissing}
+            translation={translation}
+            onChange={updateParameter}
+            onToggle={toggleParameter}
+            onExtrasChange={setExtraParameters}
+        />
+    );
 
     return (
         <dialog
@@ -412,40 +496,14 @@ export function OpenAPITryItDialog(props: OpenAPITryItDialogProps) {
                             </Section>
                         ) : null}
 
-                        {PARAMETER_SECTIONS.map((section) => {
-                            const items = operation.parameters.filter(
-                                (parameter) => parameter.in === section.in
-                            );
-                            if (items.length === 0) {
-                                return null;
-                            }
-                            return (
-                                <Section key={section.in} title={t(translation, section.label)}>
-                                    {section.in === 'cookie' && !(withProxy && context.proxyUrl) ? (
-                                        <p className="openapi-tryit-hint">
-                                            {t(translation, 'tryit_cookies_need_proxy')}
-                                        </p>
-                                    ) : null}
-                                    {items.map((parameter) => (
-                                        <Field
-                                            key={fieldKey(parameter)}
-                                            field={parameter}
-                                            invalid={showMissing}
-                                            value={parameters[fieldKey(parameter)] ?? ''}
-                                            onChange={(value) =>
-                                                updateParameter(fieldKey(parameter), value)
-                                            }
-                                        />
-                                    ))}
-                                </Section>
-                            );
-                        })}
-
-                        <ExtraParameters
-                            items={extraParameters}
-                            translation={translation}
-                            onChange={setExtraParameters}
-                        />
+                        {renderFieldSection('path', 'path_parameters')}
+                        {renderParameterTable(
+                            'query',
+                            'query_parameters',
+                            'tryit_add_query_parameter'
+                        )}
+                        {renderParameterTable('header', 'headers', 'tryit_add_header')}
+                        {renderFieldSection('cookie', 'cookie_parameters')}
 
                         {operation.body && mediaType ? (
                             <Section
@@ -593,67 +651,118 @@ function Section(props: {
     );
 }
 
-function ExtraParameters(props: {
-    items: TryItExtraParameter[];
+function ParameterTable(props: {
+    title: React.ReactNode;
+    addLabel: React.ReactNode;
+    location: 'query' | 'header';
+    declared: TryItParameter[];
+    values: Record<string, string>;
+    enabled: Record<string, boolean>;
+    extras: TryItExtraParameter[];
+    showMissing: boolean;
     translation: OpenAPIClientContext['translation'];
-    onChange: (items: TryItExtraParameter[]) => void;
+    onChange: (key: string, value: string) => void;
+    onToggle: (key: string, enabled: boolean) => void;
+    onExtrasChange: (extras: TryItExtraParameter[]) => void;
 }) {
-    const { items, translation, onChange } = props;
-    const update = (index: number, patch: Partial<TryItExtraParameter>) =>
-        onChange(items.map((item, i) => (i === index ? { ...item, ...patch } : item)));
-    const add = (location: TryItExtraParameter['in']) =>
-        onChange([...items, { in: location, name: '', value: '' }]);
+    const { declared, extras, location, values, enabled, translation, onExtrasChange } = props;
+    const updateExtra = (index: number, patch: Partial<TryItExtraParameter>) =>
+        onExtrasChange(extras.map((item, i) => (i === index ? { ...item, ...patch } : item)));
 
     return (
-        <Section title={t(translation, 'tryit_additional_parameters')}>
-            {items.map((item, index) => (
-                <div key={index} className="openapi-tryit-extra">
-                    <span className="openapi-tryit-extra-location">
-                        {t(translation, item.in === 'header' ? 'header' : 'tryit_query')}
-                    </span>
-                    <input
-                        className="openapi-tryit-input"
-                        aria-label={String(t(translation, 'name'))}
-                        placeholder={String(t(translation, 'name'))}
-                        spellCheck={false}
-                        autoComplete="off"
-                        value={item.name}
-                        onChange={(event) => update(index, { name: event.target.value })}
-                    />
-                    <input
-                        className="openapi-tryit-input"
-                        aria-label={String(t(translation, 'value'))}
-                        placeholder={String(t(translation, 'value'))}
-                        spellCheck={false}
-                        autoComplete="off"
-                        value={item.value}
-                        onChange={(event) => update(index, { value: event.target.value })}
-                    />
-                    <button
-                        type="button"
-                        className="openapi-tryit-extra-remove"
-                        aria-label={String(t(translation, 'tryit_remove'))}
-                        onClick={() => onChange(items.filter((_, i) => i !== index))}
-                    >
-                        <svg aria-hidden="true" viewBox="0 0 16 16" fill="none">
-                            <path
-                                d="M4 4l8 8M12 4l-8 8"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
+        <Section title={props.title}>
+            <div className="openapi-tryit-table">
+                {declared.map((parameter) => {
+                    const key = fieldKey(parameter);
+                    const value = values[key] ?? '';
+                    const checked = parameter.required || enabled[key] !== false;
+                    const invalid = props.showMissing && parameter.required && value === '';
+                    return (
+                        <div key={key} className="openapi-tryit-row">
+                            <input
+                                type="checkbox"
+                                className="openapi-tryit-check"
+                                aria-label={parameter.name}
+                                checked={checked}
+                                disabled={parameter.required}
+                                onChange={(event) => props.onToggle(key, event.target.checked)}
                             />
-                        </svg>
-                    </button>
-                </div>
-            ))}
-            <div className="openapi-tryit-extra-actions">
-                <button type="button" className="openapi-tryit-add" onClick={() => add('header')}>
-                    + {t(translation, 'tryit_add_header')}
-                </button>
-                <button type="button" className="openapi-tryit-add" onClick={() => add('query')}>
-                    + {t(translation, 'tryit_add_query_parameter')}
-                </button>
+                            <FieldLabel field={parameter} />
+                            <ValueInput
+                                field={parameter}
+                                value={value}
+                                invalid={invalid}
+                                onChange={(next) => props.onChange(key, next)}
+                            />
+                            <span />
+                        </div>
+                    );
+                })}
+                {extras.map((item, index) =>
+                    item.in === location ? (
+                        <div key={item.id ?? `extra-${index}`} className="openapi-tryit-row">
+                            <input
+                                type="checkbox"
+                                className="openapi-tryit-check"
+                                aria-label={item.name || String(t(translation, 'name'))}
+                                checked={item.enabled !== false}
+                                onChange={(event) =>
+                                    updateExtra(index, { enabled: event.target.checked })
+                                }
+                            />
+                            <input
+                                className="openapi-tryit-input"
+                                aria-label={String(t(translation, 'name'))}
+                                placeholder={String(t(translation, 'name'))}
+                                spellCheck={false}
+                                autoComplete="off"
+                                value={item.name}
+                                onChange={(event) =>
+                                    updateExtra(index, { name: event.target.value })
+                                }
+                            />
+                            <input
+                                className="openapi-tryit-input"
+                                aria-label={String(t(translation, 'value'))}
+                                placeholder={String(t(translation, 'value'))}
+                                spellCheck={false}
+                                autoComplete="off"
+                                value={item.value}
+                                onChange={(event) =>
+                                    updateExtra(index, { value: event.target.value })
+                                }
+                            />
+                            <button
+                                type="button"
+                                className="openapi-tryit-row-remove"
+                                aria-label={String(t(translation, 'tryit_remove'))}
+                                onClick={() => onExtrasChange(extras.filter((_, i) => i !== index))}
+                            >
+                                <svg aria-hidden="true" viewBox="0 0 16 16" fill="none">
+                                    <path
+                                        d="M4 4l8 8M12 4l-8 8"
+                                        stroke="currentColor"
+                                        strokeWidth="1.5"
+                                        strokeLinecap="round"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+                    ) : null
+                )}
             </div>
+            <button
+                type="button"
+                className="openapi-tryit-add"
+                onClick={() =>
+                    onExtrasChange([
+                        ...extras,
+                        { id: nextExtraId(), in: location, name: '', value: '' },
+                    ])
+                }
+            >
+                + {props.addLabel}
+            </button>
         </Section>
     );
 }
@@ -682,39 +791,59 @@ function Field(props: {
     onChange: (value: string) => void;
 }) {
     const { field, value, invalid, onChange } = props;
-    const isInvalid = Boolean(invalid && field.required && value === '');
     return (
         <label className="openapi-tryit-field">
             <FieldLabel field={field} />
-            {field.enum ? (
-                <select
-                    className={clsx('openapi-tryit-input', isInvalid && 'openapi-tryit-invalid')}
-                    value={value}
-                    required={field.required}
-                    onChange={(event) => onChange(event.target.value)}
-                >
-                    <option value="">{field.placeholder ? `${field.placeholder}…` : '—'}</option>
-                    {value && !field.enum.includes(value) ? (
-                        <option value={value}>{value}</option>
-                    ) : null}
-                    {field.enum.map((option) => (
-                        <option key={option} value={option}>
-                            {option}
-                        </option>
-                    ))}
-                </select>
-            ) : (
-                <input
-                    className={clsx('openapi-tryit-input', isInvalid && 'openapi-tryit-invalid')}
-                    value={value}
-                    placeholder={field.placeholder}
-                    aria-invalid={isInvalid || undefined}
-                    spellCheck={false}
-                    autoComplete="off"
-                    onChange={(event) => onChange(event.target.value)}
-                />
-            )}
+            <ValueInput
+                field={field}
+                value={value}
+                invalid={Boolean(invalid && field.required && value === '')}
+                onChange={onChange}
+            />
         </label>
+    );
+}
+
+function ValueInput(props: {
+    field: TryItField;
+    value: string;
+    invalid: boolean;
+    onChange: (value: string) => void;
+}) {
+    const { field, value, invalid, onChange } = props;
+    const className = clsx('openapi-tryit-input', invalid && 'openapi-tryit-invalid');
+    if (field.enum) {
+        return (
+            <select
+                className={className}
+                aria-label={field.name}
+                value={value}
+                required={field.required}
+                onChange={(event) => onChange(event.target.value)}
+            >
+                <option value="">{field.placeholder ? `${field.placeholder}…` : '—'}</option>
+                {value && !field.enum.includes(value) ? (
+                    <option value={value}>{value}</option>
+                ) : null}
+                {field.enum.map((option) => (
+                    <option key={option} value={option}>
+                        {option}
+                    </option>
+                ))}
+            </select>
+        );
+    }
+    return (
+        <input
+            className={className}
+            aria-label={field.name}
+            value={value}
+            placeholder={field.placeholder}
+            aria-invalid={invalid || undefined}
+            spellCheck={false}
+            autoComplete="off"
+            onChange={(event) => onChange(event.target.value)}
+        />
     );
 }
 

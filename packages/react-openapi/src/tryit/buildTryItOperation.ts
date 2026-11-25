@@ -174,7 +174,10 @@ function describeField(
     schema: OpenAPIV3.SchemaObject | undefined,
     explicitExample: unknown
 ): Pick<TryItParameter, 'enum' | 'placeholder' | 'defaultValue'> {
-    const values = schema?.enum ?? (isPlainObject(schema?.items) ? schema.items.enum : undefined);
+    const values =
+        schema?.enum ??
+        (isPlainObject(schema?.items) ? schema.items.enum : undefined) ??
+        (schema?.type === 'boolean' ? [true, false] : undefined);
     const enumValues = Array.isArray(values)
         ? values.filter((value) => value !== null).map((value) => toInputValue(value))
         : undefined;

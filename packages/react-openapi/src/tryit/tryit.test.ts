@@ -135,6 +135,17 @@ describe('buildTryItOperation', () => {
         ]);
     });
 
+    it('offers true and false for boolean parameters', () => {
+        const data = operationData();
+        data.operation.parameters = [
+            { name: 'nested', in: 'query', schema: { type: 'boolean', default: true } },
+        ];
+        expect(buildTryItOperation(data).parameters[0]).toMatchObject({
+            enum: ['true', 'false'],
+            defaultValue: 'true',
+        });
+    });
+
     it('keeps the operation-level parameter when the path item defines the same one', () => {
         const data = operationData();
         data.operation.parameters = [
@@ -315,5 +326,32 @@ describe('buildTryItRequest', () => {
         );
         expect(request.url).toBe('https://eu.example.com/v1/pets/{petId}?filter=a+b');
         expect(request.headers).toEqual({ 'X-Api-Version': '2', Authorization: 'Bearer secret' });
+    });
+
+    it('skips unchecked optional parameters and extra rows, but never required ones', () => {
+        const checks = operationData();
+        checks.operation.requestBody = undefined;
+        const request = buildTryItRequest(
+            buildTryItOperation(checks),
+            values(checks, {
+                parameters: {
+                    'path:petId': '1',
+                    'query:limit': '10',
+                    'query:sort': 'asc',
+                    'header:X-Trace': 'abc',
+                },
+                enabledParameters: {
+                    'query:limit': false,
+                    'query:sort': false,
+                    'header:X-Trace': true,
+                },
+                extraParameters: [
+                    { in: 'header', name: 'Accept', value: '*/*' },
+                    { in: 'query', name: 'debug', value: '1', enabled: false },
+                ],
+            })
+        );
+        expect(request.url).toBe('https://eu.example.com/v1/pets/1?sort=asc');
+        expect(request.headers).toEqual({ 'X-Trace': 'abc', Accept: '*/*' });
     });
 });

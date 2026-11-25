@@ -5,6 +5,7 @@ import type { TryItExtraParameter } from './request';
 
 export interface TryItOperationSession {
     parameters: Record<string, string>;
+    enabledParameters: Record<string, boolean>;
     /** Stored by name: the index alone can't tell whether it still points at the same type. */
     mediaType: string | null;
     bodyText: string;
