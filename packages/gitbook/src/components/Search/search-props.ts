@@ -1,4 +1,10 @@
-import type { SiteExternalLink, SiteSection, SiteSectionGroup, SiteSpace } from '@gitbook/api';
+import type {
+    SiteCustomizationSettings,
+    SiteExternalLink,
+    SiteSection,
+    SiteSectionGroup,
+    SiteSpace,
+} from '@gitbook/api';
 
 import { hasMultipleSiteSections } from '../SiteSections';
 import type { GitBookSiteContext } from '@/lib/context';
@@ -132,9 +138,17 @@ export function getDirectSearchProps(context: GitBookSiteContext): DirectSearchP
         return undefined;
     }
 
-    return {
+    const customization: SiteCustomizationSettings & {
+        search?: { sameDomain?: boolean };
+    } = context.customization;
+    const props: DirectSearchProps = {
         ...context.directSearch,
         spaces: getSearchSpaceLookup(context.structure),
         passURL: context.linker.toPathInSite('~gitbook/search-pass'),
     };
+    if (customization.search?.sameDomain === true) {
+        props.sameDomain = true;
+    }
+
+    return props;
 }
