@@ -1,6 +1,6 @@
 import type { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
-import { resolveMissingPagePath } from '@/components/SitePage/fetch';
+import { isSameRedirectPath, resolveMissingPagePath } from '@/components/SitePage/fetch';
 import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
 import { renderPageAgentInstructions, renderQueryingDocumentation } from '@/lib/ask-prompt';
 import type { GitBookSiteContext } from '@/lib/context';
@@ -38,10 +38,15 @@ export async function servePageMarkdown(baseContext: GitBookSiteContext, pagePat
         if (!pageLookup) {
             const fallback = await resolveMissingPagePath(baseContext, pagePath);
             if (fallback?.type === 'redirect') {
-                return markdownRedirect(
-                    toMarkdownDestination(fallback.destination),
-                    fallback.permanent
-                );
+                const destination = toMarkdownDestination(fallback.destination);
+                if (
+                    !isSameRedirectPath(
+                        context.linker.toPathForPagePath({ path: pagePath }),
+                        destination
+                    )
+                ) {
+                    return markdownRedirect(destination, fallback.permanent);
+                }
             }
             if (fallback?.type === 'page') {
                 return markdownRedirect(
