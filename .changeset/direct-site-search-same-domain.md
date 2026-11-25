@@ -2,4 +2,4 @@
 "gitbook": patch
 ---
 
-Serve direct site search under the site's own domain instead of calling the API host directly.
+Retry direct site search on the site's own domain when the browser cannot reach the search API.
