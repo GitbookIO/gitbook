@@ -77,3 +77,28 @@ Earlier render checks hit `/sites/static/...` (ISR). Re-checked on the dynamic r
 No load errors in either server log. Bundled themes are read from JSON on the server (disk on Node,
 `ASSETS` on Cloudflare). Token-for-token parity with Shiki's own bundled highlighter was checked for
 javascript, python, vue, markdown (fenced js), bash and yaml with the GitHub themes.
+
+## Cloudflare server worker memory, dynamic route (supersedes the heap rows above)
+
+Split workers (`dev:cf:server` + `dev:cf:middleware`, fresh `.wrangler`), every request with the
+`gitbook-dynamic-route` cookie so each page renders on the server worker. First page
+`developers/gitbook-api/quickstart`, then 8 more distinct developer pages (all 200). `main` = 7af524a83.
+Two runs per build; the runs agreed within ~2 MB.
+
+- Heap: V8 `Runtime.getHeapUsage` of the server isolate after a forced GC (heap snapshot).
+- RSS: `VmRSS` of the server `workerd` process, from separate runs with no heap snapshots (snapshots
+  inflate RSS by hundreds of MB and that memory isn't returned).
+
+| Point | Heap used, main | Heap used, branch | Δ heap | RSS, main | RSS, branch | Δ RSS |
+|---|---|---|---|---|---|---|
+| Idle (before any request) | 47.1 MB | 29.6 MB | −17.5 MB (−37 %) | 59.1 MB | 58.9 MB | ≈ 0 |
+| After first render | 71.0 MB | 52.3 MB | −18.7 MB (−26 %) | 88.7 MB | 97.1 MB | +8.4 MB |
+| After 9 pages | 86.3 MB | 66.6 MB | −19.7 MB (−23 %) | 140.5 MB | 151.5 MB | +11.0 MB |
+
+Reading:
+- The heap saving is the Shiki source code no longer in the worker script; it is there from idle and
+  stays constant, so grammars loaded from JSON cost about what the lazily imported modules cost.
+- The RSS increase appears only once requests start fetching from `ASSETS`. Locally, wrangler/miniflare
+  serves the assets binding from a service in the same `workerd` process, so that memory is likely the
+  local assets service rather than the worker isolate (not verified; it would not be part of the
+  isolate in production, where the 128 MB limit applies per isolate).
