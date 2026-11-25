@@ -32,8 +32,6 @@ type DirectSearchOutcome =
     | { type: 'results'; results: OrderedComputedResult[] }
     | { type: 'route'; reason?: string };
 
-type SearchTransport = { type: 'api'; url: string } | { type: 'proxy'; url: string };
-
 type SearchAttempt =
     | { type: 'success'; body: string }
     | { type: 'http'; response: Response }
@@ -46,10 +44,7 @@ export type SearchPassStore = ReturnType<typeof createSearchPassStore>;
  */
 export function createSearchPassStore(directSearch: DirectSearchProps | undefined) {
     let state: SearchPassState = { status: 'none' };
-    let proxy: Extract<SearchTransport, { type: 'proxy' }> | undefined;
-    if (directSearch?.sameDomain && directSearch.proxyURL) {
-        proxy = { type: 'proxy', url: directSearch.proxyURL };
-    }
+    let useProxy = Boolean(directSearch?.sameDomain && directSearch.proxyURL);
     let pendingRequest: Promise<void> | null = null;
 
     const sendPassRequest = async () => {
@@ -88,7 +83,7 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
                         (current.status === 'none' && current.reason === '401') ||
                         (current.status === 'ready' && current.replacesRejectedPass),
                 };
-                if (!proxy && !directSearch.sameDomain) {
+                if (!useProxy && !directSearch.sameDomain) {
                     ReactDOM.preconnect(directSearch.apiURL, { crossOrigin: 'anonymous' });
                 }
             } else if (current.status === 'ready') {
@@ -161,27 +156,24 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
 
         let pass = state;
         const { apiURL, organizationId, siteId, proxyURL } = directSearch;
-        const transport: SearchTransport = proxy ?? {
-            type: 'api',
-            url: `${apiURL}/v1/orgs/${organizationId}/sites/${siteId}/search`,
-        };
+        const usingProxy = useProxy && Boolean(proxyURL);
+        let url = `${apiURL}/v1/orgs/${organizationId}/sites/${siteId}/search`;
+        if (usingProxy && proxyURL) {
+            url = proxyURL;
+        }
         const body = JSON.stringify(toSearchSiteContentBody(query, scope, searchId));
-        let attempt = await sendSearch(transport, pass.token, body, signal);
+        let attempt = await sendSearch(url, usingProxy, pass.token, body, signal);
 
-        if (attempt.type === 'failure' && transport.type === 'api' && proxyURL) {
+        if (attempt.type === 'failure' && !usingProxy && proxyURL) {
             const current = state as SearchPassState;
-            if (current.status === 'route') {
-                return waitForCooldown(current, signal);
-            }
-            proxy = { type: 'proxy', url: proxyURL };
-            if (current.status !== 'ready') {
+            if (current.status === 'ready') {
+                useProxy = true;
+                pass = current;
+                attempt = await sendSearch(proxyURL, true, pass.token, body, signal);
+            } else if (current.status === 'none') {
+                useProxy = true;
                 return { type: 'route', reason: attempt.reason };
             }
-            if (current.expiresAt - Date.now() <= EXPIRY_MARGIN_MS) {
-                return dropPass(current.token, 'expired');
-            }
-            pass = current;
-            attempt = await sendSearch(proxy, pass.token, body, signal);
         }
 
         if (attempt.type === 'failure') {
@@ -237,14 +229,15 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
 }
 
 async function sendSearch(
-    transport: SearchTransport,
+    url: string,
+    useProxy: boolean,
     token: string,
     body: string,
     signal: AbortSignal
 ): Promise<SearchAttempt> {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     let mode: RequestMode | undefined;
-    if (transport.type === 'proxy') {
+    if (useProxy) {
         mode = 'same-origin';
         headers['x-gitbook-search-pass'] = token;
     } else {
@@ -259,7 +252,7 @@ async function sendSearch(
     signal.addEventListener('abort', abort, { once: true });
     const timeout = setTimeout(abort, DIRECT_SEARCH_TIMEOUT_MS);
     try {
-        const response = await fetch(transport.url, {
+        const response = await fetch(url, {
             method: 'POST',
             headers,
             body,

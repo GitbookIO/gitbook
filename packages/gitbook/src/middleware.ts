@@ -211,23 +211,20 @@ async function serveDirectSearch(request: NextRequest, organizationId = '', site
         Authorization: `Bearer ${pass}`,
         'Content-Type': request.headers.get('Content-Type') ?? 'application/json',
     });
-    const accept = request.headers.get('Accept');
-    if (accept) headers.set('Accept', accept);
     const ip = request.headers.get('x-gitbook-ip') ?? getXForwardedFor(request.headers);
     if (ip) headers.set('X-Forwarded-For', ip);
 
-    const url = new URL(
-        `${removeTrailingSlash(GITBOOK_API_URL)}/v1/orgs/${organizationId}/sites/${siteId}/search`
-    );
-    const init = {
-        method: 'POST',
-        headers,
-        body: request.body,
-        redirect: 'manual',
-        signal: request.signal,
-        duplex: 'half',
-    } as const;
-    const upstream = await fetch(url, init).catch(() => {
+    const upstream = await fetch(
+        `${removeTrailingSlash(GITBOOK_API_URL)}/v1/orgs/${organizationId}/sites/${siteId}/search`,
+        {
+            method: 'POST',
+            headers,
+            body: request.body,
+            redirect: 'manual',
+            signal: request.signal,
+            duplex: 'half',
+        } as RequestInit
+    ).catch(() => {
         getLogger().subLogger('directSiteSearch').warn('Direct search upstream failed', {
             status: 502,
             organizationId,

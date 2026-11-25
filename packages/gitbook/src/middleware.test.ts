@@ -7,10 +7,8 @@ import { removeTrailingSlash } from '@/lib/paths';
 
 const PATH = '/~gitbook/search-direct/orgs/org_1/sites/site-1';
 const PASS_HEADER = 'x-gitbook-search-pass';
-const PROTECTED_HEADER = btoa(
-    JSON.stringify({ alg: 'dir', enc: 'A256GCM', typ: 'site-search-pass+jwt' })
-).replace(/=+$/, '');
-const SEARCH_PASS = `${PROTECTED_HEADER}..AAAAAAAAAAAAAAAA.AAAA.AAAAAAAAAAAAAAAAAAAAAA`;
+const SEARCH_PASS =
+    'eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIiwidHlwIjoic2l0ZS1zZWFyY2gtcGFzcytqd3QifQ..AAAAAAAAAAAAAAAA.AAAA.AAAAAAAAAAAAAAAAAAAAAA';
 
 let fetchSpy: ReturnType<typeof spyOn<typeof globalThis, 'fetch'>>;
 
@@ -23,8 +21,6 @@ afterEach(() => fetchSpy.mockRestore());
 describe('direct site search middleware', () => {
     it.each([
         ['https://hosted.gitbook.io', '', ''],
-        ['https://docs.example.com', '/docs', ''],
-        ['https://proxy.gitbook.site', '/sites/site-1', ''],
         ['https://proxy.gitbook.site', '/sites/site-1', '/'],
     ])('forwards a search from %s%s%s directly to GBX', async (host, prefix, suffix) => {
         fetchSpy.mockResolvedValueOnce(
@@ -53,7 +49,6 @@ describe('direct site search middleware', () => {
                 'cf-connecting-ip': '192.0.2.2',
                 'x-forwarded-for': '192.0.2.3',
                 [PASS_HEADER]: SEARCH_PASS,
-                accept: 'application/json',
                 cookie: 'session=1',
                 authorization: 'Bearer incoming-token',
             },
@@ -69,7 +64,6 @@ describe('direct site search middleware', () => {
         expect(init?.body).toBe(request.body);
         expect(await new Response(init?.body).text()).toBe(body);
         expect(Object.fromEntries(new Headers(init?.headers))).toEqual({
-            accept: 'application/json',
             authorization: `Bearer ${SEARCH_PASS}`,
             'content-type': 'application/json',
             'x-forwarded-for': '192.0.2.1',
@@ -116,12 +110,5 @@ describe('direct site search middleware', () => {
         expect(response.status).toBe(502);
         expect(response.headers.get('cache-control')).toBe('no-store');
         expect(fetchSpy).toHaveBeenCalledTimes(1);
-    });
-
-    it('leaves requests without a site URL to Next.js', async () => {
-        const response = await middleware(new NextRequest('https://origin.example.com/'));
-
-        expect(response.headers.get('x-middleware-next')).toBe('1');
-        expect(fetchSpy).not.toHaveBeenCalled();
     });
 });

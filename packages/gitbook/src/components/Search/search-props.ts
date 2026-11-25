@@ -141,10 +141,14 @@ export function getDirectSearchProps(context: GitBookSiteContext): DirectSearchP
     const customization: SiteCustomizationSettings & {
         search?: { sameDomain?: boolean };
     } = context.customization;
+    const { organizationId, siteId } = context.directSearch;
     const props: DirectSearchProps = {
         ...context.directSearch,
         spaces: getSearchSpaceLookup(context.structure),
         passURL: context.linker.toPathInSite('~gitbook/search-pass'),
+        proxyURL: context.linker.toPathInSite(
+            `~gitbook/search-direct/orgs/${organizationId}/sites/${siteId}`
+        ),
     };
     if (customization.search?.sameDomain === true) {
         props.sameDomain = true;

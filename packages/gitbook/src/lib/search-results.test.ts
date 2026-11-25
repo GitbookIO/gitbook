@@ -218,32 +218,3 @@ describe('computePublishedSearchResults', () => {
         ).toBeNull();
     });
 });
-
-describe('direct search URL', () => {
-    it.each([
-        ['url-host', '/', '/~gitbook/search-direct/orgs/org_1/sites/site_1'],
-        ['url-host', '/docs/', '/docs/~gitbook/search-direct/orgs/org_1/sites/site_1'],
-        [
-            'url',
-            '/docs/',
-            '/url/docs.example.com/docs/~gitbook/search-direct/orgs/org_1/sites/site_1',
-        ],
-    ] as const)('uses the search endpoint for %s at %s', (urlMode, siteBasePath, searchURL) => {
-        const context = getBaseContext({
-            siteURL: 'https://docs.example.com',
-            siteURLData: {
-                organization: 'org_1',
-                site: 'site_1',
-                siteSpace: 'ss_v2',
-                space: 'space_v2',
-                siteBasePath,
-                basePath: `${siteBasePath}api/`,
-                apiToken: 'page-token',
-                imagesContextId: 'images',
-            },
-            urlMode,
-        });
-
-        expect(context.directSearch?.proxyURL).toBe(searchURL);
-    });
-});
