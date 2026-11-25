@@ -10,6 +10,7 @@ import {
     isDocumentTableImageRecord,
     isStringArray,
 } from '@/components/DocumentView/Table/utils';
+import { getPageGitMetadata } from '@/components/PageActions/pageActionsData';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getDataOrNull, getPageDocument } from '@/lib/data';
 import { getSimplifiedContentType } from '@/lib/files';
@@ -34,6 +35,7 @@ type Deps = {
         options: ResolveContentRefOptions
     ) => Promise<unknown>;
     loadIcons: (context: GitBookSiteContext, document: JSONDocument) => Promise<unknown>;
+    loadGitMetadata: (context: GitBookSiteContext, page: RevisionPageDocument) => Promise<unknown>;
 };
 
 const defaultDeps: Deps = {
@@ -48,6 +50,7 @@ const defaultDeps: Deps = {
                 document,
             })
         ),
+    loadGitMetadata: getPageGitMetadata,
 };
 
 type Node = { object?: string; type?: string; data?: Record<string, unknown>; nodes?: unknown };
@@ -116,6 +119,9 @@ export function runSitePagePlan(
     };
 
     const ids = { spaceId: context.space.id, revisionId: context.revisionId, pageId: page.id };
+
+    // The Edit on Git action reloads the page with its Git metadata, which the revision tree omits.
+    start(() => deps.loadGitMetadata(context, page));
 
     start(async () => {
         const links = await getDataOrNull(context.dataFetcher.listRevisionPageMetaLinks(ids));
@@ -190,7 +196,7 @@ export function runSitePagePlan(
         });
     });
 
-    const planRef = (document: JSONDocument, ref: ContentRef, anchorText: boolean) => {
+    const planRef = (document: JSONDocument | null, ref: ContentRef, anchorText: boolean) => {
         if (needsRequest(ref, anchorText, context)) {
             resolveRef(document, ref, anchorText);
         }
@@ -273,7 +279,28 @@ export function runSitePagePlan(
         }
     };
 
-    const planSiteImages = () => {
+    const planSite = () => {
+        // Links the layout resolves: header, announcement, footer, and link pages of the table of contents.
+        const { header: headerLinks, footer: footerLinks, announcement } = context.customization;
+        const layoutRefs: (ContentRef | null | undefined)[] = [
+            headerLinks.primaryLink,
+            // Same condition as `Announcement`, which renders nothing otherwise.
+            announcement?.enabled && announcement.message ? announcement.link?.to : undefined,
+            ...(headerLinks.links ?? []).flatMap((link) => [
+                link.to,
+                ...(link.links ?? []).map((sub) => sub.to),
+            ]),
+            ...(footerLinks.groups ?? []).flatMap((group) =>
+                (group.links ?? []).map((link) => link.to)
+            ),
+        ];
+        visitPages(context.revision?.pages, (target) => layoutRefs.push(target));
+        for (const ref of layoutRefs) {
+            if (ref) {
+                planRef(null, ref, false);
+            }
+        }
+
         // Logos and the custom icon carry no size, so the layout measures them on every page.
         const { header, footer, favicon } = context.customization;
         if (header.logo) {
@@ -304,7 +331,7 @@ export function runSitePagePlan(
     };
 
     // After every helper above is defined, and inside `start` so nothing throws out of the plan.
-    start(async () => planSiteImages());
+    start(async () => planSite());
 
     return settle(pending);
 }
@@ -318,6 +345,28 @@ function needsRequest(ref: ContentRef, anchorText: boolean, context: GitBookSite
         return true;
     }
     return ref.kind === 'anchor' && anchorText;
+}
+
+/** Calls `fn` with the target of every link page, as the table of contents resolves them. */
+function visitPages(pages: unknown, fn: (target: ContentRef) => void) {
+    if (!Array.isArray(pages)) {
+        return;
+    }
+    for (const page of pages as {
+        type?: string;
+        hidden?: boolean;
+        target?: ContentRef;
+        pages?: unknown;
+    }[]) {
+        // The table of contents skips hidden pages and everything under them.
+        if (!page || page.hidden) {
+            continue;
+        }
+        if (page.type === 'link' && page.target) {
+            fn(page.target);
+        }
+        visitPages(page.pages, fn);
+    }
 }
 
 function visit(nodes: unknown, fn: (node: Node) => void) {

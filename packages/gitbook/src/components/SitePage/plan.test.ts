@@ -74,7 +74,8 @@ function setup(options: {
         }
     );
     const loadIcons = mock(async () => ({}));
-    return { context, dataFetcher, imageResizer, resolveRef, loadIcons };
+    const loadGitMetadata = mock(async () => undefined);
+    return { context, dataFetcher, imageResizer, resolveRef, loadIcons, loadGitMetadata };
 }
 
 const doc = (nodes: unknown[]) => ({ object: 'document', nodes }) as unknown as JSONDocument;
@@ -96,6 +97,71 @@ describe('runSitePagePlan', () => {
         });
         pending.resolve({ data: null });
         await done;
+    });
+
+    it('starts the Git metadata of the page for the Edit on Git action', async () => {
+        const s = setup({});
+        await runSitePagePlan(s.context, page, s);
+        expect(s.loadGitMetadata).toHaveBeenCalledWith(s.context, page);
+    });
+
+    it('resolves cross-space links of the layout and the table of contents', async () => {
+        const ref = (space: string, page: string) => ({ kind: 'page', space, page });
+        const s = setup({
+            customization: {
+                header: {
+                    primaryLink: ref('space-2', 'primary'),
+                    links: [
+                        {
+                            title: 'Docs',
+                            to: ref('space-2', 'top'),
+                            links: [{ title: 'API', to: ref('space-2', 'nested') }],
+                        },
+                        { title: 'Here', to: { kind: 'page', page: 'same-space' } },
+                    ],
+                },
+                footer: { groups: [{ title: 'More', links: [{ to: ref('space-2', 'footer') }] }] },
+                announcement: {
+                    enabled: true,
+                    message: 'Hi',
+                    link: { to: ref('space-2', 'announce') },
+                },
+            },
+        });
+        (s.context as unknown as { revision: unknown }).revision = {
+            pages: [
+                {
+                    type: 'group',
+                    pages: [{ type: 'link', target: ref('space-2', 'toc') }],
+                },
+            ],
+        };
+        await runSitePagePlan(s.context, page, s);
+        const resolved = s.resolveRef.mock.calls.map(([d, r]) => [
+            d,
+            (r as { page?: string }).page,
+        ]);
+        for (const name of ['primary', 'top', 'nested', 'footer', 'announce', 'toc']) {
+            expect(resolved).toContainEqual([null, name]);
+        }
+        expect(resolved).not.toContainEqual([null, 'same-space']);
+    });
+
+    it('skips hidden table of contents links and a disabled announcement', async () => {
+        const ref = (page: string) => ({ kind: 'page', space: 'space-2', page });
+        const s = setup({
+            customization: {
+                announcement: { enabled: false, message: 'Hi', link: { to: ref('announce') } },
+            },
+        });
+        (s.context as unknown as { revision: unknown }).revision = {
+            pages: [
+                { type: 'link', hidden: true, target: ref('hidden-link') },
+                { type: 'group', hidden: true, pages: [{ type: 'link', target: ref('inside') }] },
+            ],
+        };
+        await runSitePagePlan(s.context, page, s);
+        expect(s.resolveRef).not.toHaveBeenCalled();
     });
 
     it('starts embeds from the document with the page space', async () => {
