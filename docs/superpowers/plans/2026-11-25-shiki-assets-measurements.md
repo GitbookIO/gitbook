@@ -62,3 +62,18 @@ Notes:
 
 Grammar assets: 247 deduplicated grammar files (7.3 MB) + 60 themes (1.4 MB), versus 9.7 MB of
 language modules before; a flattened file per language would have been 39 MB.
+
+## Dynamic route check
+
+Earlier render checks hit `/sites/static/...` (ISR). Re-checked on the dynamic route with the
+`gitbook-dynamic-route` cookie, on builds made with `GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE=true`, page
+`/url/gitbook.com/docs/developers/gitbook-api/quickstart`, two requests per case (each re-rendered, ~8 s):
+
+| Runtime | Route | Default themes | `github-light` / `github-dark` (via `?customization=`) |
+|---|---|---|---|
+| `next start` | `x-gitbook-route-type: dynamic` | 200, 154 tokens | 200, 124 tokens, GitHub colours (`#D73A49`) |
+| Split Cloudflare workers | `/sites/dynamic/...` `SERVER-MISS` | 200, 154 tokens | 200, 124 tokens, GitHub colours |
+
+No load errors in either server log. Bundled themes are read from JSON on the server (disk on Node,
+`ASSETS` on Cloudflare). Token-for-token parity with Shiki's own bundled highlighter was checked for
+javascript, python, vue, markdown (fenced js), bash and yaml with the GitHub themes.
