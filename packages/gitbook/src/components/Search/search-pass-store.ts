@@ -169,7 +169,14 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
             if (current.status === 'ready') {
                 useProxy = true;
                 pass = current;
-                attempt = await sendSearch(proxyURL, true, pass.token, body, signal);
+                attempt = await sendSearch(
+                    proxyURL,
+                    true,
+                    pass.token,
+                    body,
+                    signal,
+                    attempt.reason
+                );
             } else if (current.status === 'none') {
                 useProxy = true;
                 return { type: 'route', reason: attempt.reason };
@@ -233,13 +240,17 @@ async function sendSearch(
     useProxy: boolean,
     token: string,
     body: string,
-    signal: AbortSignal
+    signal: AbortSignal,
+    fallbackReason?: 'network' | 'timeout'
 ): Promise<SearchAttempt> {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     let mode: RequestMode | undefined;
     if (useProxy) {
         mode = 'same-origin';
         headers['x-gitbook-search-pass'] = token;
+        if (fallbackReason) {
+            headers[SEARCH_FALLBACK_HEADER] = fallbackReason;
+        }
     } else {
         headers.Authorization = `Bearer ${token}`;
     }

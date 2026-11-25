@@ -48,7 +48,9 @@ describe('direct site search middleware', () => {
                 'x-gitbook-ip': '192.0.2.1',
                 'cf-connecting-ip': '192.0.2.2',
                 'x-forwarded-for': '192.0.2.3',
+                'user-agent': 'Mozilla/5.0',
                 [PASS_HEADER]: SEARCH_PASS,
+                'x-gitbook-search-fallback': 'network',
                 cookie: 'session=1',
                 authorization: 'Bearer incoming-token',
             },
@@ -66,6 +68,7 @@ describe('direct site search middleware', () => {
         expect(Object.fromEntries(new Headers(init?.headers))).toEqual({
             authorization: `Bearer ${SEARCH_PASS}`,
             'content-type': 'application/json',
+            'user-agent': 'Mozilla/5.0',
             'x-forwarded-for': '192.0.2.1',
         });
         expect(response.status).toBe(429);
@@ -100,6 +103,25 @@ describe('direct site search middleware', () => {
 
     it('returns an uncached 502 when the upstream request fails', async () => {
         fetchSpy.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+        const response = await middleware(
+            new NextRequest(`https://origin.example.com${PATH}`, {
+                method: 'POST',
+                headers: { 'x-forwarded-host': 'docs.example.com', [PASS_HEADER]: SEARCH_PASS },
+            })
+        );
+
+        expect(response.status).toBe(502);
+        expect(response.headers.get('cache-control')).toBe('no-store');
+        expect(fetchSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('returns an uncached 502 when reading the upstream response body fails', async () => {
+        const body = new ReadableStream({
+            start(controller) {
+                controller.error(new TypeError('Connection reset'));
+            },
+        });
+        fetchSpy.mockResolvedValueOnce(new Response(body, { status: 200 }));
         const response = await middleware(
             new NextRequest(`https://origin.example.com${PATH}`, {
                 method: 'POST',

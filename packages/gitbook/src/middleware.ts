@@ -96,6 +96,7 @@ const DIRECT_SEARCH_PATH = /\/~gitbook\/search-direct\/orgs\/([^/]*)\/sites\/([^
 const DIRECT_SEARCH_ID = /^[a-zA-Z0-9_-]+$/;
 const DIRECT_SEARCH_PASS =
     /^[a-zA-Z0-9_-]+\.\.[a-zA-Z0-9_-]{16}\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]{22}$/;
+const DIRECT_SEARCH_TIMEOUT_MS = 10_000;
 
 export async function middleware(request: NextRequest) {
     try {
@@ -211,33 +212,60 @@ async function serveDirectSearch(request: NextRequest, organizationId = '', site
         Authorization: `Bearer ${pass}`,
         'Content-Type': request.headers.get('Content-Type') ?? 'application/json',
     });
+    const userAgent = request.headers.get('User-Agent');
+    if (userAgent) headers.set('User-Agent', userAgent);
     const ip = request.headers.get('x-gitbook-ip') ?? getXForwardedFor(request.headers);
     if (ip) headers.set('X-Forwarded-For', ip);
 
-    const upstream = await fetch(
-        `${removeTrailingSlash(GITBOOK_API_URL)}/v1/orgs/${organizationId}/sites/${siteId}/search`,
-        {
-            method: 'POST',
-            headers,
-            body: request.body,
-            redirect: 'manual',
-            signal: request.signal,
-            duplex: 'half',
-        } as RequestInit
-    ).catch(() => {
+    const controller = new AbortController();
+    const abort = () => controller.abort();
+    if (request.signal.aborted) {
+        abort();
+    }
+    request.signal.addEventListener('abort', abort, { once: true });
+    const timeout = setTimeout(abort, DIRECT_SEARCH_TIMEOUT_MS);
+    try {
+        const upstream = await fetch(
+            `${removeTrailingSlash(GITBOOK_API_URL)}/v1/orgs/${organizationId}/sites/${siteId}/search`,
+            {
+                method: 'POST',
+                headers,
+                body: request.body,
+                redirect: 'manual',
+                signal: controller.signal,
+                duplex: 'half',
+            } as RequestInit
+        );
+        const responseBody = await upstream.arrayBuffer();
+        for (const name of [
+            'Content-Type',
+            'Retry-After',
+            'X-RateLimit-Scope',
+            'X-RateLimit-Reset',
+        ]) {
+            const value = upstream.headers.get(name);
+            if (value !== null) responseHeaders.set(name, value);
+        }
+        const fallback = request.headers.get('x-gitbook-search-fallback');
+        if (upstream.ok && (fallback === 'network' || fallback === 'timeout')) {
+            getLogger().subLogger('directSiteSearch').info('Direct search recovered via proxy', {
+                reason: fallback,
+                organizationId,
+                siteId,
+            });
+        }
+        return new Response(responseBody, { status: upstream.status, headers: responseHeaders });
+    } catch {
         getLogger().subLogger('directSiteSearch').warn('Direct search upstream failed', {
             status: 502,
             organizationId,
             siteId,
         });
-        return new Response(null, { status: 502 });
-    });
-    for (const name of ['Content-Type', 'Retry-After', 'X-RateLimit-Scope', 'X-RateLimit-Reset']) {
-        const value = upstream.headers.get(name);
-        if (value !== null) responseHeaders.set(name, value);
+        return new Response(null, { status: 502, headers: responseHeaders });
+    } finally {
+        clearTimeout(timeout);
+        request.signal.removeEventListener('abort', abort);
     }
-    const responseBody = await upstream.arrayBuffer();
-    return new Response(responseBody, { status: upstream.status, headers: responseHeaders });
 }
 
 async function serveSiteRequest(requestURL: URL, request: NextRequest, match: URLWithMode) {

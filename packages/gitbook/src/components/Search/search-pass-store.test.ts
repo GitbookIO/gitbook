@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, spyOn } from 'bun:test';
 
-import { createSearchPassStore } from './search-pass-store';
+import { SEARCH_FALLBACK_HEADER, createSearchPassStore } from './search-pass-store';
 import type { DirectSearchProps } from '@/lib/search-results';
 
 const endpoint = 'https://api.gitbook.com/v1/orgs/org_1/sites/site_1/search';
@@ -84,7 +84,11 @@ describe('createSearchPassStore', () => {
         expect(init?.body).toBe(JSON.stringify({ query: 'tokens', mode: 'all' }));
         const headers = new Headers(init?.headers);
         expect(headers.get('x-gitbook-search-pass')).toBe('pass-1');
+        expect(headers.get(SEARCH_FALLBACK_HEADER)).toBe('network');
         expect(headers.has('authorization')).toBe(false);
+        expect(new Headers(fetchSpy.mock.calls[3]?.[1]?.headers).has(SEARCH_FALLBACK_HEADER)).toBe(
+            false
+        );
     });
 
     it('uses the server route after the site proxy also fails', async () => {
