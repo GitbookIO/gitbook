@@ -94,6 +94,17 @@ describe('servePageMarkdown', () => {
         expect(response.headers.get('Location')).toBe('/docs/new-page.md');
     });
 
+    it('returns not-found markdown instead of looping when a site redirect targets the same markdown path', async () => {
+        const context = createContext({
+            siteRedirect: { target: 'https://docs.example.com/docs/old-page.md', permanent: false },
+        });
+
+        const response = await servePageMarkdown(context, 'old-page');
+
+        expect(response.status).toBe(200);
+        expect(await response.text()).toContain('# Page Not Found');
+    });
+
     it('redirects to the markdown version of a space redirect target', async () => {
         const context = createContext({ spaceRedirectPageId: page.id });
 
