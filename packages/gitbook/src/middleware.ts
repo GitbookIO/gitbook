@@ -239,7 +239,8 @@ async function serveDirectSearch(request: NextRequest, organizationId = '', site
         const value = upstream.headers.get(name);
         if (value !== null) responseHeaders.set(name, value);
     }
-    return new Response(upstream.body, { status: upstream.status, headers: responseHeaders });
+    const responseBody = await upstream.arrayBuffer();
+    return new Response(responseBody, { status: upstream.status, headers: responseHeaders });
 }
 
 async function serveSiteRequest(requestURL: URL, request: NextRequest, match: URLWithMode) {
