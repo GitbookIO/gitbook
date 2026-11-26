@@ -83,6 +83,7 @@ const getBlockHeight = memoize((block: DocumentBlock | undefined): number => {
         case 'heading-2':
             return 50;
         case 'heading-3':
+        case 'heading-4':
             return 40;
         case 'paragraph':
             return 30;

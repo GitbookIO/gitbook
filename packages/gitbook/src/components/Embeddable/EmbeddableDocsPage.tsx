@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 
+import { PaginatedUpdatesProvider } from '../DocumentView/PaginatedUpdates';
 import { HeaderMobileMenu } from '../Header/HeaderMobileMenu';
 import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
 import { PageBody } from '../PageBody';
@@ -33,6 +34,7 @@ export const dynamic = 'force-static';
 type EmbeddableDocsPageProps = {
     context: GitBookSiteContext;
     pageParams: PagePathParams;
+    updatesPage?: number;
 };
 
 /**
@@ -41,11 +43,42 @@ type EmbeddableDocsPageProps = {
 export async function EmbeddableDocsPage(
     props: EmbeddableDocsPageProps & { staticRoute: boolean }
 ) {
-    const { context, pageParams } = props;
-    const { page, document, ancestors, withPageFeedback } = await getSitePageData({
-        context,
-        pageParams,
-    });
+    const { context } = props;
+    const {
+        page,
+        document,
+        ancestors,
+        withPageFeedback,
+        pagination,
+        updatesBaseHref,
+        filterableTags,
+    } = await getSitePageData(props);
+    let pageBody = (
+        <PageBody
+            context={context}
+            page={page}
+            ancestors={ancestors}
+            document={document}
+            withPageFeedback={withPageFeedback}
+            insightsDisplayContext={SiteInsightsDisplayContext.Embed}
+            staticRoute={props.staticRoute}
+            updatesBaseHref={updatesBaseHref}
+        />
+    );
+    if (pagination) {
+        pageBody = (
+            <PaginatedUpdatesProvider
+                key={`${context.space.id}/${context.revisionId}/${page.id}/${pagination.page}`}
+                pageId={page.id}
+                revisionId={context.revisionId}
+                isEmbeddable
+                tagSlugs={filterableTags.map((tag) => tag.slug)}
+                initialPagination={pagination}
+            >
+                {pageBody}
+            </PaginatedUpdatesProvider>
+        );
+    }
 
     const variants = categorizeVariants(context);
 
@@ -147,15 +180,7 @@ export async function EmbeddableDocsPage(
                                 ) : null
                             }
                         />
-                        <PageBody
-                            context={context}
-                            page={page}
-                            ancestors={ancestors}
-                            document={document}
-                            withPageFeedback={withPageFeedback}
-                            insightsDisplayContext={SiteInsightsDisplayContext.Embed}
-                            staticRoute={props.staticRoute}
-                        />
+                        {pageBody}
                     </ScrollContainer>
                 </EmbeddableFrameBody>
             </EmbeddableFrameMain>

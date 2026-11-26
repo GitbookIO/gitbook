@@ -15,7 +15,7 @@ import { PageFeedbackForm } from '../PageFeedback';
 import { SideSheet } from '../primitives/SideSheet';
 import { ThemeToggler } from '../ThemeToggler';
 import { PageAsideCloseButton } from './PageAsideButton';
-import { ScrollSectionsList } from './ScrollSectionsList';
+import { PaginatedScrollSectionsList, ScrollSectionsList } from './ScrollSectionsList';
 import { ScrollToTopButton } from './ScrollToTopButton';
 import { getSpaceLanguage, t, tString } from '@/intl/server';
 import type { GitBookSiteContext } from '@/lib/context';
@@ -29,6 +29,7 @@ export async function PageAside(props: {
     page: RevisionPageDocument;
     document: JSONDocument | null;
     filterableTags: RevisionTag[];
+    withUpdatesPagination: boolean;
     context: GitBookSiteContext;
     withHeaderOffset: { sectionsHeader: boolean; topHeader: boolean };
     withFullPageCover: boolean;
@@ -142,7 +143,11 @@ export async function PageAside(props: {
                         <div className="flex shrink flex-col overflow-hidden">
                             {document ? (
                                 <React.Suspense fallback={null}>
-                                    <PageAsideSections document={document} context={context} />
+                                    <PageAsideSections
+                                        document={document}
+                                        context={context}
+                                        withUpdatesPagination={props.withUpdatesPagination}
+                                    />
                                 </React.Suspense>
                             ) : null}
                             <PageAsideActions page={page} withPageFeedback={withPageFeedback} />
@@ -157,10 +162,18 @@ export async function PageAside(props: {
     );
 }
 
-async function PageAsideSections(props: { document: JSONDocument; context: GitBookSiteContext }) {
+async function PageAsideSections(props: {
+    document: JSONDocument;
+    context: GitBookSiteContext;
+    withUpdatesPagination: boolean;
+}) {
     const { document, context } = props;
 
     const sections = await getDocumentSections(context, document);
+
+    if (props.withUpdatesPagination) {
+        return <PaginatedScrollSectionsList sections={sections} />;
+    }
 
     return sections.length > 1 ? (
         <div data-gb-page-outline className="overflow-y-auto">

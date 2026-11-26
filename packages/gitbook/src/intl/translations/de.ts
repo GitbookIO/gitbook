@@ -47,6 +47,8 @@ export const de: TranslationLanguage = {
     on_this_page: 'Auf dieser Seite',
     next_page: 'Nächste',
     previous_page: 'Vorherige',
+    updates_pagination_navigation: 'Seitennavigation',
+    updates_pagination_range: '${1} - ${2} von ${3} Updates',
     toc_back_to_space: 'Zurück zu ${1}',
     page_last_modified: 'Zuletzt aktualisiert ${1}',
     was_this_helpful: 'War das hilfreich?',

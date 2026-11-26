@@ -6,6 +6,7 @@ import {
     CustomizationHeaderPreset,
     SiteInsightsDisplayContext,
     type TranslationLanguage,
+    type RevisionTag,
 } from '@gitbook/api';
 import { IconsProvider } from '@gitbook/icons';
 
@@ -18,6 +19,7 @@ import {
 } from './fetch';
 import { PageClientLayout } from './PageClientLayout';
 import { getPageFullTitle } from './title';
+import { PaginatedUpdatesProvider } from '@/components/DocumentView/PaginatedUpdates';
 import { UpdatesFilterProvider } from '@/components/DocumentView/UpdatesFilter';
 import { UpdatesFilterScript } from '@/components/DocumentView/UpdatesFilterScript';
 import { PageAside } from '@/components/PageAside';
@@ -30,22 +32,29 @@ import {
     getInlineIconSources,
 } from '@/lib/icons/inline';
 import { getResizedImageURL } from '@/lib/images';
+import { getLogger } from '@/lib/logger';
 import { getPagePath } from '@/lib/pages';
 import { resolveContentRef } from '@/lib/references';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 import { getSiteSpacePagePaths, resolveSiteSpaceCustomHomePage } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 import {
+    countDocumentUpdates,
     generateUpdatesFilterCSS,
+    getUpdatesPageRange,
+    paginateUpdatesDocument,
+    UPDATES_PAGINATION_THRESHOLD,
     getDocumentFilterableTags,
     updatesFilterStyleHref,
 } from '@/lib/updates';
+import { UPDATES_PAGE_SEARCH_PARAM } from '@/lib/updates-url';
 
 export { getPageFullTitle } from './title';
 
 export type SitePageProps = {
     context: GitBookSiteContext;
     pageParams: PagePathParams;
+    updatesPage?: number;
 };
 
 type AlternateLinkSpace = {
@@ -85,11 +94,13 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
         withTopHeader,
         pageMetaLinks,
         iconSources,
+        filterableTags,
+        pagination,
+        updatesBaseHref,
     } = await getSitePageData(props);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
-    const filterableTags = document ? getDocumentFilterableTags(document, context.revision) : [];
     const filterableTagSlugs = filterableTags.map((tag) => tag.slug);
-    const content = (
+    let content = (
         <>
             {/* Using `contents` makes the children of this div according to its parent — which keeps them in a single flex row with the TOC by default.
             If there's a page cover, we use `flex flex-col` to lay out the PageCover above the PageBody + PageAside instead. */}
@@ -119,6 +130,7 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
                         page={page}
                         document={document}
                         filterableTags={filterableTags}
+                        withUpdatesPagination={Boolean(pagination)}
                         withHeaderOffset={headerOffset}
                         withFullPageCover={withFullPageCover}
                         withPageFeedback={withPageFeedback}
@@ -132,6 +144,7 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
                         withPageFeedback={withPageFeedback}
                         insightsDisplayContext={SiteInsightsDisplayContext.Site}
                         staticRoute={props.staticRoute}
+                        updatesBaseHref={updatesBaseHref}
                     />
                 </div>
                 <PageClientLayout pageMetaLinks={pageMetaLinks} />
@@ -139,18 +152,34 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
         </>
     );
 
+    if (pagination) {
+        content = (
+            <PaginatedUpdatesProvider
+                key={`${context.space.id}/${context.revisionId}/${page.id}/${pagination.page}`}
+                pageId={page.id}
+                revisionId={context.revisionId}
+                isEmbeddable={false}
+                tagSlugs={filterableTagSlugs}
+                initialPagination={pagination}
+            >
+                <UpdatesFilterStyle tagSlugs={filterableTagSlugs} />
+                {content}
+            </PaginatedUpdatesProvider>
+        );
+    } else if (filterableTagSlugs.length > 0) {
+        content = (
+            <UpdatesFilterProvider tagSlugs={filterableTagSlugs}>
+                <UpdatesFilterScript tagSlugs={filterableTagSlugs} />
+                <UpdatesFilterStyle tagSlugs={filterableTagSlugs} />
+                {content}
+            </UpdatesFilterProvider>
+        );
+    }
+
     return (
         <IconsProvider iconSources={iconSources}>
             <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
-                {filterableTagSlugs.length > 0 ? (
-                    <UpdatesFilterProvider tagSlugs={filterableTagSlugs}>
-                        <UpdatesFilterScript tagSlugs={filterableTagSlugs} />
-                        <UpdatesFilterStyle tagSlugs={filterableTagSlugs} />
-                        {content}
-                    </UpdatesFilterProvider>
-                ) : (
-                    content
-                )}
+                {content}
             </PageContextProvider>
         </IconsProvider>
     );
@@ -204,7 +233,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     const { page, ancestors } = pageTarget;
     const { customization, revision, linker, imageResizer } = context;
 
-    const canonical = (
+    let canonical = (
         pageMetaLinks?.canonical
             ? new URL(
                   // If the canonical link is an absolute URL, use it as is.
@@ -215,6 +244,23 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
             : // If no canonical is set, use the current page URL (default case)
               linker.toAbsoluteURL(linker.toPathForPage({ pages: revision.pages, page }))
     ).replace(/\/+$/, ''); // Trim trailing slashes in canonical URL to match the redirect behavior
+
+    let title = getPageFullTitle(context, page);
+    if (props.updatesPage) {
+        const document = await getPageDocument(context, page);
+        if (document) {
+            const count = countDocumentUpdates(document);
+            if (count > UPDATES_PAGINATION_THRESHOLD) {
+                const { page: pageNumber } = getUpdatesPageRange(props.updatesPage, count);
+                title = `${title} (Page ${pageNumber})`;
+                if (!pageMetaLinks?.canonical) {
+                    const url = new URL(canonical);
+                    url.searchParams.set(UPDATES_PAGE_SEARCH_PARAM, String(pageNumber));
+                    canonical = url.toString();
+                }
+            }
+        }
+    }
 
     const alternates = pageMetaLinks?.alternates.reduce<{
         languages: Record<string, string>;
@@ -239,7 +285,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     );
 
     return {
-        title: getPageFullTitle(context, page),
+        title,
         description: page.description ?? '',
         keywords: page.keywords?.length ? page.keywords : undefined,
         alternates: {
@@ -327,7 +373,42 @@ export async function getSitePageData(props: SitePageProps) {
 
     const withSections = Boolean(visibleSections && visibleSections.list.length > 0);
 
-    const document = await getPageDocument(context, page);
+    const fullDocument = await getPageDocument(context, page);
+    const pageHref = context.linker.toPathForPagePath({ path: rawPathname });
+    let filterableTags: RevisionTag[] = [];
+    let document = fullDocument;
+    let pagination = null;
+    if (fullDocument) {
+        filterableTags = getDocumentFilterableTags(fullDocument, context.revision);
+        ({ document, pagination } = paginateUpdatesDocument(fullDocument, context.revision, {
+            page: props.updatesPage ?? 1,
+        }));
+    }
+
+    if (pagination || props.updatesPage) {
+        const logger = getLogger().subLogger('updatesPagination', {
+            labels: { siteId: context.site.id, pageId: page.id },
+        });
+        if (props.updatesPage && (!pagination || pagination.isClamped)) {
+            const targetPage = pagination?.page ?? 1;
+            logger.info('Redirected out-of-range updates page', {
+                requestedPage: props.updatesPage,
+                targetPage,
+            });
+            if (targetPage > 1) {
+                redirect(`${pageHref}?${UPDATES_PAGE_SEARCH_PARAM}=${targetPage}`);
+            }
+            redirect(pageHref);
+        }
+        if (pagination) {
+            logger.info('Rendered updates page', {
+                page: pagination.page,
+                totalItems: pagination.totalItems,
+                totalPages: pagination.totalPages,
+            });
+        }
+    }
+
     const iconStyle = getCustomizationIconStyle(customization);
     const iconSources = await getInlineIconSources(
         getContentInlineIconSourceRequests({
@@ -335,6 +416,11 @@ export async function getSitePageData(props: SitePageProps) {
             document,
         })
     );
+
+    let updatesBaseHref: string | undefined;
+    if (pagination) {
+        updatesBaseHref = pageHref;
+    }
 
     return {
         context,
@@ -347,6 +433,9 @@ export async function getSitePageData(props: SitePageProps) {
         withTopHeader,
         pageMetaLinks,
         iconSources,
+        filterableTags,
+        pagination,
+        updatesBaseHref,
     };
 }
 
