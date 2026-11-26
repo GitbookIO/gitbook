@@ -46,6 +46,8 @@ export const uk: TranslationLanguage = {
     on_this_page: 'На цій сторінці',
     next_page: 'Наступна',
     previous_page: 'Попередня',
+    updates_pagination_navigation: 'Навігація сторінками',
+    updates_pagination_range: '${1} - ${2} з ${3} оновлень',
     toc_back_to_space: 'Назад до ${1}',
     page_last_modified: 'Останнє оновлення ${1}',
     was_this_helpful: 'Це було корисно?',

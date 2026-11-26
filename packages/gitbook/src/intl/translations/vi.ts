@@ -46,6 +46,8 @@ export const vi: TranslationLanguage = {
     on_this_page: 'Trên trang này',
     next_page: 'Tiếp theo',
     previous_page: 'Trước',
+    updates_pagination_navigation: 'Điều hướng trang',
+    updates_pagination_range: '${1} - ${2} trong số ${3} bản cập nhật',
     toc_back_to_space: 'Quay lại ${1}',
     page_last_modified: 'Cập nhật lần cuối ${1}',
     was_this_helpful: 'Nội dung này có hữu ích không?',

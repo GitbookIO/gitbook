@@ -1,4 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, spyOn } from 'bun:test';
+import { RequestCookiesAdapter } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
+import * as nextHeaders from 'next/headers';
 import { NextRequest } from 'next/server';
 
 import { middleware } from './middleware';
@@ -156,4 +158,62 @@ describe('direct site search middleware', () => {
         expect(response.headers.get('x-content-type-options')).toBe('nosniff');
         expect(response.headers.get('server-timing')).toMatch(/^api;dur=\d+$/);
     });
+});
+
+describe('Updates page middleware', () => {
+    it.each([
+        ['/changelog', '', '/changelog', null],
+        ['/changelog', '?page=2', '/changelog/2', null],
+        ['/changelog', '?page=500&tag=fixes&tag=releases', '/changelog/500', 'noindex, follow'],
+        ['/changelog', '?tag=fixes', '/changelog', 'noindex, follow'],
+        ['/changelog', '?page=1', '/changelog', null],
+        ['/changelog', '?page=0', '/changelog', null],
+        ['/changelog', '?page=-1', '/changelog', null],
+        ['/changelog', '?page=abc', '/changelog', null],
+        ['/changelog', '?page=501', '/changelog', null],
+        ['/changelog.md', '?page=2', '/~gitbook/markdown/changelog', null],
+        ['/changelog/rss.xml', '?page=2', '/~gitbook/rss/changelog', null],
+        ['/llms-full.txt', '?page=2', '/llms-full.txt', null],
+        ['/sitemap.xml', '?page=2', '/sitemap.xml', null],
+        ['/changelog', '?page=2&tag=fixes&ask=test', '/changelog/2', 'none'],
+        ['/~gitbook/embed/page/changelog', '?page=2', '/~gitbook/embed/page/%2Fchangelog/2', null],
+    ] as const)(
+        'rewrites %s%s without changing its query',
+        async (path, search, suffix, robots) => {
+            const url = new URL(`https://docs.example.com${path}${search}`);
+            fetchSpy.mockResolvedValueOnce(
+                Response.json({
+                    site: 'site',
+                    siteSpace: 'variant',
+                    space: 'space',
+                    organization: 'org',
+                    apiToken: 'content-token',
+                    pathname: path,
+                    basePath: '',
+                    siteBasePath: '',
+                    canonicalUrl: url.origin + url.pathname,
+                    complete: true,
+                })
+            );
+
+            const request = new NextRequest(url, { headers: { 'x-forwarded-host': url.host } });
+            const cookiesSpy = spyOn(nextHeaders, 'cookies').mockResolvedValue(
+                RequestCookiesAdapter.seal(request.cookies)
+            );
+            let response;
+            try {
+                response = await middleware(request);
+            } finally {
+                cookiesSpy.mockRestore();
+            }
+
+            expect(response.headers.get('x-gitbook-route-type')).toBe('static');
+            expect(response.headers.get('x-robots-tag')).toBe(robots);
+            const rewrite = response.headers.get('x-middleware-rewrite');
+            expect(rewrite).not.toBeNull();
+            const destination = new URL(rewrite!);
+            expect(destination.pathname).toEndWith(suffix);
+            expect(destination.search).toBe(search);
+        }
+    );
 });

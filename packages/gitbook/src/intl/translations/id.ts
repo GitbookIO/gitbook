@@ -46,6 +46,8 @@ export const id: TranslationLanguage = {
     on_this_page: 'Di halaman ini',
     next_page: 'Berikutnya',
     previous_page: 'Sebelumnya',
+    updates_pagination_navigation: 'Navigasi halaman',
+    updates_pagination_range: '${1} - ${2} dari ${3} pembaruan',
     toc_back_to_space: 'Kembali ke ${1}',
     page_last_modified: 'Terakhir diperbarui ${1}',
     was_this_helpful: 'Apakah ini membantu?',

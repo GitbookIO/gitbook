@@ -183,6 +183,7 @@ const TEXT_ONLY_BLOCKS = new Set<DocumentBlock['type']>([
     'heading-1',
     'heading-2',
     'heading-3',
+    'heading-4',
 ]);
 
 /**
@@ -270,7 +271,7 @@ export function getBlocksByType<Type extends DocumentBlock['type']>(
  * Check if a block is a heading block.
  */
 export function isHeadingBlock(block: DocumentBlock): block is DocumentBlockHeading {
-    return ['heading-1', 'heading-2', 'heading-3'].includes(block.type);
+    return ['heading-1', 'heading-2', 'heading-3', 'heading-4'].includes(block.type);
 }
 
 /**

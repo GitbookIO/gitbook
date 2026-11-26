@@ -46,6 +46,8 @@ export const lt: TranslationLanguage = {
     on_this_page: 'Šiame puslapyje',
     next_page: 'Kitas',
     previous_page: 'Ankstesnis',
+    updates_pagination_navigation: 'Puslapių navigacija',
+    updates_pagination_range: '${1} - ${2} iš ${3} naujinimų',
     toc_back_to_space: 'Atgal į ${1}',
     page_last_modified: 'Paskutinį kartą atnaujinta ${1}',
     was_this_helpful: 'Ar tai buvo naudinga?',

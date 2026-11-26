@@ -27,6 +27,7 @@ export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
             case 'heading-2':
                 return '-mt-[calc(1.25rem+1px)]';
             case 'heading-3':
+            case 'heading-4':
                 return '-mt-[calc(0.50rem+1px)]';
             default:
                 return '';

@@ -46,6 +46,8 @@ export const ro: TranslationLanguage = {
     on_this_page: 'Pe această pagină',
     next_page: 'Următoarea',
     previous_page: 'Anterioara',
+    updates_pagination_navigation: 'Navigare între pagini',
+    updates_pagination_range: '${1} - ${2} din ${3} actualizări',
     toc_back_to_space: 'Înapoi la ${1}',
     page_last_modified: 'Ultima actualizare ${1}',
     was_this_helpful: 'A fost util?',
