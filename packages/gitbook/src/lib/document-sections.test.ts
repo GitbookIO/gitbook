@@ -237,8 +237,11 @@ describe('getDocumentSections', () => {
         ]);
     });
 
-    it('nests heading-3 under the heading before it', async () => {
-        const heading = (type: 'heading-1' | 'heading-2' | 'heading-3', id: string) => ({
+    it('nests heading-3 under the heading before it and leaves heading-4 out', async () => {
+        const heading = (
+            type: 'heading-1' | 'heading-2' | 'heading-3' | 'heading-4',
+            id: string
+        ) => ({
             object: 'block' as const,
             type,
             data: {},
@@ -261,6 +264,7 @@ describe('getDocumentSections', () => {
                 heading('heading-3', 'h3-under-h1'),
                 heading('heading-2', 'h2'),
                 heading('heading-3', 'h3-under-h1-h2'),
+                heading('heading-4', 'h4-not-in-outline'),
                 {
                     object: 'block',
                     type: 'stepper',
@@ -272,7 +276,10 @@ describe('getDocumentSections', () => {
                             type: 'stepper-step',
                             data: {},
                             isVoid: false,
-                            nodes: [heading('heading-3', 'h3-in-stepper')],
+                            nodes: [
+                                heading('heading-3', 'h3-in-stepper'),
+                                heading('heading-4', 'h4-in-stepper'),
+                            ],
                         },
                     ],
                 },

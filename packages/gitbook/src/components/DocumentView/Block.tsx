@@ -57,6 +57,7 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
             case 'heading-1':
             case 'heading-2':
             case 'heading-3':
+            case 'heading-4':
                 return <Heading {...props} block={block} />;
             case 'list-ordered':
             case 'list-unordered':
@@ -140,6 +141,7 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'heading-1':
         case 'heading-2':
         case 'heading-3':
+        case 'heading-4':
         case 'file':
             return <SkeletonHeading id={id} style={style} />;
         case 'paragraph':
