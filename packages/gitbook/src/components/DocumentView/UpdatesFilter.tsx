@@ -249,7 +249,7 @@ function TagChip(props: { tag: RevisionTag; onToggle: (tag: string) => void }) {
     );
 }
 
-export function areTagsEqual(left: string[], right: string[]): boolean {
+function areTagsEqual(left: string[], right: string[]): boolean {
     return left.length === right.length && left.every((tag, index) => tag === right[index]);
 }
 

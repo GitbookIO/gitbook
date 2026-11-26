@@ -23,7 +23,7 @@ import { MAIN_CONTENT_ID } from '@/components/layout';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import type { GitBookSiteContext } from '@/lib/context';
-import { hasAPIBlock, hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
+import { hasAPIBlock, hasFullWidthBlock, hasTopLevelBlock, isNodeEmpty } from '@/lib/document';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
@@ -36,7 +36,6 @@ export async function PageBody(props: {
     withPageFeedback: boolean;
     insightsDisplayContext: SiteInsightsDisplayContext;
     staticRoute: boolean;
-    contentHasUpdates: boolean;
     updatesBaseHref?: string | undefined;
 }) {
     const {
@@ -47,10 +46,14 @@ export async function PageBody(props: {
         withPageFeedback,
         insightsDisplayContext,
         staticRoute,
-        contentHasUpdates,
         updatesBaseHref,
     } = props;
     const { customization } = context;
+
+    // Update blocks can only be at the top level of the document, so we optimize the check.
+    const contentHasUpdates = document
+        ? hasTopLevelBlock(document, (block) => block.type === 'updates')
+        : false;
 
     // Comments can only be made on change request previews, so public pages skip their markers.
     const withCommentAnchors = Boolean(context.changeRequest);

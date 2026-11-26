@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 
 import { SiteInsightsDisplayContext } from '@gitbook/api';
-import { IconsProvider } from '@gitbook/icons';
 
 import { PaginatedUpdatesProvider } from '../DocumentView/PaginatedUpdates';
 import { HeaderMobileMenu } from '../Header/HeaderMobileMenu';
@@ -50,16 +49,10 @@ export async function EmbeddableDocsPage(
         document,
         ancestors,
         withPageFeedback,
-        contentHasUpdates,
         pagination,
-        pageHref,
+        updatesBaseHref,
         filterableTags,
-        iconSources,
     } = await getSitePageData(props);
-    let updatesBaseHref: string | undefined;
-    if (pagination) {
-        updatesBaseHref = pageHref;
-    }
     let pageBody = (
         <PageBody
             context={context}
@@ -69,24 +62,21 @@ export async function EmbeddableDocsPage(
             withPageFeedback={withPageFeedback}
             insightsDisplayContext={SiteInsightsDisplayContext.Embed}
             staticRoute={props.staticRoute}
-            contentHasUpdates={contentHasUpdates}
             updatesBaseHref={updatesBaseHref}
         />
     );
     if (pagination) {
         pageBody = (
-            <IconsProvider iconSources={iconSources}>
-                <PaginatedUpdatesProvider
-                    key={`${context.space.id}/${context.revisionId}/${page.id}/${pagination.page}`}
-                    pageId={page.id}
-                    revisionId={context.revisionId}
-                    isEmbeddable
-                    tagSlugs={filterableTags.map((tag) => tag.slug)}
-                    initialPagination={pagination}
-                >
-                    {pageBody}
-                </PaginatedUpdatesProvider>
-            </IconsProvider>
+            <PaginatedUpdatesProvider
+                key={`${context.space.id}/${context.revisionId}/${page.id}/${pagination.page}`}
+                pageId={page.id}
+                revisionId={context.revisionId}
+                isEmbeddable
+                tagSlugs={filterableTags.map((tag) => tag.slug)}
+                initialPagination={pagination}
+            >
+                {pageBody}
+            </PaginatedUpdatesProvider>
         );
     }
 

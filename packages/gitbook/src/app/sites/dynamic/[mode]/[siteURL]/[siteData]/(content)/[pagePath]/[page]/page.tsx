@@ -1,12 +1,8 @@
-import type { Metadata, Viewport } from 'next';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { type RouteParams, getDynamicSiteContext, getPagePathFromParams } from '@/app/utils';
-import {
-    SitePage,
-    generateSitePageMetadata,
-    generateSitePageViewport,
-} from '@/components/SitePage';
+import { SitePage, generateSitePageMetadata } from '@/components/SitePage';
 import { parseUpdatesPageParam } from '@/lib/updates-url';
 
 type PageProps = {
@@ -30,11 +26,6 @@ export default async function Page(props: PageProps) {
             updatesPage={updatesPage}
         />
     );
-}
-
-export async function generateViewport(props: PageProps): Promise<Viewport> {
-    const { context } = await getDynamicSiteContext(await props.params);
-    return generateSitePageViewport(context);
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {

@@ -26,7 +26,6 @@ import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getDataOrNull, getPageDocument } from '@/lib/data';
-import { hasTopLevelBlock } from '@/lib/document';
 import {
     getContentInlineIconSourceRequests,
     getCustomizationIconStyle,
@@ -96,16 +95,11 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
         pageMetaLinks,
         iconSources,
         filterableTags,
-        contentHasUpdates,
         pagination,
-        pageHref,
+        updatesBaseHref,
     } = await getSitePageData(props);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
     const filterableTagSlugs = filterableTags.map((tag) => tag.slug);
-    let updatesBaseHref: string | undefined;
-    if (pagination) {
-        updatesBaseHref = pageHref;
-    }
     let content = (
         <>
             {/* Using `contents` makes the children of this div according to its parent — which keeps them in a single flex row with the TOC by default.
@@ -150,7 +144,6 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
                         withPageFeedback={withPageFeedback}
                         insightsDisplayContext={SiteInsightsDisplayContext.Site}
                         staticRoute={props.staticRoute}
-                        contentHasUpdates={contentHasUpdates}
                         updatesBaseHref={updatesBaseHref}
                     />
                 </div>
@@ -382,12 +375,10 @@ export async function getSitePageData(props: SitePageProps) {
 
     const fullDocument = await getPageDocument(context, page);
     const pageHref = context.linker.toPathForPagePath({ path: rawPathname });
-    let contentHasUpdates = false;
     let filterableTags: RevisionTag[] = [];
     let document = fullDocument;
     let pagination = null;
     if (fullDocument) {
-        contentHasUpdates = hasTopLevelBlock(fullDocument, (block) => block.type === 'updates');
         filterableTags = getDocumentFilterableTags(fullDocument, context.revision);
         ({ document, pagination } = paginateUpdatesDocument(fullDocument, context.revision, {
             page: props.updatesPage ?? 1,
@@ -426,6 +417,11 @@ export async function getSitePageData(props: SitePageProps) {
         })
     );
 
+    let updatesBaseHref: string | undefined;
+    if (pagination) {
+        updatesBaseHref = pageHref;
+    }
+
     return {
         context,
         page,
@@ -437,10 +433,9 @@ export async function getSitePageData(props: SitePageProps) {
         withTopHeader,
         pageMetaLinks,
         iconSources,
-        contentHasUpdates,
         filterableTags,
         pagination,
-        pageHref,
+        updatesBaseHref,
     };
 }
 
