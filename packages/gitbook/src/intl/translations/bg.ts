@@ -46,6 +46,8 @@ export const bg: TranslationLanguage = {
     on_this_page: 'На тази страница',
     next_page: 'Следваща',
     previous_page: 'Предишна',
+    updates_pagination_navigation: 'Навигация между страниците',
+    updates_pagination_range: '${1} - ${2} от ${3} актуализации',
     toc_back_to_space: 'Обратно към ${1}',
     page_last_modified: 'Последна актуализация ${1}',
     was_this_helpful: 'Беше ли полезно?',

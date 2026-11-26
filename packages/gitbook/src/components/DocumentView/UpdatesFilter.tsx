@@ -36,7 +36,7 @@ const emptyUpdatesFilterContext: UpdatesFilterContextValue = {
     clearTags: () => {},
 };
 
-const UpdatesFilterContext = React.createContext<UpdatesFilterContextValue | null>(null);
+export const UpdatesFilterContext = React.createContext<UpdatesFilterContextValue | null>(null);
 
 export function UpdatesFilterProvider(props: { tagSlugs: string[]; children: React.ReactNode }) {
     const { tagSlugs, children } = props;
@@ -249,12 +249,12 @@ function TagChip(props: { tag: RevisionTag; onToggle: (tag: string) => void }) {
     );
 }
 
-function areTagsEqual(left: string[], right: string[]): boolean {
+export function areTagsEqual(left: string[], right: string[]): boolean {
     return left.length === right.length && left.every((tag, index) => tag === right[index]);
 }
 
 /** Mirrors the active filter onto `<html>`, matching what the pre-paint script does on first load. */
-function applyTagFilterAttribute(tags: string[]) {
+export function applyTagFilterAttribute(tags: string[]) {
     if (typeof document === 'undefined') {
         return;
     }

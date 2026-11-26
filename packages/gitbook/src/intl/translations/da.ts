@@ -46,6 +46,8 @@ export const da: TranslationLanguage = {
     on_this_page: 'På denne side',
     next_page: 'Næste',
     previous_page: 'Forrige',
+    updates_pagination_navigation: 'Sidenavigation',
+    updates_pagination_range: '${1} - ${2} af ${3} opdateringer',
     toc_back_to_space: 'Tilbage til ${1}',
     page_last_modified: 'Sidst opdateret ${1}',
     was_this_helpful: 'Var dette nyttigt?',

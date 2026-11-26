@@ -46,6 +46,8 @@ export const sl: TranslationLanguage = {
     on_this_page: 'Na tej strani',
     next_page: 'Naslednja',
     previous_page: 'Prejšnja',
+    updates_pagination_navigation: 'Krmarjenje med stranmi',
+    updates_pagination_range: '${1} - ${2} od ${3} posodobitev',
     toc_back_to_space: 'Nazaj na ${1}',
     page_last_modified: 'Nazadnje posodobljeno ${1}',
     was_this_helpful: 'Je bilo to koristno?',

@@ -4,7 +4,9 @@ import {
     SiteInsightsDisplayContext,
 } from '@gitbook/api';
 
-import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
+import { DocumentViewSkeleton } from '../DocumentView';
+import { PaginatedUpdatesBody } from '../DocumentView/PaginatedUpdates';
+import { UpdatesPagination } from '../DocumentView/UpdatesPagination';
 import { CurrentPageProvider } from '../hooks/useCurrentPage';
 import { TrackPageViewEvent } from '../Insights';
 import { CONTENT_STYLE } from '../layout';
@@ -12,6 +14,7 @@ import { PageFeedbackForm } from '../PageFeedback';
 import { DateRelative, SuspenseLoadedHint } from '../primitives';
 import OptionalSuspense from './OptionalSuspense';
 import { PageBodyBlankslate } from './PageBodyBlankslate';
+import { PageBodyDocument } from './PageBodyDocument';
 import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
@@ -20,18 +23,10 @@ import { MAIN_CONTENT_ID } from '@/components/layout';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import type { GitBookSiteContext } from '@/lib/context';
-import {
-    hasAPIBlock,
-    hasFullWidthBlock,
-    hasMoreThan,
-    hasTopLevelBlock,
-    isNodeEmpty,
-} from '@/lib/document';
+import { hasAPIBlock, hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
-
-const LINK_PREVIEW_MAX_COUNT = 500;
 
 export async function PageBody(props: {
     context: GitBookSiteContext;
@@ -41,6 +36,8 @@ export async function PageBody(props: {
     withPageFeedback: boolean;
     insightsDisplayContext: SiteInsightsDisplayContext;
     staticRoute: boolean;
+    contentHasUpdates: boolean;
+    updatesBaseHref?: string | undefined;
 }) {
     const {
         page,
@@ -50,25 +47,13 @@ export async function PageBody(props: {
         withPageFeedback,
         insightsDisplayContext,
         staticRoute,
+        contentHasUpdates,
+        updatesBaseHref,
     } = props;
     const { customization } = context;
 
-    // Update blocks can only be at the top level of the document, so we optimize the check.
-    const contentHasUpdates = document
-        ? hasTopLevelBlock(document, (block) => block.type === 'updates')
-        : false;
-
     // Comments can only be made on change request previews, so public pages skip their markers.
     const withCommentAnchors = Boolean(context.changeRequest);
-
-    // Render link previews only if there are less than LINK_PREVIEW_MAX_COUNT links in the document.
-    const withLinkPreviews = document
-        ? !hasMoreThan(
-              document,
-              (inline) => inline.object === 'inline' && inline.type === 'link',
-              LINK_PREVIEW_MAX_COUNT
-          )
-        : false;
 
     // Determine if content should use wide layout (2-column or 1-column instead of 3-column)
     // This happens when: (1) document has full-width blocks, OR (2) page layout is explicitly set to 'wide'
@@ -92,6 +77,29 @@ export async function PageBody(props: {
 
     const pageHasToc = page.layout.tableOfContents && hasVisibleTOCItems;
 
+    let content = <PageBodyBlankslate page={page} context={context} />;
+    if (document && !isNodeEmpty(document)) {
+        content = (
+            <OptionalSuspense
+                staticRoute={staticRoute}
+                fallback={<DocumentViewSkeleton document={document} blockStyle="" />}
+            >
+                <SuspenseLoadedHint />
+                <div className="contents" data-content-ref-root="">
+                    <PageBodyDocument document={document} context={context} page={page} />
+                </div>
+            </OptionalSuspense>
+        );
+    }
+    if (updatesBaseHref) {
+        content = (
+            <>
+                <PaginatedUpdatesBody>{content}</PaginatedUpdatesBody>
+                <UpdatesPagination language={language} baseHref={updatesBaseHref} />
+            </>
+        );
+    }
+
     return (
         <CurrentPageProvider page={{ spaceId: context.space.id, pageId: page.id }}>
             {contentHasUpdates ? (
@@ -104,10 +112,11 @@ export async function PageBody(props: {
             ) : null}
             <main
                 id={MAIN_CONTENT_ID}
+                tabIndex={-1}
                 // Comments on the whole page target anywhere in it that isn't a block.
                 {...(withCommentAnchors ? { 'data-comment-page': '' } : {})}
                 className={tcls(
-                    'relative min-w-0 flex-1',
+                    'relative min-w-0 flex-1 outline-none',
                     'break-anywhere', // Allow words to break if they are too long.
                     'py-8',
                     'layout-wide:no-sidebar:lg:max-xl:pb-20', // Add padding to prevent overlap of minimised trademark
@@ -138,32 +147,7 @@ export async function PageBody(props: {
                         hasAPIBlocks={hasAPIBlocks}
                         asEmbeddable={insightsDisplayContext === SiteInsightsDisplayContext.Embed}
                     />
-                    {document && !isNodeEmpty(document) ? (
-                        <OptionalSuspense
-                            staticRoute={staticRoute}
-                            fallback={<DocumentViewSkeleton document={document} blockStyle="" />}
-                        >
-                            <SuspenseLoadedHint />
-                            <div className="contents" data-content-ref-root="">
-                                <DocumentView
-                                    document={document}
-                                    style="flex flex-col [&>*+*]:mt-5"
-                                    context={{
-                                        mode: 'default',
-                                        contentContext: {
-                                            ...context,
-                                            page,
-                                        },
-                                        withLinkPreviews,
-                                        withCommentAnchors,
-                                        isPageBody: true,
-                                    }}
-                                />
-                            </div>
-                        </OptionalSuspense>
-                    ) : (
-                        <PageBodyBlankslate page={page} context={context} />
-                    )}
+                    {content}
                 </div>
 
                 {page.layout.pagination && customization.pagination.enabled ? (

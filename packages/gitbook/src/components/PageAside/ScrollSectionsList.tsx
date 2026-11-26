@@ -4,6 +4,10 @@ import React from 'react';
 import { OpenAPIMethodBadge } from '@gitbook/react-openapi';
 
 import { HEADER_HEIGHT_DESKTOP } from '../layout';
+import {
+    HIDE_PENDING_UPDATES,
+    usePaginatedUpdates,
+} from '@/components/DocumentView/PaginatedUpdates';
 import { useUpdatesFilter } from '@/components/DocumentView/UpdatesFilter';
 import { useScrollActiveId } from '@/components/hooks';
 import { useBodyLoaded } from '@/components/primitives';
@@ -20,6 +24,34 @@ const SECTION_INTERSECTING_THRESHOLD = 0.9;
  * The offset from the top of the page when scrolling to the active item.
  */
 const ACTIVE_ITEM_OFFSET = 100;
+
+export function PaginatedScrollSectionsList(props: { sections: DocumentSection[] }) {
+    const updates = usePaginatedUpdates();
+    const view = updates?.view;
+    if (view?.status === 'loading' || view?.status === 'error') {
+        return null;
+    }
+
+    let sections = props.sections;
+    if (view?.status === 'filtered') {
+        sections = view.sections;
+    }
+    if (sections.length <= 1) {
+        return null;
+    }
+
+    return (
+        <div
+            data-gb-page-outline
+            className={tcls(
+                'overflow-y-auto',
+                view?.status === 'unfiltered' && HIDE_PENDING_UPDATES
+            )}
+        >
+            <ScrollSectionsList sections={sections} />
+        </div>
+    );
+}
 
 export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }) {
     const { selectedTagSet } = useUpdatesFilter();

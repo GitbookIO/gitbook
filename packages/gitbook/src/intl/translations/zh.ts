@@ -46,6 +46,8 @@ export const zh: TranslationLanguage = {
     on_this_page: '在本页',
     next_page: '下一页',
     previous_page: '上一页',
+    updates_pagination_navigation: '分页导航',
+    updates_pagination_range: '第 ${1} 至 ${2} 条更新，共 ${3} 条',
     toc_back_to_space: '返回${1}',
     page_last_modified: '最后更新于 ${1}',
     was_this_helpful: '这有帮助吗？',
