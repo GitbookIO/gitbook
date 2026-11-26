@@ -24,6 +24,7 @@ import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import type { GitBookSiteContext } from '@/lib/context';
 import { hasAPIBlock, hasFullWidthBlock, hasTopLevelBlock, isNodeEmpty } from '@/lib/document';
+import { isOpenAPITagPage } from '@/lib/openapi/computedSourceProps';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
@@ -151,6 +152,9 @@ export async function PageBody(props: {
                         asEmbeddable={insightsDisplayContext === SiteInsightsDisplayContext.Embed}
                     />
                     {content}
+                    {isOpenAPITagPage(page) && document && !isNodeEmpty(document) ? (
+                        <PageBodyBlankslate page={page} context={context} className="mt-8" />
+                    ) : null}
                 </div>
 
                 {page.layout.pagination && customization.pagination.enabled ? (
