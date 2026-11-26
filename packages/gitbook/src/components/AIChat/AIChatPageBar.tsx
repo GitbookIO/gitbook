@@ -17,6 +17,7 @@ import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
 const SUGGESTIONS_COUNT = 3;
+const SCROLL_STOP_DELAY = 400;
 
 // Per space, for the whole session, so navigating between pages doesn't refetch.
 const recommendedQuestionsCache = new Map<string, Promise<string[]>>();
@@ -36,6 +37,8 @@ export function AIChatPageBar() {
     useInViewportListener(restRef, (isIntersecting) => setStuck(!isIntersecting));
     // The card's height assumes a one-line input, so the suggestions give way once the visitor types.
     const showSuggestions = expanded && !value;
+    const scrollingDown = useScrollingDown();
+    const hidden = scrollingDown && stuck && !expanded && !value;
 
     const configuredSuggestions = config.suggestions?.length ? config.suggestions : undefined;
     const [recommended, setRecommended] = React.useState<string[]>();
@@ -80,15 +83,18 @@ export function AIChatPageBar() {
             {/* z-30 sits above page content (cards, tables and code blocks go up to z-20) and below sheets and dialogs (z-40). */}
             <div
                 className={tcls(
-                    'sticky bottom-6 z-30 mx-auto mt-8 max-w-full transition-[width] duration-300 ease-out motion-reduce:transition-none chat-open:hidden print:hidden',
+                    'sticky bottom-6 z-30 mx-auto mt-8 max-w-full transition-[width,translate,opacity,visibility] duration-300 ease-out motion-reduce:transition-none chat-open:hidden print:hidden',
                     // Mobile browsers already inset the viewport's bottom edge for their own toolbar.
                     'max-lg:bottom-(--bar-bottom) max-lg:[--bar-bottom:max(env(safe-area-inset-bottom),0.75rem)]',
-                    expanded ? 'w-[42rem]' : 'w-[28rem]'
+                    expanded ? 'w-[42rem]' : 'w-[28rem]',
+                    hidden
+                        ? 'invisible opacity-0 motion-safe:translate-y-[calc(100%+1.5rem)]'
+                        : null
                 )}
             >
                 {/* On small screens the page would show all around a stuck bar, so a strip of its background sits behind it. */}
                 {stuck ? (
-                    <div className="site-background -bottom-(--bar-bottom) mask-t-from-[calc(100%-1.5rem)] animate-fade-in absolute -top-8 left-1/2 -z-10 w-screen -translate-x-1/2 lg:hidden" />
+                    <div className="site-background -bottom-(--bar-bottom) mask-t-from-[calc(100%-1.5rem)] animate-fade-in absolute -top-8 left-1/2 -z-10 w-screen -translate-x-1/2 motion-reduce:animate-none lg:hidden" />
                 ) : null}
                 {showSuggestions ? (
                     // The input stays in flow on top of the card, so focusing it never moves it; the bottom padding leaves its room.
@@ -99,7 +105,7 @@ export function AIChatPageBar() {
                                 truncate={false}
                                 variant="blank"
                                 size="small"
-                                className="animate-blur-in-slow w-full"
+                                className="animate-blur-in-slow w-full motion-reduce:animate-none"
                                 style={{ animationDelay: `${index * 50}ms` }}
                                 // Keep the input focused so the bar doesn't collapse before the click lands.
                                 onMouseDown={(event) => event.preventDefault()}
@@ -173,6 +179,34 @@ export function AIChatPageBar() {
     );
 }
 
+// The bar steps aside while the reader scrolls down through the page, and comes back once they stop or scroll up.
+function useScrollingDown() {
+    const [scrollingDown, setScrollingDown] = React.useState(false);
+
+    React.useEffect(() => {
+        let lastY = window.scrollY;
+        let stopTimeout: ReturnType<typeof setTimeout>;
+        const onScroll = () => {
+            clearTimeout(stopTimeout);
+            stopTimeout = setTimeout(() => setScrollingDown(false), SCROLL_STOP_DELAY);
+            const y = window.scrollY;
+            // Ignores small jitters, such as the elastic bounce at the edges of the page on iOS.
+            if (Math.abs(y - lastY) < 8) {
+                return;
+            }
+            setScrollingDown(y > lastY);
+            lastY = y;
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => {
+            clearTimeout(stopTimeout);
+            window.removeEventListener('scroll', onScroll);
+        };
+    }, []);
+
+    return scrollingDown;
+}
+
 // Writes the placeholder straight to the field: a state update per tick would re-render the whole bar.
 function useTypewriter({
     ref,
@@ -210,6 +244,10 @@ function useTypewriter({
 
             let delay = erasing ? 20 : 45;
             if (!erasing && length >= current.length) {
+                // Each question plays once, then the first one comes back and stays.
+                if (index === texts.length) {
+                    return;
+                }
                 erasing = true;
                 delay = 2500;
             } else if (erasing && length <= 0) {
