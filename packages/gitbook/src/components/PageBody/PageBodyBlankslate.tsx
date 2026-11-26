@@ -3,11 +3,13 @@ import {
     RevisionPageType,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
+import { OpenAPIMethodBadge } from '@gitbook/react-openapi';
 
 import { CONTENT_STYLE } from '../layout';
 import { PageIcon } from '../PageIcon';
 import { Card } from '@/components/primitives';
 import type { GitBookAnyContext } from '@/lib/context';
+import { getOpenAPIOperationPageProps } from '@/lib/openapi/computedSourceProps';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -17,8 +19,9 @@ import { tcls } from '@/lib/tailwind';
 export async function PageBodyBlankslate(props: {
     page: RevisionPageDocument;
     context: GitBookAnyContext;
+    className?: string;
 }) {
-    const { page, context } = props;
+    const { page, context, className } = props;
 
     const pages = page.pages.filter((child) =>
         child.type === RevisionPageType.Document ? !child.hidden : true
@@ -62,11 +65,24 @@ export async function PageBodyBlankslate(props: {
                 pages: context.revision.pages,
                 page: child,
             });
+            const openAPIOperation = getOpenAPIOperationPageProps(child);
             return (
                 <Card
                     key={child.id}
                     title={child.linkTitle || child.title}
-                    leadingIcon={icon}
+                    leadingIcon={
+                        openAPIOperation ? (
+                            <span className="page-card-method min-w-13 flex shrink-0">
+                                <OpenAPIMethodBadge
+                                    method={openAPIOperation.method}
+                                    short
+                                    className="w-full"
+                                />
+                            </span>
+                        ) : (
+                            icon
+                        )
+                    }
                     href={href}
                 />
             );
@@ -81,7 +97,8 @@ export async function PageBodyBlankslate(props: {
                 'gap-4',
                 'grid-cols-1',
                 'sm:grid-cols-2',
-                'md:layout-wide:grid-cols-3'
+                'md:layout-wide:grid-cols-3',
+                className
             )}
         >
             {pageElements}

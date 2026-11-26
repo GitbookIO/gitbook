@@ -7,6 +7,25 @@ import type { ComputedContentSourceDocumentOpenAPI, RevisionPageDocument } from 
 export function getOpenAPIOperationPageProps(
     page: RevisionPageDocument
 ): { method: string; deprecated: boolean } | undefined {
+    const props = getOpenAPIComputedProps(page);
+    if (props?.doc !== 'operation') {
+        return;
+    }
+
+    return {
+        method: props.method,
+        deprecated: props.deprecated === true,
+    };
+}
+
+/** Whether the page is an OpenAPI tag page in one-operation-per-page mode. */
+export function isOpenAPITagPage(page: RevisionPageDocument): boolean {
+    return getOpenAPIComputedProps(page)?.doc === 'tag';
+}
+
+function getOpenAPIComputedProps(
+    page: RevisionPageDocument
+): ComputedContentSourceDocumentOpenAPI['props'] | undefined {
     if (!('computed' in page)) {
         return;
     }
@@ -16,13 +35,5 @@ export function getOpenAPIOperationPageProps(
         return;
     }
 
-    const { props } = source as ComputedContentSourceDocumentOpenAPI;
-    if (props.doc !== 'operation') {
-        return;
-    }
-
-    return {
-        method: props.method,
-        deprecated: props.deprecated === true,
-    };
+    return (source as ComputedContentSourceDocumentOpenAPI).props;
 }
