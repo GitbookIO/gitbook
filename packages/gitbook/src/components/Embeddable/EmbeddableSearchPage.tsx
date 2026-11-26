@@ -1,3 +1,4 @@
+import { EmbeddableNavigateEvent } from './EmbeddableIframeAPI';
 import { EmbeddableSearch } from './EmbeddableSearch';
 import { getSearchBaseProps } from '@/components/Search/search-props';
 import type { GitBookSiteContext } from '@/lib/context';
@@ -13,10 +14,13 @@ export function EmbeddableSearchPage(props: EmbeddableSearchPageProps) {
     const { context } = props;
 
     return (
-        <EmbeddableSearch
-            baseURL={context.linker.toPathInSite('~gitbook/embed/')}
-            siteTitle={context.site.title}
-            searchProps={getSearchBaseProps(context)}
-        />
+        <>
+            <EmbeddableNavigateEvent tab="search" />
+            <EmbeddableSearch
+                baseURL={context.linker.toPathInSite('~gitbook/embed/')}
+                siteTitle={context.site.title}
+                searchProps={getSearchBaseProps(context)}
+            />
+        </>
     );
 }

@@ -3,6 +3,7 @@ import { createChannel } from 'bidc';
 import type {
     FrameToParentMessage,
     GitBookEmbeddableConfiguration,
+    GitBookFrameEvents,
     ParentToFrameMessage,
 } from './protocol';
 
@@ -42,8 +43,11 @@ export type GitBookFrameClient = {
      *
      * - `close`: the built-in close button was clicked.
      * - `escape`: Escape was pressed inside the frame and nothing in it (a menu, a dialog) used it.
+     * - `navigate`: the reader opened a page in the docs tab, or switched to another tab.
      */
-    on: (event: string, listener: (...args: any[]) => void) => () => void;
+    on<E extends keyof GitBookFrameEvents>(event: E, listener: GitBookFrameEvents[E]): () => void;
+    // Kept so callers typed against the earlier `string` signature still compile.
+    on(event: string, listener: (...args: any[]) => void): () => void;
 };
 
 /**
@@ -67,9 +71,16 @@ export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClien
 
     channel.receive((message: FrameToParentMessage) => {
         console.log('[gitbook:embed] received message', message);
-        if (message.type === 'close' || message.type === 'escape') {
-            const listeners = events.get(message.type) || [];
-            listeners.forEach((listener) => listener());
+        switch (message.type) {
+            case 'close':
+            case 'escape':
+                emit(message.type);
+                break;
+            case 'navigate': {
+                const { type: _type, ...event } = message;
+                emit('navigate', event);
+                break;
+            }
         }
     });
 
@@ -79,6 +90,12 @@ export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClien
     };
 
     const events = new Map<string, ((...args: any[]) => void)[]>();
+    const emit = <E extends keyof GitBookFrameEvents>(
+        event: E,
+        ...args: Parameters<GitBookFrameEvents[E]>
+    ) => {
+        (events.get(event) || []).forEach((listener) => listener(...args));
+    };
 
     const configuration: GitBookEmbeddableConfiguration = {
         tabs: ['assistant', 'search', 'docs'],
@@ -102,7 +119,7 @@ export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClien
             sendToFrame({ type: 'configure', settings: configuration });
         },
         clearChat: () => sendToFrame({ type: 'clearChat' }),
-        on: (event, listener) => {
+        on: (event: string, listener: (...args: any[]) => void) => {
             const listeners = events.get(event) || [];
             listeners.push(listener);
             events.set(event, listeners);

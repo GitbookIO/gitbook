@@ -135,6 +135,38 @@ export type ParentToFrameMessage =
       };
 
 /**
+ * Where the reader is in the embed, sent with the `navigate` event.
+ */
+export type GitBookNavigateEvent =
+    | {
+          tab: 'docs';
+          /**
+           * Path of the page from the root of the site (e.g. `/getting-started/quickstart`),
+           * in the form `navigateToPage` accepts.
+           */
+          path: string;
+          /** Published URL of the page, without query parameters. */
+          url: string;
+          /** Title of the page. */
+          title: string;
+      }
+    | {
+          tab: 'assistant' | 'search';
+      };
+
+/**
+ * Events emitted by the frame, and the arguments their listeners receive.
+ */
+export type GitBookFrameEvents = {
+    /** The built-in close button was clicked. */
+    close: () => void;
+    /** Escape was pressed inside the frame and nothing in it (a menu, a dialog) used it. */
+    escape: () => void;
+    /** The reader opened a page in the docs tab, or switched to another tab. */
+    navigate: (event: GitBookNavigateEvent) => void;
+};
+
+/**
  * Messages sent from the frame to the parent.
  */
 export type FrameToParentMessage =
@@ -144,4 +176,7 @@ export type FrameToParentMessage =
     | {
           /** Escape was pressed inside the frame and nothing in the frame handled it. */
           type: 'escape';
-      };
+      }
+    | ({
+          type: 'navigate';
+      } & GitBookNavigateEvent);

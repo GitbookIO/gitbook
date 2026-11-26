@@ -6,8 +6,10 @@ import {
     type GitBookClient,
     type GitBookEmbeddableConfiguration,
     type GitBookFrameClient,
+    type GitBookFrameEvents,
     createGitBook,
 } from '../client';
+import { createFrameEventRelay } from './events';
 
 export type GitBook = () => void;
 
@@ -35,7 +37,9 @@ type StandaloneCalls =
     // Navigate to a page
     | ['navigateToPage', string]
     // Navigate to the assistant
-    | ['navigateToAssistant'];
+    | ['navigateToAssistant']
+    // Listen to an event from the embed, returns a function to stop listening
+    | { [E in keyof GitBookFrameEvents]: ['on', E, GitBookFrameEvents[E]] }[keyof GitBookFrameEvents];
 
 type StandaloneConfiguration = {
     /** Configure the button to open the embed */
@@ -47,7 +51,7 @@ type StandaloneConfiguration = {
     };
 };
 
-export type GitBookStandalone = ((...args: StandaloneCalls) => void) & {
+export type GitBookStandalone = ((...args: StandaloneCalls) => void | (() => void)) & {
     q?: StandaloneCalls[];
 };
 
@@ -56,6 +60,7 @@ let _client: GitBookClient | undefined;
 let _frame: GitBookFrameClient | undefined;
 let frameOptions: GetFrameURLOptions | undefined;
 let frameConfigured = false;
+const frameEvents = createFrameEventRelay();
 let frameConfiguration: GitBookEmbeddableConfiguration & StandaloneConfiguration = {
     button: {
         label: 'Ask',
@@ -152,6 +157,7 @@ function getIframe() {
             widgetWindow.classList.add('hidden');
             widgetButton.classList.remove('open');
         });
+        frameEvents.attach(_frame);
         // A new frame starts from the site's own defaults, so replay whatever the host configured.
         if (frameConfigured) {
             _frame.configure(frameConfiguration);
@@ -160,7 +166,7 @@ function getIframe() {
     return { iframe: widgetIframe, frame: _frame };
 }
 
-const GitBook = (...args: StandaloneCalls) => {
+const GitBook = (...args: StandaloneCalls): void | (() => void) => {
     switch (args[0]) {
         case 'init': {
             // `~gitbook/embed/script.js` already calls `init`, so an integrator following the docs
@@ -185,6 +191,7 @@ const GitBook = (...args: StandaloneCalls) => {
                 widgetIframe.remove();
                 widgetIframe = undefined;
                 _frame = undefined;
+                frameEvents.detach();
                 if (wasOpen) {
                     getIframe();
                 }
@@ -194,6 +201,7 @@ const GitBook = (...args: StandaloneCalls) => {
         case 'unload':
             _client = undefined;
             _frame = undefined;
+            frameEvents.detach();
             widgetIframe?.remove();
             widgetIframe = undefined;
             frameOptions = undefined;
@@ -272,6 +280,9 @@ const GitBook = (...args: StandaloneCalls) => {
         case 'navigateToAssistant':
             getIframe().frame.navigateToAssistant();
             break;
+        case 'on':
+            // Not `getIframe()`: listening shouldn't load the frame before the reader opens it.
+            return frameEvents.on(args[1], args[2]);
     }
 };
 

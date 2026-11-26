@@ -72,6 +72,19 @@ GitBook('configure', {
 
 See the [Configuration](#configuration) section for all available options.
 
+### Example: Listening to events
+
+```javascript
+// The reader opened a page in the docs tab, or switched to the assistant or search tab
+GitBook('on', 'navigate', (event) => {
+    if (event.tab === 'docs') {
+        console.log('Reading', event.title, event.path, event.url);
+    }
+});
+```
+
+`GitBook('on', ...)` returns a function that removes the listener once the script has loaded. See [Events](#events).
+
 ## As a package from NPM
 
 Install the package: `npm install @gitbook/embed` and import it in your web application:
@@ -132,6 +145,11 @@ frame.on('close', () => {
 frame.on('escape', () => {
     closeHelpPanel();
 });
+
+// The reader opened a page in the docs tab, or switched to another tab
+const unsubscribe = frame.on('navigate', (event) => {
+    console.log('Navigated to:', event.tab === 'docs' ? event.path : event.tab);
+});
 ```
 
 ## As React components
@@ -162,6 +180,12 @@ import { GitBookProvider, GitBookFrame } from '@gitbook/embed/react';
         ]}
         tools={[/* ... */]}
         closeButton
+        onNavigate={(event) => {
+            if (event.tab === 'docs') {
+                setCurrentDocsPage(event.path);
+            }
+        }}
+        onClose={() => setHelpPanelOpen(false)}
     />
 </GitBookProvider>
 ```
@@ -194,7 +218,7 @@ function MyComponent() {
 | **Post message** | `GitBook('postUserMessage', message)` | `frame.postUserMessage(message)` | Via frame client |
 | **Clear chat** | `GitBook('clearChat')` | `frame.clearChat()` | Via frame client |
 | **Configure** | `GitBook('configure', settings)` | `frame.configure(settings)` | Props on `<GitBookFrame>` |
-| **Event listeners** | ❌ | `frame.on(event, listener)` | Via frame client |
+| **Event listeners** | `GitBook('on', event, listener)` | `frame.on(event, listener)` | `onNavigate`, `onClose`, `onEscape` props |
 | **Unload** | `GitBook('unload')` | ❌ | ❌ |
 
 ## Method Signatures
@@ -212,6 +236,7 @@ function MyComponent() {
 - `GitBook('postUserMessage', message: string)` - Post message to chat
 - `GitBook('clearChat')` - Clear chat history
 - `GitBook('configure', settings: {...})` - Configure widget
+- `GitBook('on', event: string, listener: Function)` → `() => void` - Listen to an [event](#events); returns a function that removes the listener (once the script has loaded)
 - `GitBook('unload')` - Unload widget
 
 ### NPM Package
@@ -227,16 +252,29 @@ function MyComponent() {
 - `frame.postUserMessage(message: string)` → `void`
 - `frame.clearChat()` → `void`
 - `frame.configure(settings: Partial<GitBookEmbeddableConfiguration>)` → `void`
-- `frame.on(event: string, listener: Function)` → `() => void` (unsubscribe). Events: `close`, `escape`
+- `frame.on(event: string, listener: Function)` → `() => void` (unsubscribe). See [Events](#events)
 
 ### React Components
 
 **Components:**
 - `<GitBookProvider siteURL: string>` - Provider component
-- `<GitBookFrame {...props}>` - Frame component (accepts all config options as props)
+- `<GitBookFrame {...props}>` - Frame component (accepts all config options as props, and `onNavigate`, `onClose`, `onEscape` callbacks for the [events](#events))
 
 **Hooks:**
 - `useGitBook()` → `GitBookClient` (must be used within `<GitBookProvider>`)
+
+## Events
+
+| Event | Listener | When |
+|-------|----------|------|
+| `navigate` | `(event: GitBookNavigateEvent) => void` | The reader opened a page in the docs tab, or switched to another tab. Also sent for the tab the embed first opens on. |
+| `close` | `() => void` | The built-in close button was clicked. |
+| `escape` | `() => void` | Escape was pressed inside the frame and nothing in it (a menu, a dialog) used it. |
+
+`GitBookNavigateEvent` is one of:
+
+- `{ tab: 'docs', path: string, url: string, title: string }`: `path` is the page's path from the root of the site (e.g. `/getting-started/quickstart`) and can be passed back to `navigateToPage`; `url` is its published URL, without query parameters; `title` is the page's title.
+- `{ tab: 'assistant' }` or `{ tab: 'search' }`
 
 # Configuration
 
