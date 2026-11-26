@@ -8,6 +8,7 @@ import type { GitBookIntegrationTool } from '@gitbook/browser-types';
 import type {
     FrameToParentMessage,
     GitBookEmbeddableConfiguration,
+    GitBookNavigateEvent,
     ParentToFrameMessage,
 } from '@gitbook/embed';
 
@@ -177,6 +178,22 @@ export function EmbeddableIframeAPI(props: { baseURL: string }) {
             }
         });
     }, []);
+
+    return null;
+}
+
+/**
+ * Tell the parent window where the reader is, each time it changes.
+ */
+export function EmbeddableNavigateEvent(props: GitBookNavigateEvent) {
+    // Compared by value: a server re-render passes a new object for the same page.
+    const event = JSON.stringify(props);
+    useEffect(() => {
+        getChannel()?.send({
+            type: 'navigate',
+            ...(JSON.parse(event) as GitBookNavigateEvent),
+        } satisfies FrameToParentMessage);
+    }, [event]);
 
     return null;
 }

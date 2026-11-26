@@ -25,7 +25,9 @@ import {
     EmbeddableIframeButtons,
     EmbeddableIframeCloseButton,
     EmbeddableIframeTabs,
+    EmbeddableNavigateEvent,
 } from './EmbeddableIframeAPI';
+import { getEmbeddableDocsNavigateEvent, getEmbeddablePagePublishedPath } from './navigate-event';
 import { type PagePathParams, getSitePageData } from '@/components/SitePage';
 import type { GitBookSiteContext } from '@/lib/context';
 
@@ -81,9 +83,11 @@ export async function EmbeddableDocsPage(
     }
 
     const variants = categorizeVariants(context);
+    const pageInput = { linker: context.linker, pages: context.revision.pages, page };
 
     return (
         <EmbeddableFrame className="site-background">
+            <EmbeddableNavigateEvent {...getEmbeddableDocsNavigateEvent(pageInput)} />
             <EmbeddableFrameSidebar>
                 <EmbeddableIframeTabs
                     active="docs"
@@ -105,12 +109,7 @@ export async function EmbeddableDocsPage(
                         </EmbeddableFrameHeaderMain>
                         <EmbeddableFrameButtons>
                             <EmbeddableDocsPageControlButtons
-                                href={context.linker
-                                    .toPathForPage({
-                                        pages: context.revision.pages,
-                                        page,
-                                    })
-                                    .replace(/~gitbook\/embed\/page\/?/, '')}
+                                href={getEmbeddablePagePublishedPath(pageInput)}
                             />
                         </EmbeddableFrameButtons>
                     </EmbeddableFrameHeader>

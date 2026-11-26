@@ -6,11 +6,21 @@ import type {
     GetFrameURLOptions,
     GitBookEmbeddableConfiguration,
     GitBookFrameClient,
+    GitBookNavigateEvent,
 } from '../client';
 import { useGitBook } from './GitBookProvider';
 
 export type GitBookFrameProps = {
     className?: string;
+
+    /** Called when the reader opens a page in the docs tab, or switches to another tab. */
+    onNavigate?: (event: GitBookNavigateEvent) => void;
+
+    /** Called when the built-in close button is clicked. */
+    onClose?: () => void;
+
+    /** Called when Escape is pressed inside the frame and nothing in it (a menu, a dialog) used it. */
+    onEscape?: () => void;
 } & GetFrameURLOptions &
     Partial<GitBookEmbeddableConfiguration>;
 
@@ -32,6 +42,9 @@ export function GitBookFrame(props: GitBookFrameProps) {
         trademark = true,
         closeButton = false,
         assistantName,
+        onNavigate,
+        onClose,
+        onEscape,
     } = props;
 
     const frameRef = useRef<HTMLIFrameElement>(null);
@@ -48,6 +61,24 @@ export function GitBookFrame(props: GitBookFrameProps) {
             setGitbookFrame(gitbook.createFrame(frameRef.current));
         }
     }, [gitbook]);
+
+    // Read through a ref so inline callbacks don't resubscribe on every render.
+    const handlers = useRef({ onNavigate, onClose, onEscape });
+    useEffect(() => {
+        handlers.current = { onNavigate, onClose, onEscape };
+    });
+
+    useEffect(() => {
+        if (!gitbookFrame) {
+            return;
+        }
+        const unsubscribes = [
+            gitbookFrame.on('navigate', (event) => handlers.current.onNavigate?.(event)),
+            gitbookFrame.on('close', () => handlers.current.onClose?.()),
+            gitbookFrame.on('escape', () => handlers.current.onEscape?.()),
+        ];
+        return () => unsubscribes.forEach((unsubscribe) => unsubscribe());
+    }, [gitbookFrame]);
 
     useEffect(() => {
         gitbookFrame?.configure({

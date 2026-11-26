@@ -15,7 +15,7 @@ import {
     GitBookAPI,
     SiteSocialAccountPlatform,
 } from '@gitbook/api';
-import type { GitBookStandalone } from '@gitbook/embed';
+import type { GitBookNavigateEvent, GitBookStandalone } from '@gitbook/embed';
 
 import { getContentTestURL, getGitBookPreviewURL, getSiteAPIToken } from '../tests/utils';
 import {
@@ -3558,6 +3558,41 @@ const testCases: TestsCase[] = [
                         'src',
                         expect.stringContaining('text-page')
                     );
+                },
+            },
+            {
+                name: 'API - navigate event',
+                url: '',
+                screenshot: false,
+                run: async (page) => {
+                    await page.evaluate(() => {
+                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        const host = window as unknown as {
+                            navigateEvents: GitBookNavigateEvent[];
+                        };
+                        host.navigateEvents = [];
+                        GitBook('on', 'navigate', (event) => host.navigateEvents.push(event));
+                        GitBook('navigateToPage', '/text-page');
+                    });
+                    const navigateEvents = () =>
+                        page.evaluate(
+                            () =>
+                                (window as unknown as { navigateEvents: GitBookNavigateEvent[] })
+                                    .navigateEvents
+                        );
+
+                    await expect.poll(navigateEvents, { timeout: 20000 }).toContainEqual({
+                        tab: 'docs',
+                        path: '/text-page',
+                        url: expect.stringMatching(/^[^?#]+\/text-page$/),
+                        title: 'Text page',
+                    });
+
+                    const iframe = page.frameLocator('#gitbook-widget-iframe');
+                    await iframe.getByTestId('embed-tab-assistant').click();
+                    await expect
+                        .poll(navigateEvents, { timeout: 20000 })
+                        .toContainEqual({ tab: 'assistant' });
                 },
             },
             {
