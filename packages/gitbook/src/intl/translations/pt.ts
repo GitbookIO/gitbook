@@ -43,11 +43,11 @@ export const pt: TranslationLanguage = {
     search_ask_no_answer:
         'Não foi possível encontrar uma resposta para a sua pergunta. Pode tentar reformulá-la ou ser mais específico.',
     search_ask_error: 'Algo correu mal. Tente novamente mais tarde.',
-    search_partial_error:
-        'Não foi possível carregar alguns resultados. A mostrar os resultados disponíveis.',
     on_this_page: 'Nesta página',
     next_page: 'Seguinte',
     previous_page: 'Anterior',
+    updates_pagination_navigation: 'Navegação entre páginas',
+    updates_pagination_range: '${1} - ${2} de ${3} atualizações',
     toc_back_to_space: 'Voltar para ${1}',
     page_last_modified: 'Última atualização ${1}',
     was_this_helpful: 'Isto foi útil?',

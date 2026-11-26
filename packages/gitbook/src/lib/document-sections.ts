@@ -22,6 +22,14 @@ export interface DocumentSection {
 }
 
 /**
+ * Depth of the last heading-1 and heading-2 seen, or 0 when there is none.
+ */
+interface HeadingParents {
+    h1: number;
+    h2: number;
+}
+
+/**
  * Extract a list of sections from a document.
  */
 export async function getDocumentSections(
@@ -37,11 +45,11 @@ export async function getDocumentSections(
 async function getSectionsFromNodes(
     nodes: DocumentBlock[],
     context: GitBookAnyContext,
-    initialDepth = 0,
+    parents: HeadingParents = { h1: 0, h2: 0 },
     tags?: string[]
 ): Promise<DocumentSection[]> {
     const sections: DocumentSection[] = [];
-    let depth = initialDepth;
+    let { h1, h2 } = parents;
 
     for (const block of nodes) {
         switch (block.type) {
@@ -50,9 +58,10 @@ async function getSectionsFromNodes(
                 if (!id) {
                     continue;
                 }
-                depth = 1;
+                h1 = 1;
+                h2 = 0;
                 const title = getNodeReactText(block);
-                sections.push(withTags({ id, title, depth: 1 }, tags));
+                sections.push(withTags({ id, title, depth: h1 }, tags));
                 continue;
             }
             case 'heading-2': {
@@ -60,15 +69,25 @@ async function getSectionsFromNodes(
                 if (!id) {
                     continue;
                 }
+                h2 = h1 + 1;
                 const title = getNodeReactText(block);
-                sections.push(withTags({ id, title, depth: depth > 0 ? 2 : 1 }, tags));
+                sections.push(withTags({ id, title, depth: h2 }, tags));
+                continue;
+            }
+            case 'heading-3': {
+                const id = block.meta?.id;
+                if (!id) {
+                    continue;
+                }
+                const title = getNodeReactText(block);
+                sections.push(withTags({ id, title, depth: (h2 || h1) + 1 }, tags));
                 continue;
             }
             case 'columns':
             case 'stepper': {
                 const stepNodes = await Promise.all(
                     block.nodes.map(async (step) =>
-                        getSectionsFromNodes(step.nodes, context, depth, tags)
+                        getSectionsFromNodes(step.nodes, context, { h1, h2 }, tags)
                     )
                 );
                 for (const stepSections of stepNodes) {
@@ -80,12 +99,16 @@ async function getSectionsFromNodes(
                 const revisionTags = getRevisionTags(context.revision);
                 const updateNodes = await Promise.all(
                     block.nodes.map(async (update) =>
-                        getSectionsFromNodes(
-                            update.nodes as DocumentBlock[],
-                            context,
-                            depth,
-                            resolveBlockTags(update.data.tags, revisionTags).map((tag) => tag.slug)
-                        )
+                        update.type === 'update'
+                            ? getSectionsFromNodes(
+                                  update.nodes as DocumentBlock[],
+                                  context,
+                                  { h1, h2 },
+                                  resolveBlockTags(update.data.tags, revisionTags).map(
+                                      (tag) => tag.slug
+                                  )
+                              )
+                            : []
                     )
                 );
                 for (const updateSections of updateNodes) {
@@ -200,7 +223,7 @@ async function getSectionsFromNodes(
                 const reusableContentSections = await getSectionsFromNodes(
                     document.nodes,
                     reusableContent.context,
-                    depth,
+                    { h1, h2 },
                     tags
                 );
                 sections.push(...reusableContentSections);

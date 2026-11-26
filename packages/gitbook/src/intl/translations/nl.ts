@@ -44,11 +44,11 @@ export const nl: TranslationLanguage = {
     search_ask_no_answer:
         'Er kon geen antwoord op je vraag worden gevonden. Probeer je vraag anders te formuleren of wees specifieker.',
     search_ask_error: 'Er is iets misgegaan. Probeer het later opnieuw.',
-    search_partial_error:
-        'Sommige resultaten konden niet worden geladen. Beschikbare resultaten worden weergegeven.',
     on_this_page: 'Op deze pagina',
     next_page: 'Volgende',
     previous_page: 'Vorige',
+    updates_pagination_navigation: 'Paginanavigatie',
+    updates_pagination_range: '${1} - ${2} van ${3} updates',
     toc_back_to_space: 'Terug naar ${1}',
     page_last_modified: 'Laatst bijgewerkt ${1}',
     was_this_helpful: 'Was dit nuttig?',

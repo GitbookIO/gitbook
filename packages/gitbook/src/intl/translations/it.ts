@@ -44,11 +44,11 @@ export const it: TranslationLanguage = {
     search_ask_no_answer:
         'Non è stato possibile trovare una risposta alla tua domanda. Prova a riformularla o a essere più specifico.',
     search_ask_error: 'Qualcosa è andato storto. Riprova più tardi.',
-    search_partial_error:
-        'Non è stato possibile caricare alcuni risultati. Visualizziamo i risultati disponibili.',
     on_this_page: 'In questa pagina',
     next_page: 'Successivo',
     previous_page: 'Precedente',
+    updates_pagination_navigation: 'Navigazione tra le pagine',
+    updates_pagination_range: '${1} - ${2} di ${3} aggiornamenti',
     toc_back_to_space: 'Torna a ${1}',
     page_last_modified: 'Ultimo aggiornamento ${1}',
     was_this_helpful: 'È stato utile?',

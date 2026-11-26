@@ -1,10 +1,34 @@
-import type { JSONDocument, Revision, RevisionTag } from '@gitbook/api';
+import type {
+    DocumentBlock,
+    DocumentBlockUpdate,
+    DocumentInline,
+    JSONDocument,
+    Revision,
+    RevisionTag,
+} from '@gitbook/api';
 
-import { getBlocksByType } from './document';
+import { getBlocksByType, hasMoreThan } from './document';
 import { getRevisionTags, resolveBlockTags } from './tags';
 
-/** URL search param carrying the active tag filter, e.g. `?tag=changelog`. */
-export const UPDATES_FILTER_SEARCH_PARAM = 'tag';
+export {
+    UPDATES_FILTER_SEARCH_PARAM,
+    UPDATES_MAX_PAGE,
+    UPDATES_PAGE_SEARCH_PARAM,
+    parseUpdatesPageParam,
+} from './updates-url';
+
+export const UPDATES_PAGINATION_THRESHOLD = 50;
+export const UPDATES_PAGE_SIZE = 20;
+
+export type UpdatesPageRange = {
+    page: number;
+    totalPages: number;
+    totalItems: number;
+    pageSize: number;
+    start: number;
+    end: number;
+    isClamped: boolean;
+};
 
 /** Attribute on `<html>` with the active filter's tag slugs, space-separated (e.g. `"a b"`). */
 export const UPDATES_TAG_FILTER_ATTR = 'data-updates-tag-filter';
@@ -75,6 +99,10 @@ export function getDocumentFilterableTags(
 
     for (const updatesBlock of getBlocksByType(document, 'updates')) {
         for (const updateBlock of updatesBlock.nodes) {
+            if (updateBlock.type !== 'update') {
+                continue;
+            }
+
             for (const tag of resolveBlockTags(updateBlock.data.tags, revisionTags)) {
                 if (seen.has(tag.slug)) {
                     continue;
@@ -87,6 +115,138 @@ export function getDocumentFilterableTags(
     }
 
     return tags;
+}
+
+export function countDocumentUpdates(document: JSONDocument): number {
+    return getDocumentUpdates(document).length;
+}
+
+export function paginateUpdatesDocument(
+    document: JSONDocument,
+    revision: Revision | undefined,
+    { page, tags }: { page: number; tags?: string[] }
+): { document: JSONDocument; pagination: UpdatesPageRange | null } {
+    const updates = getDocumentUpdates(document);
+    if (updates.length <= UPDATES_PAGINATION_THRESHOLD) {
+        return { document, pagination: null };
+    }
+
+    const matching = filterUpdates(updates, document, revision, tags);
+    const pagination = getUpdatesPageRange(page, matching.length);
+    const slice = new Set(matching.slice(pagination.start - 1, pagination.end));
+    const nodes: JSONDocument['nodes'] = [];
+
+    for (const block of document.nodes) {
+        if (block.type !== 'updates') {
+            nodes.push(block);
+            continue;
+        }
+
+        const entries = block.nodes.filter((entry) => entry.type === 'update' && slice.has(entry));
+        if (entries.length > 0) {
+            nodes.push({ ...block, nodes: entries });
+        }
+    }
+
+    return { document: { ...document, nodes }, pagination };
+}
+
+export function getUpdatesPageRange(requestedPage: number, totalItems: number): UpdatesPageRange {
+    const totalPages = Math.max(1, Math.ceil(totalItems / UPDATES_PAGE_SIZE));
+    const page = Math.min(Math.max(1, requestedPage), totalPages);
+    let start = (page - 1) * UPDATES_PAGE_SIZE + 1;
+    if (totalItems === 0) {
+        start = 0;
+    }
+
+    return {
+        page,
+        totalPages,
+        totalItems,
+        pageSize: UPDATES_PAGE_SIZE,
+        start,
+        end: Math.min(page * UPDATES_PAGE_SIZE, totalItems),
+        isClamped: page !== requestedPage,
+    };
+}
+
+export function findUpdateAnchorPage(
+    document: JSONDocument,
+    revision: Revision | undefined,
+    { anchor, tags }: { anchor: string; tags?: string[] }
+): { found: true; page: number; clearTags: boolean } | { found: false } {
+    const updates = getDocumentUpdates(document);
+    const index = updates.findIndex((update) =>
+        hasMoreThan(update, (node) => matchesUpdateAnchor(node, anchor), 0)
+    );
+    const entry = updates[index];
+    if (!entry) {
+        return { found: false };
+    }
+
+    const filteredIndex = filterUpdates(updates, document, revision, tags).indexOf(entry);
+    if (filteredIndex >= 0) {
+        return {
+            found: true,
+            page: Math.floor(filteredIndex / UPDATES_PAGE_SIZE) + 1,
+            clearTags: false,
+        };
+    }
+
+    return { found: true, page: Math.floor(index / UPDATES_PAGE_SIZE) + 1, clearTags: true };
+}
+
+function matchesUpdateAnchor(node: DocumentBlock | DocumentInline, anchor: string): boolean {
+    if (node.object !== 'block') {
+        return false;
+    }
+    if ('meta' in node && node.meta && 'id' in node.meta && node.meta.id === anchor) {
+        return true;
+    }
+    if (node.type === 'tabs-item' && !node.meta?.id && node.key === anchor) {
+        return true;
+    }
+    return false;
+}
+
+function getDocumentUpdates(document: JSONDocument): DocumentBlockUpdate[] {
+    const updates: DocumentBlockUpdate[] = [];
+    for (const block of document.nodes) {
+        if (block.type !== 'updates') {
+            continue;
+        }
+
+        for (const entry of block.nodes) {
+            if (entry.type === 'update') {
+                updates.push(entry);
+            }
+        }
+    }
+    return updates;
+}
+
+function filterUpdates(
+    updates: DocumentBlockUpdate[],
+    document: JSONDocument,
+    revision: Revision | undefined,
+    tags: string[] | undefined
+): DocumentBlockUpdate[] {
+    if (!tags?.length) {
+        return updates;
+    }
+
+    const availableTags = new Set(
+        getDocumentFilterableTags(document, revision).map((tag) => tag.slug)
+    );
+    const selectedTags = new Set(normalizeUpdatesFilterTags(tags, availableTags));
+    if (!selectedTags.size) {
+        return updates;
+    }
+
+    const revisionTags = getRevisionTags(revision);
+    return updates.filter((update) =>
+        resolveBlockTags(update.data.tags, revisionTags).some((tag) => selectedTags.has(tag.slug))
+    );
 }
 
 /**

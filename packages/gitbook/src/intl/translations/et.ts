@@ -43,10 +43,11 @@ export const et: TranslationLanguage = {
     search_ask_no_answer:
         'Teie küsimusele ei leitud vastust. Proovige seda ümber sõnastada või olla täpsem.',
     search_ask_error: 'Midagi läks valesti. Palun proovige hiljem uuesti.',
-    search_partial_error: 'Mõnda tulemust ei saanud laadida. Kuvatakse saadaolevad tulemused.',
     on_this_page: 'Sellel lehel',
     next_page: 'Järgmine',
     previous_page: 'Eelmine',
+    updates_pagination_navigation: 'Lehekülgede vahel liikumine',
+    updates_pagination_range: '${1} - ${2} / ${3} uuendust',
     toc_back_to_space: 'Tagasi: ${1}',
     page_last_modified: 'Viimati uuendatud ${1}',
     was_this_helpful: 'Kas sellest oli abi?',

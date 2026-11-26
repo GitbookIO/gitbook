@@ -41,10 +41,11 @@ export const en = {
     search_ask_no_answer:
         'An answer could not be found for your question. You could try rephrasing it, or be more specific.',
     search_ask_error: 'Something went wrong. Please try again later.',
-    search_partial_error: "Some results couldn't load. Showing available results.",
     on_this_page: 'On this page',
     next_page: 'Next',
     previous_page: 'Previous',
+    updates_pagination_navigation: 'Pagination Navigation',
+    updates_pagination_range: '${1} - ${2} of ${3} updates',
     toc_back_to_space: 'Back to ${1}',
     page_last_modified: 'Last updated ${1}',
     was_this_helpful: 'Was this helpful?',

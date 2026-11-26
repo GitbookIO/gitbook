@@ -4,27 +4,39 @@ import assertNever from 'assert-never';
 import { motion } from 'framer-motion';
 import React from 'react';
 
-import { Button, SkeletonParagraph, SkeletonSmall } from '../primitives';
+import { Button } from '../primitives';
 import { isExternalLink } from '../utils/link';
 import { addRecentSearchQuery } from './recent-queries';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchRecordResultItem } from './SearchRecordResultItem';
-import { SearchResultItem } from './SearchResultItem';
 import type { ResultType } from './useSearchResults';
 import { useAI } from '@/components/AI';
 import { useCurrentContent } from '@/components/hooks';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
+/**
+ * Bar widths (breadcrumb, title, description, in %) of the loading placeholder rows. Six rows of
+ * this height fill the results area of the desktop popover; the count never depends on an answer.
+ */
+const PLACEHOLDER_ROWS: [crumb: number, title: number, description: number][] = [
+    [28, 64, 86],
+    [20, 48, 78],
+    [34, 58, 90],
+    [24, 70, 72],
+    [30, 52, 84],
+    [22, 60, 76],
+];
+
 export interface SearchResultsRef {
     select(): boolean;
+    /** Activate the first result, ignoring the cursor. */
+    selectFirst(): boolean;
 }
 
 function getResultKey(item: ResultType): string {
     switch (item.type) {
-        case 'local-page':
-            return `page:${item.id}`;
         case 'page':
             return `page:${item.pageId}`;
         case 'record':
@@ -51,14 +63,16 @@ export const SearchResults = React.forwardRef(function SearchResults(
         cursor: number | null;
         error: boolean;
         onResultSelect?: () => void;
+        onResultHover?: (index: number) => void;
     },
     ref: React.Ref<SearchResultsRef>
 ) {
-    const { children, id, query, results, fetching, cursor, error, onResultSelect } = props;
+    const { children, id, query, results, fetching, cursor, error, onResultSelect, onResultHover } =
+        props;
 
     const language = useLanguage();
     const { siteSpaceId } = useCurrentContent();
-    const shouldAnimateResults = !query || fetching;
+    const shouldAnimateResults = !query;
     const previousCursor = React.useRef<number | null>(cursor);
     const seenResultKeys = React.useRef(new Set<string>());
     const lastQuery = React.useRef(query);
@@ -69,6 +83,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     }
 
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
+    const selectedByPointer = React.useRef(false);
 
     React.useEffect(() => {
         for (const item of results) {
@@ -76,8 +91,12 @@ export const SearchResults = React.forwardRef(function SearchResults(
         }
     }, [results]);
 
-    // Scroll to the active result.
+    // Scroll to the active result, unless the mouse picked it: it is already under the pointer.
     React.useEffect(() => {
+        if (selectedByPointer.current) {
+            selectedByPointer.current = false;
+            return;
+        }
         if (cursor === null || !refs.current[cursor]) {
             return;
         }
@@ -107,6 +126,11 @@ export const SearchResults = React.forwardRef(function SearchResults(
         ref,
         () => ({
             select,
+            selectFirst: () => {
+                const first = refs.current[0];
+                first?.click();
+                return Boolean(first);
+            },
         }),
         [select]
     );
@@ -114,7 +138,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const { assistants } = useAI();
     const primaryAssistant = assistants[0];
 
-    if (error && results.length === 0) {
+    if (error) {
         return (
             <output
                 className={tcls(
@@ -157,26 +181,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
         </output>
     );
 
-    const partialError = error ? (
-        <div
-            className={tcls(
-                'mt-3',
-                'rounded-corners:rounded-md',
-                'circular-corners:rounded-2xl',
-                'bg-tint-subtle',
-                'px-3',
-                'py-2',
-                'text-center',
-                'text-sm',
-                'text-tint-subtle',
-                'animate-blur-in-slow'
-            )}
-            role="status"
-        >
-            {t(language, 'search_partial_error')}
-        </div>
-    ) : null;
-
     return (
         <output className="flex grow flex-col" aria-busy={fetching}>
             {children}
@@ -202,10 +206,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                             const handleResultSelect = (
                                 event: React.MouseEvent<HTMLAnchorElement>
                             ) => {
-                                const isPageResult =
-                                    item.type === 'local-page' ||
-                                    item.type === 'page' ||
-                                    item.type === 'record';
+                                const isPageResult = item.type === 'page' || item.type === 'record';
 
                                 if (
                                     isPageResult &&
@@ -227,18 +228,22 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                 // users should keep their place in it.
                                 if (navigatesCurrentWindow(event)) {
                                     event.currentTarget.blur();
+                                    onResultSelect?.();
                                 }
-
-                                onResultSelect?.();
                             };
                             const resultItemProps = {
                                 'aria-posinset': index + 1,
                                 'aria-setsize': results.length,
                                 id: `${id}-${index}`,
                                 onClickCapture: handleResultSelect,
+                                onHover: onResultHover
+                                    ? () => {
+                                          selectedByPointer.current = true;
+                                          onResultHover(index);
+                                      }
+                                    : undefined,
                             };
                             switch (item.type) {
-                                case 'local-page':
                                 case 'page': {
                                     return (
                                         <motion.div
@@ -266,6 +271,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                                     }}
                                                     query={query}
                                                     item={item}
+                                                    position={index + 1}
+                                                    resultsCount={results.length}
                                                     active={index === cursor}
                                                     style={{
                                                         animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
@@ -335,6 +342,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                                     key={itemKey}
                                                     query={query}
                                                     item={item}
+                                                    position={index + 1}
+                                                    resultsCount={results.length}
                                                     active={index === cursor}
                                                     style={{
                                                         animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
@@ -353,49 +362,57 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     {!fetching && results.length === 0 ? noResults : null}
                 </>
             )}
-            {partialError}
-            {fetching ? (
+            {fetching && results.length === 0 ? (
                 <div
-                    className={tcls(
-                        results.length > 0 ? 'mt-1' : '',
-                        'flex animate-blur-in flex-col gap-1'
-                    )}
-                    style={{ animationDelay: `${results.length * 25}ms` }}
+                    role="status"
+                    aria-busy="true"
+                    className="flex animate-[fadeIn_150ms_ease-out_both,pulse_2.4s_ease-in-out_600ms_infinite] flex-col gap-1 motion-reduce:animate-none"
                 >
-                    <SearchResultsSkeleton items={Math.max(3, 5 - results.length)} />
+                    <SearchResultsPlaceholder />
                 </div>
             ) : null}
         </output>
     );
 });
 
-const SearchResultsSkeleton = (props: { items: number }) => {
-    const { items } = props;
-    const skeletonKeys = Array.from({ length: items }, (_, index) => `skeleton:${index}`);
+/**
+ * Loading rows shaped like a page result: breadcrumb, title and description lines in the real
+ * row's box, so the first result lands where the first placeholder was.
+ */
+const SearchResultsPlaceholder = () =>
+    PLACEHOLDER_ROWS.map(([crumb, title, description], index) => (
+        <div
+            key={index}
+            data-search-placeholder-row
+            aria-hidden
+            className="flex items-center gap-3 py-2 pl-3 pr-2"
+        >
+            <div className="grow">
+                <PlaceholderLine className="text-xs" barClassName="h-2" width={crumb} />
+                <PlaceholderLine
+                    className="font-heading text-base font-semibold leading-snug"
+                    barClassName="h-3.5 bg-tint-solid/3"
+                    width={title}
+                />
+                <PlaceholderLine className="h-5 text-sm" barClassName="h-2.5" width={description} />
+            </div>
+            <div className="size-7 shrink-0" />
+        </div>
+    ));
 
-    return (
-        <>
-            {skeletonKeys.map((key, index) => (
-                <SearchResultItem
-                    key={key}
-                    active={false}
-                    href="#"
-                    action=""
-                    disabled
-                    data-testid="search-page-result"
-                    leadingIcon={
-                        <SkeletonSmall
-                            className="size-4"
-                            style={{ animationDelay: `${index * 0.3}s` }}
-                        />
-                    }
-                >
-                    <SkeletonParagraph size="small" start={index * 3} />
-                </SearchResultItem>
-            ))}
-        </>
-    );
-};
+/** One text line of a placeholder row: the line box of the real text, with a bar inside it. */
+const PlaceholderLine = (props: { className: string; barClassName: string; width: number }) => (
+    <div className={tcls('relative', props.className)}>
+        {'\u00a0'}
+        <div
+            className={tcls(
+                'absolute inset-y-0 left-0 my-auto rounded-full bg-tint-solid/2',
+                props.barClassName
+            )}
+            style={{ width: `${props.width}%` }}
+        />
+    </div>
+);
 
 /**
  * Whether clicking a result navigates the current window, and so closes the search — as opposed

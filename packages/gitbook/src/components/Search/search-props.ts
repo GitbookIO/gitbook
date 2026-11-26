@@ -2,6 +2,8 @@ import type { SiteExternalLink, SiteSection, SiteSectionGroup, SiteSpace } from 
 
 import { hasMultipleSiteSections } from '../SiteSections';
 import type { GitBookSiteContext } from '@/lib/context';
+import { getSearchSpaceLookup } from '@/lib/search';
+import type { DirectSearchProps } from '@/lib/search-results';
 import { getLocalizedTitle } from '@/lib/sites';
 
 export type SearchSection = Pick<SiteSection, 'id' | 'icon' | 'object'> & {
@@ -25,7 +27,6 @@ export interface SearchBaseProps {
     sections: SearchSectionItem[];
     withVariants: boolean;
     withSiteVariants: boolean;
-    indexURL: string;
     searchURL: string;
 }
 
@@ -47,7 +48,6 @@ export function getSearchBaseProps(context: GitBookSiteContext): SearchBaseProps
             visibleSections?.list.some(
                 (section) => section.object === 'site-section' && section.siteSpaces.length > 1
             ) ?? false,
-        indexURL: context.linker.toPathInSite('~gitbook/site-index'),
         withVariants: visibleSiteSpaces.length > 1,
     };
 }
@@ -122,4 +122,23 @@ export function findSearchSection(
     }
 
     return undefined;
+}
+
+/**
+ * What the browser needs to search the API directly, built from the site spaces visitors can see.
+ */
+export function getDirectSearchProps(context: GitBookSiteContext): DirectSearchProps | undefined {
+    if (!context.directSearch) {
+        return undefined;
+    }
+
+    const { organizationId, siteId } = context.directSearch;
+    return {
+        ...context.directSearch,
+        spaces: getSearchSpaceLookup(context.structure),
+        passURL: context.linker.toPathInSite('~gitbook/search-pass'),
+        proxyURL: context.linker.toPathInSite(
+            `~gitbook/search-direct/orgs/${organizationId}/sites/${siteId}`
+        ),
+    };
 }

@@ -65,7 +65,7 @@ export async function* streamAIChatResponse({
                           },
                       ]
                     : [],
-                model: AIModel.ReasoningLow,
+                model: AIModel.ReasoningMedium,
                 previousResponseId,
                 toolCall,
                 tools,

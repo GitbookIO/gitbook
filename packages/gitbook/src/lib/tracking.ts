@@ -157,8 +157,7 @@ export async function serveProxyAnalyticsEvent(req: Request) {
 /**
  * Extract the real IP address of the client from the request headers, accounting for various proxies and CDNs.
  */
-
-function getXForwardedFor(headers: Headers): string | null {
+export function getXForwardedFor(headers: Headers): string | null {
     // We start first with the cloudflare headers
     if (headers.has('cf-connecting-ip')) {
         return headers.get('cf-connecting-ip');

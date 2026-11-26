@@ -78,6 +78,10 @@ export async function servePageRSS(
 
     updatesBlocks.forEach((updatesBlock) => {
         updatesBlock.nodes.forEach((update) => {
+            if (update.type !== 'update') {
+                return;
+            }
+
             const heading = update.nodes[0];
             if (!heading || !isHeadingBlock(heading)) {
                 return;
@@ -129,6 +133,8 @@ function getNodeHTML(node: DocumentBlock | DocumentInline | DocumentText): strin
             return `<h3>${children}</h3>`;
         case 'heading-3':
             return `<h4>${children}</h4>`;
+        case 'heading-4':
+            return `<h5>${children}</h5>`;
         case 'list-unordered':
         case 'list-tasks':
             return `<ul>${children}</ul>`;

@@ -43,10 +43,11 @@ export const he: TranslationLanguage = {
     search_ask_no_answer:
         'לא נמצאה תשובה לשאלה שלך. אפשר לנסות לנסח אותה מחדש או להיות מדויקים יותר.',
     search_ask_error: 'משהו השתבש. נסה שוב מאוחר יותר.',
-    search_partial_error: 'לא ניתן היה לטעון חלק מהתוצאות. מוצגות התוצאות הזמינות.',
     on_this_page: 'בדף הזה',
     next_page: 'הבא',
     previous_page: 'הקודם',
+    updates_pagination_navigation: 'ניווט בין עמודים',
+    updates_pagination_range: '${1} - ${2} מתוך ${3} עדכונים',
     toc_back_to_space: 'חזרה אל ${1}',
     page_last_modified: 'עודכן לאחרונה ${1}',
     was_this_helpful: 'האם זה היה מועיל?',

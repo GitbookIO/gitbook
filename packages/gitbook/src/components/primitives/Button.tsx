@@ -98,7 +98,10 @@ export const activeClasses = {
 export const Button = React.forwardRef<
     HTMLButtonElement | HTMLAnchorElement,
     ButtonProps &
-        React.ButtonHTMLAttributes<HTMLButtonElement> & { target?: React.HTMLAttributeAnchorTarget }
+        React.ButtonHTMLAttributes<HTMLButtonElement> & {
+            target?: React.HTMLAttributeAnchorTarget;
+            rel?: string;
+        }
 >(
     (
         {
@@ -164,6 +167,11 @@ export const Button = React.forwardRef<
             }
         }
 
+        let trailingElement = null;
+        if (trailing) {
+            trailingElement = <span className="button-trailing-icon ms-auto">{trailing}</span>;
+        }
+
         const content = (
             <>
                 {iconElement}
@@ -177,6 +185,7 @@ export const Button = React.forwardRef<
                         {children ?? label}
                     </span>
                 )}
+                {trailingElement}
             </>
         );
 
@@ -207,7 +216,6 @@ export const Button = React.forwardRef<
                 {...rest}
             >
                 {content}
-                {trailing ? <span className="button-trailing-icon ms-auto">{trailing}</span> : null}
             </button>
         );
 

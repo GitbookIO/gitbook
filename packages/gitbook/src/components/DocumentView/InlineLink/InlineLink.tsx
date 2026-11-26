@@ -40,7 +40,12 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
         return (
             <NotFoundRefHoverCard context={context}>
                 {fallback ? (
-                    <InlineLinkAnchor href={fallback.href} contentRef={inline.data.ref} isExternal>
+                    <InlineLinkAnchor
+                        href={fallback.href}
+                        contentRef={inline.data.ref}
+                        target={inline.data.target}
+                        isExternal
+                    >
                         {inlinesElement}
                     </InlineLinkAnchor>
                 ) : (
@@ -53,6 +58,7 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
         <InlineLinkAnchor
             href={resolved.href}
             contentRef={resolved.resolvedRef ?? inline.data.ref}
+            target={inline.data.target}
             isExternal={(resolved.resolvedRef ?? inline.data.ref).kind === 'url'}
         >
             {inlinesElement}
@@ -75,14 +81,16 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
 function InlineLinkAnchor(props: {
     href: string;
     contentRef: ContentRef;
+    target: DocumentInlineLink['data']['target'];
     isExternal?: boolean;
     children: React.ReactNode;
 }) {
-    const { href, isExternal, contentRef, children } = props;
+    const { href, isExternal, contentRef, target, children } = props;
     const isMailto = href.startsWith('mailto:');
     return (
         <StyledLink
             href={href}
+            target={target ? `_${target}` : undefined}
             insights={{
                 type: 'link_click',
                 link: {

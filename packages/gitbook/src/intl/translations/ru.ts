@@ -44,11 +44,11 @@ export const ru: TranslationLanguage = {
     search_ask_no_answer:
         'Не удалось найти ответ на ваш вопрос. Попробуйте перефразировать его или задать более конкретный вопрос.',
     search_ask_error: 'Что-то пошло не так. Пожалуйста, попробуйте позже.',
-    search_partial_error:
-        'Не удалось загрузить некоторые результаты. Показаны доступные результаты.',
     on_this_page: 'На этой странице',
     next_page: 'Следующая',
     previous_page: 'Предыдущая',
+    updates_pagination_navigation: 'Навигация по страницам',
+    updates_pagination_range: '${1} - ${2} из ${3} обновлений',
     toc_back_to_space: 'Назад к ${1}',
     page_last_modified: 'Последнее обновление ${1}',
     was_this_helpful: 'Это было полезно?',

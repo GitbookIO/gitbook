@@ -43,11 +43,11 @@ export const bg: TranslationLanguage = {
     search_ask_no_answer:
         'Не беше намерен отговор на въпроса ви. Можете да опитате да го преформулирате или да бъдете по-конкретни.',
     search_ask_error: 'Нещо се обърка. Моля, опитайте отново по-късно.',
-    search_partial_error:
-        'Някои резултати не можаха да се заредят. Показват се наличните резултати.',
     on_this_page: 'На тази страница',
     next_page: 'Следваща',
     previous_page: 'Предишна',
+    updates_pagination_navigation: 'Навигация между страниците',
+    updates_pagination_range: '${1} - ${2} от ${3} актуализации',
     toc_back_to_space: 'Обратно към ${1}',
     page_last_modified: 'Последна актуализация ${1}',
     was_this_helpful: 'Беше ли полезно?',

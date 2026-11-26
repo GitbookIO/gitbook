@@ -11,3 +11,4 @@ export * from './useListOverflow';
 export * from './useCurrentPageMetadata';
 export * from './useBackToSpace';
 export * from './useCopyToClipboard';
+export * from './useResizeObserver';

@@ -43,11 +43,11 @@ export const hu: TranslationLanguage = {
     search_ask_no_answer:
         'Nem található válasz a kérdésére. Próbálja meg átfogalmazni, vagy legyen pontosabb.',
     search_ask_error: 'Valami hiba történt. Kérjük, próbálja újra később.',
-    search_partial_error:
-        'Néhány találatot nem sikerült betölteni. Az elérhető találatok jelennek meg.',
     on_this_page: 'Ezen az oldalon',
     next_page: 'Következő',
     previous_page: 'Előző',
+    updates_pagination_navigation: 'Lapozás',
+    updates_pagination_range: '${1} - ${2} / ${3} frissítés',
     toc_back_to_space: 'Vissza ide: ${1}',
     page_last_modified: 'Utoljára frissítve: ${1}',
     was_this_helpful: 'Hasznos volt ez?',

@@ -53,6 +53,8 @@ async function main() {
     await Promise.all([
         writeDataFile('styles-map', JSON.stringify(onlyStyles, null, 2)),
         writeDataFile('icons', JSON.stringify(result, null, 2)),
+        // Names only, so validating an icon name doesn't load every label and search term.
+        writeDataFile('icon-names', JSON.stringify(result.map((entry) => entry.icon))),
     ]);
 
     // oxlint-disable-next-line no-console

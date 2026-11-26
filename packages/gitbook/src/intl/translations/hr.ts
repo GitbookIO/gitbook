@@ -43,10 +43,11 @@ export const hr: TranslationLanguage = {
     search_ask_no_answer:
         'Nije bilo moguće pronaći odgovor na vaše pitanje. Pokušajte ga preformulirati ili biti konkretniji.',
     search_ask_error: 'Nešto je pošlo po zlu. Pokušajte ponovno kasnije.',
-    search_partial_error: 'Neki se rezultati nisu mogli učitati. Prikazuju se dostupni rezultati.',
     on_this_page: 'Na ovoj stranici',
     next_page: 'Sljedeća',
     previous_page: 'Prethodna',
+    updates_pagination_navigation: 'Navigacija stranicama',
+    updates_pagination_range: '${1} - ${2} od ${3} ažuriranja',
     toc_back_to_space: 'Natrag na ${1}',
     page_last_modified: 'Zadnje ažurirano ${1}',
     was_this_helpful: 'Je li ovo bilo korisno?',

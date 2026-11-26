@@ -16,6 +16,8 @@ export const SearchResultItem = React.forwardRef(function SearchResultItem(
         size?: 'small' | 'medium';
         leadingIcon?: React.ReactNode;
         disabled?: boolean;
+        /** Called when the mouse moves over the item, to make it the selected one. */
+        onHover?: () => void;
     } & LinkInsightsProps &
         Omit<React.ComponentProps<typeof Link>, keyof LinkInsightsProps>,
     ref: React.Ref<HTMLAnchorElement>
@@ -29,6 +31,7 @@ export const SearchResultItem = React.forwardRef(function SearchResultItem(
         size = 'medium',
         action,
         disabled,
+        onHover,
         ...rest
     } = props;
 
@@ -37,6 +40,16 @@ export const SearchResultItem = React.forwardRef(function SearchResultItem(
             ref={ref}
             href={href ?? '#'}
             aria-disabled={disabled}
+            // Only a real mouse move selects, so rows scrolling under a still pointer don't.
+            onPointerMove={
+                onHover && !active
+                    ? (event: React.PointerEvent) => {
+                          if (event.pointerType === 'mouse') {
+                              onHover();
+                          }
+                      }
+                    : undefined
+            }
             className={tcls(
                 'flex',
                 'items-center',
@@ -46,27 +59,26 @@ export const SearchResultItem = React.forwardRef(function SearchResultItem(
                 'pr-2',
                 'py-2',
                 'text-tint',
-                disabled ? ['pointer-events-none'] : ['hover:bg-tint', 'hover:text-tint-strong'],
-                'group',
+                disabled ? ['pointer-events-none'] : null,
                 'transition-colors',
                 'rounded-corners:rounded-md',
                 'circular-corners:rounded-2xl',
-                active
-                    ? ['is-active', 'bg-primary', 'text-primary-strong', 'hover:bg-primary']
-                    : null,
+                active ? ['is-active', 'bg-primary', 'text-primary-strong'] : null,
                 className
             )}
             role="option"
             {...rest}
         >
-            <div className="size-4 shrink-0 text-tint-subtle">
-                {typeof leadingIcon === 'string' ? (
-                    <Icon icon={leadingIcon as IconName} className="size-4" />
-                ) : (
-                    leadingIcon
-                )}
-            </div>
-            <div className="grow">{children}</div>
+            {leadingIcon ? (
+                <div className="size-4 shrink-0 text-tint-subtle">
+                    {typeof leadingIcon === 'string' ? (
+                        <Icon icon={leadingIcon as IconName} className="size-4" />
+                    ) : (
+                        leadingIcon
+                    )}
+                </div>
+            ) : null}
+            <div className="min-w-0 grow">{children}</div>
             {disabled ? null : active ? (
                 <Button
                     label={action}

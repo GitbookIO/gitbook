@@ -1,6 +1,6 @@
 import { describe, expect, it, mock } from 'bun:test';
 
-import type { RevisionPageDocument } from '@gitbook/api';
+import { type RevisionPageDocument, SiteVisibility } from '@gitbook/api';
 
 import type { GitBookSiteContext } from '@/lib/context';
 import { createLinker } from '@/lib/links';
@@ -24,8 +24,9 @@ function createContext(options: {
     spaceRedirectPageId?: string;
 }) {
     return {
+        displayAgentInstructions: false,
         organizationId: 'org-1',
-        site: { id: 'site-1' },
+        site: { id: 'site-1', visibility: SiteVisibility.Public },
         siteSpace: { id: 'site-space-1' },
         space: { id: 'space-1', revision: 'revision-1' },
         revisionId: 'revision-1',
@@ -36,6 +37,9 @@ function createContext(options: {
             spaceBasePath: '/docs/',
         }),
         dataFetcher: {
+            getRevisionPageMarkdown: async () => ({
+                data: '# New page\n\n[Read this page](/pages/page-1)\n',
+            }),
             getSiteRedirectBySource: async ({ source }: { source: string }) =>
                 options.siteRedirect && source === '/old-page'
                     ? {
@@ -54,6 +58,31 @@ function createContext(options: {
 }
 
 describe('servePageMarkdown', () => {
+    it('serves page links that can be opened without the source origin', async () => {
+        const response = await servePageMarkdown(createContext({}), 'new-page');
+        expect(response.status).toBe(200);
+        expect(await response.text()).toContain(
+            '[Read this page](https://docs.example.com/docs/new-page.md)'
+        );
+    });
+
+    it('serves the current revision by selector with a noindex header for AI agents', async () => {
+        const context = createContext({});
+        const response = await servePageMarkdown(
+            {
+                ...context,
+                isAiAgent: true,
+                linker: context.linker.fork({
+                    spaceBasePath: `/docs/~/revisions/${context.revisionId}/`,
+                }),
+            },
+            'new-page'
+        );
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('X-Robots-Tag')).toBe('noindex, nofollow');
+    });
+
     it('redirects to the markdown version of a site redirect target', async () => {
         const context = createContext({
             siteRedirect: { target: 'https://docs.example.com/docs/new-page', permanent: true },
@@ -63,6 +92,17 @@ describe('servePageMarkdown', () => {
 
         expect(response.status).toBe(308);
         expect(response.headers.get('Location')).toBe('/docs/new-page.md');
+    });
+
+    it('returns not-found markdown instead of looping when a site redirect targets the same markdown path', async () => {
+        const context = createContext({
+            siteRedirect: { target: 'https://docs.example.com/docs/old-page.md', permanent: false },
+        });
+
+        const response = await servePageMarkdown(context, 'old-page');
+
+        expect(response.status).toBe(200);
+        expect(await response.text()).toContain('# Page Not Found');
     });
 
     it('redirects to the markdown version of a space redirect target', async () => {

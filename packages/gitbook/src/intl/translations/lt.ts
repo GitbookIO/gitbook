@@ -43,10 +43,11 @@ export const lt: TranslationLanguage = {
     search_ask_no_answer:
         'Nepavyko rasti atsakymo į jūsų klausimą. Galite pabandyti jį performuluoti arba pateikti konkrečiau.',
     search_ask_error: 'Kažkas nepavyko. Bandykite dar kartą vėliau.',
-    search_partial_error: 'Nepavyko įkelti kai kurių rezultatų. Rodomi pasiekiami rezultatai.',
     on_this_page: 'Šiame puslapyje',
     next_page: 'Kitas',
     previous_page: 'Ankstesnis',
+    updates_pagination_navigation: 'Puslapių navigacija',
+    updates_pagination_range: '${1} - ${2} iš ${3} naujinimų',
     toc_back_to_space: 'Atgal į ${1}',
     page_last_modified: 'Paskutinį kartą atnaujinta ${1}',
     was_this_helpful: 'Ar tai buvo naudinga?',

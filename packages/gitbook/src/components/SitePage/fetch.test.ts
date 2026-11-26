@@ -1,17 +1,13 @@
 import { describe, expect, it, mock } from 'bun:test';
 
-import { CustomizationPageActionType, type RevisionPageDocument } from '@gitbook/api';
+import type { RevisionPageDocument, SiteRedirectDestination } from '@gitbook/api';
 
 import type { GitBookSiteContext } from '@/lib/context';
 
 mock.module('server-only', () => ({}));
 
-const {
-    fetchPageData,
-    getLowercasePathnameRedirect,
-    resolveMissingPagePath,
-    resolveSitePageFromURL,
-} = await import('./fetch');
+const { getLowercasePathnameRedirect, resolveMissingPagePath, resolveSitePageFromURL } =
+    await import('./fetch');
 const { normalizeURL } = await import('@/lib/data/urls');
 const { createLinker } = await import('@/lib/links');
 
@@ -25,92 +21,30 @@ const page = {
     pages: [],
 } as RevisionPageDocument;
 
-const git = {
-    oid: 'abc123',
-    path: 'README.md',
-};
-
-function createContext(options: { gitEnabled: boolean; gitSync?: boolean }) {
-    const getRevisionPageByPath = mock(async () => ({
-        data: {
-            ...page,
-            git,
-        },
-    }));
-
-    const context = {
-        revision: { pages: [page] },
-        revisionId: 'revision-1',
-        customization: {
-            pageActions: {
-                items: options.gitEnabled ? [CustomizationPageActionType.Git] : [],
-            },
-        },
-        space: {
-            id: 'space-1',
-            gitSync:
-                options.gitSync === false
-                    ? undefined
-                    : {
-                          url: 'https://github.com/gitbook/example/tree/main',
-                      },
-        },
-        dataFetcher: { getRevisionPageByPath },
-    } as unknown as GitBookSiteContext;
-
-    return { context, getRevisionPageByPath };
-}
-
-describe('fetchPageData', () => {
-    it('fetches the Git metadata for an enabled Edit on Git action', async () => {
-        const { context, getRevisionPageByPath } = createContext({ gitEnabled: true });
-
-        const result = await fetchPageData(context, { pageId: page.id });
-
-        expect(getRevisionPageByPath).toHaveBeenCalledWith({
-            spaceId: 'space-1',
-            revisionId: 'revision-1',
-            path: 'readme',
-            metadata: true,
-            cachedMetadata: true,
-        });
-        expect(result.pageTarget?.page.git).toEqual(git);
-        expect(result.context.page?.git).toEqual(git);
-    });
-
-    it('does not fetch Git metadata when the action is disabled', async () => {
-        const { context, getRevisionPageByPath } = createContext({ gitEnabled: false });
-
-        const result = await fetchPageData(context, { pageId: page.id });
-
-        expect(getRevisionPageByPath).not.toHaveBeenCalled();
-        expect(result.pageTarget?.page.git).toBeUndefined();
-    });
-
-    it('does not fetch Git metadata without Git Sync', async () => {
-        const { context, getRevisionPageByPath } = createContext({
-            gitEnabled: true,
-            gitSync: false,
-        });
-
-        const result = await fetchPageData(context, { pageId: page.id });
-
-        expect(getRevisionPageByPath).not.toHaveBeenCalled();
-        expect(result.pageTarget?.page.git).toBeUndefined();
-    });
-});
-
 describe('resolveMissingPagePath', () => {
     function createRedirectContext(options: {
-        siteRedirect?: { source?: string; target: string; permanent?: boolean };
+        siteRedirect?: {
+            source?: string;
+            target: string;
+            permanent?: boolean;
+            destination?: SiteRedirectDestination;
+        };
         spaceRedirectPageId?: string;
+        contextId?: string;
+        structure?: GitBookSiteContext['structure'];
+        revisionsBySpace?: Record<string, RevisionPageDocument[]>;
     }) {
         const getSiteRedirectBySource = mock(async ({ source }: { source: string }) =>
             options.siteRedirect && source === (options.siteRedirect.source ?? '/old')
                 ? {
                       data: {
                           target: options.siteRedirect.target,
-                          redirect: { permanent: options.siteRedirect.permanent ?? false },
+                          redirect: {
+                              permanent: options.siteRedirect.permanent ?? false,
+                              ...(options.siteRedirect.destination
+                                  ? { destination: options.siteRedirect.destination }
+                                  : {}),
+                          },
                       },
                   }
                 : { error: { code: 404, message: 'Not found' } }
@@ -120,19 +54,35 @@ describe('resolveMissingPagePath', () => {
                 ? { data: { id: options.spaceRedirectPageId } }
                 : { error: { code: 404, message: 'Not found' } }
         );
+        const getRevision = mock(async ({ spaceId }: { spaceId: string }) =>
+            options.revisionsBySpace?.[spaceId]
+                ? { data: { pages: options.revisionsBySpace[spaceId] } }
+                : { error: { code: 404, message: 'Not found' } }
+        );
+
+        const defaultSiteSpace = {
+            id: 'site-space-1',
+            space: { id: 'space-1', revision: 'revision-1' },
+        };
 
         return {
             organizationId: 'org-1',
             site: { id: 'site-1' },
+            siteSpace: defaultSiteSpace,
+            structure: options.structure ?? {
+                type: 'siteSpaces',
+                structure: [defaultSiteSpace],
+            },
             space: { id: 'space-1', revision: 'revision-1' },
             revisionId: 'revision-1',
             revision: { pages: [page] },
+            contextId: options.contextId,
             linker: {
                 toPathInSpace: (path: string) => path,
                 toRelativePathInSite: (path: string) => path,
                 toLinkForContent: (url: string) => new URL(url).pathname,
             },
-            dataFetcher: { getSiteRedirectBySource, getRevisionPageByPath },
+            dataFetcher: { getSiteRedirectBySource, getRevisionPageByPath, getRevision },
         } as unknown as GitBookSiteContext;
     }
 
@@ -162,6 +112,224 @@ describe('resolveMissingPagePath', () => {
         expect(await resolveMissingPagePath(context, pathname)).toEqual({
             type: 'redirect',
             destination: '/new',
+            permanent: false,
+        });
+    });
+
+    it('ignores a site redirect that targets the current path', async () => {
+        const context = createRedirectContext({
+            siteRedirect: {
+                source: '/release-notes/restricted',
+                target: 'https://docs.example.com/release-notes/restricted',
+            },
+        });
+
+        expect(await resolveMissingPagePath(context, 'release-notes/restricted')).toBeUndefined();
+    });
+
+    it('ignores a site redirect that targets the current path with trailing slash, case, or query differences', async () => {
+        const context = createRedirectContext({
+            siteRedirect: {
+                source: '/release-notes/restricted',
+                target: 'https://docs.example.com/Release-Notes/Restricted/?tab=1#top',
+            },
+        });
+
+        expect(await resolveMissingPagePath(context, 'release-notes/restricted')).toBeUndefined();
+    });
+
+    it('ignores a space-relative redirect that resolves back to the current section path', async () => {
+        const context = {
+            ...createRedirectContext({
+                siteRedirect: {
+                    source: '/v3/getting-started',
+                    target: 'https://docs.example.com/docs/v3/getting-started',
+                },
+            }),
+            linker: createLinker({
+                host: 'docs.example.com',
+                siteBasePath: '/',
+                spaceBasePath: '/docs/',
+            }),
+        } as unknown as GitBookSiteContext;
+
+        expect(await resolveMissingPagePath(context, 'v3/getting-started')).toBeUndefined();
+    });
+
+    it('ignores a site redirect targeting a hidden site space on an adaptive site', async () => {
+        const context = createRedirectContext({
+            contextId: 'adaptive-ctx',
+            siteRedirect: {
+                source: '/getting-started',
+                target: 'https://docs.example.com/docs/v3/getting-started',
+                destination: {
+                    kind: 'site-page',
+                    siteSpaceId: 'site-space-hidden',
+                    pageId: 'page-v3',
+                },
+            },
+        });
+
+        expect(await resolveMissingPagePath(context, 'getting-started')).toBeUndefined();
+    });
+
+    it('ignores a site redirect targeting a hidden section on an adaptive site', async () => {
+        const context = createRedirectContext({
+            contextId: 'adaptive-ctx',
+            structure: {
+                type: 'sections',
+                structure: [
+                    {
+                        object: 'site-section',
+                        id: 'section-visible',
+                        siteSpaces: [
+                            {
+                                id: 'site-space-1',
+                                space: { id: 'space-1', revision: 'revision-1' },
+                            },
+                        ],
+                    },
+                ],
+            } as unknown as GitBookSiteContext['structure'],
+            siteRedirect: {
+                source: '/old-section',
+                target: 'https://docs.example.com/hidden-section',
+                destination: {
+                    kind: 'site-section',
+                    siteSectionId: 'section-hidden',
+                },
+            },
+        });
+
+        expect(await resolveMissingPagePath(context, 'old-section')).toBeUndefined();
+    });
+
+    it('ignores a site redirect targeting a hidden page in the current space on an adaptive site', async () => {
+        const context = createRedirectContext({
+            contextId: 'adaptive-ctx',
+            siteRedirect: {
+                source: '/release-notes/restricted.html',
+                target: 'https://docs.example.com/release-notes/restricted',
+                destination: {
+                    kind: 'site-page',
+                    siteSpaceId: 'site-space-1',
+                    pageId: 'hidden-page',
+                },
+            },
+        });
+
+        expect(
+            await resolveMissingPagePath(context, 'release-notes/restricted.html')
+        ).toBeUndefined();
+    });
+
+    it('checks target page visibility in another accessible space on an adaptive site', async () => {
+        const otherSpace = {
+            id: 'site-space-2',
+            space: { id: 'space-2', revision: 'revision-2' },
+        };
+        const structure = {
+            type: 'siteSpaces',
+            structure: [
+                { id: 'site-space-1', space: { id: 'space-1', revision: 'revision-1' } },
+                otherSpace,
+            ],
+        } as unknown as GitBookSiteContext['structure'];
+
+        const hiddenContext = createRedirectContext({
+            contextId: 'adaptive-ctx',
+            structure,
+            revisionsBySpace: { 'space-2': [] },
+            siteRedirect: {
+                source: '/old',
+                target: 'https://docs.example.com/other/secret',
+                destination: {
+                    kind: 'site-page',
+                    siteSpaceId: 'site-space-2',
+                    pageId: 'page-secret',
+                },
+            },
+        });
+        expect(await resolveMissingPagePath(hiddenContext, 'old')).toBeUndefined();
+
+        const visibleContext = createRedirectContext({
+            contextId: 'adaptive-ctx',
+            structure,
+            revisionsBySpace: { 'space-2': [{ ...page, id: 'page-secret', path: 'secret' }] },
+            siteRedirect: {
+                source: '/old',
+                target: 'https://docs.example.com/other/secret',
+                destination: {
+                    kind: 'site-page',
+                    siteSpaceId: 'site-space-2',
+                    pageId: 'page-secret',
+                },
+            },
+        });
+        expect(await resolveMissingPagePath(visibleContext, 'old')).toEqual({
+            type: 'redirect',
+            destination: '/other/secret',
+            permanent: false,
+        });
+    });
+
+    it('ignores a site redirect targeting the reassigned default variant path of the current space', async () => {
+        const context = {
+            ...createRedirectContext({
+                contextId: 'adaptive-ctx',
+                siteRedirect: {
+                    source: '/guide/missing',
+                    target: 'https://docs.example.com/guide/v3/missing',
+                    destination: {
+                        kind: 'site-space',
+                        siteSpaceId: 'site-space-v3',
+                    },
+                },
+                structure: {
+                    type: 'sections',
+                    structure: [
+                        {
+                            object: 'site-section',
+                            id: 'section-guide',
+                            siteSpaces: [
+                                {
+                                    id: 'site-space-v3',
+                                    path: 'v3',
+                                    default: true,
+                                    space: { id: 'space-v3', revision: 'revision-1' },
+                                },
+                            ],
+                        },
+                    ],
+                } as unknown as GitBookSiteContext['structure'],
+            }),
+            siteSpace: {
+                id: 'site-space-v3',
+                path: 'v3',
+                default: true,
+                space: { id: 'space-v3', revision: 'revision-1' },
+            },
+            linker: createLinker({
+                host: 'docs.example.com',
+                siteBasePath: '/',
+                spaceBasePath: '/guide/',
+            }),
+        } as unknown as GitBookSiteContext;
+
+        expect(await resolveMissingPagePath(context, 'missing')).toBeUndefined();
+    });
+
+    it('keeps a redirect whose current path contains a literal question mark', async () => {
+        const context = createRedirectContext({
+            siteRedirect: {
+                source: '/foo/bar%3Fbaz',
+                target: 'https://docs.example.com/foo/bar',
+            },
+        });
+
+        expect(await resolveMissingPagePath(context, 'foo/bar?baz')).toEqual({
+            type: 'redirect',
+            destination: '/foo/bar',
             permanent: false,
         });
     });

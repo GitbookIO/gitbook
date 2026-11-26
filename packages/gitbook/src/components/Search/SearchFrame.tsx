@@ -9,8 +9,6 @@ import {
     EmbeddableFrameMain,
     EmbeddableFrameSidebar,
 } from '../Embeddable/EmbeddableFrame';
-import { Tooltip } from '../primitives';
-import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SearchAskAnswer } from './SearchAskAnswer';
 import { SearchAskBar } from './SearchAskBar';
@@ -29,8 +27,11 @@ export function SearchFrame(props: {
     query: string;
     results: ResultType[];
     resultsId: string;
+    resultsQuery: string;
     resultsRef: React.Ref<SearchResultsRef>;
     onResultSelect?: () => void;
+    /** Select the result under the mouse, so hover and keyboard share one highlight. */
+    onResultHover?: (index: number) => void;
     scopeControl?: React.ReactNode;
     showAsk: boolean;
     sidebar?: React.ReactNode;
@@ -50,8 +51,10 @@ export function SearchFrame(props: {
         query,
         results,
         resultsId,
+        resultsQuery,
         resultsRef,
         onResultSelect,
+        onResultHover,
         scopeControl,
         showAsk,
         sidebar,
@@ -77,7 +80,7 @@ export function SearchFrame(props: {
                             fetching ? 'block animate-fade-in' : 'hidden animate-fade-out-slow'
                         )}
                         style={{
-                            animationDelay: fetching ? '2s' : undefined,
+                            animationDelay: fetching && results.length === 0 ? '2s' : undefined,
                         }}
                     >
                         <div
@@ -99,8 +102,16 @@ export function SearchFrame(props: {
                             <ScrollContainer
                                 orientation="vertical"
                                 className={tcls(fillHeight ? 'min-h-0 flex-1' : '')}
+                                leading={{ fade: 'long', button: false }}
+                                trailing={{
+                                    fade: 'long',
+                                    button: true,
+                                    // Loading placeholders are not more results.
+                                    buttonAlwaysVisible: results.length > 0,
+                                }}
                                 contentClassName={tcls(
-                                    'gutter-stable scroll-py-3 p-3',
+                                    // Keeps the keyboard selection clear of the faded edges.
+                                    'gutter-stable scroll-pt-12 scroll-pb-24 p-3',
                                     fillHeight ? 'min-h-full' : ''
                                 )}
                             >
@@ -109,13 +120,14 @@ export function SearchFrame(props: {
                                 ) : (
                                     <SearchResults
                                         ref={resultsRef}
-                                        query={query}
+                                        query={resultsQuery}
                                         id={resultsId}
                                         fetching={fetching}
                                         results={results}
                                         cursor={cursor}
                                         error={error}
                                         onResultSelect={onResultSelect}
+                                        onResultHover={onResultHover}
                                     />
                                 )}
                             </ScrollContainer>
@@ -126,21 +138,16 @@ export function SearchFrame(props: {
                                           query={query}
                                           assistant={assistant}
                                           active={cursor === results.length + index}
-                                          withShortcut={assistant === assistants[0]}
+                                          onHover={() => onResultHover?.(results.length + index)}
                                           onSelect={onResultSelect}
                                       />
                                   ))
                                 : null}
-                            <div
-                                className={tcls(
-                                    'flex gap-2 border-tint-subtle border-t bg-tint-subtle px-4 py-1.5',
-                                    !scopeControl ? 'not-pointer-fine:hidden' : '',
-                                    showAsk ? 'hidden' : ''
-                                )}
-                            >
-                                {scopeControl && !showAsk ? scopeControl : null}
-                                <SearchFrameKeyboardHints />
-                            </div>
+                            {scopeControl && !showAsk ? (
+                                <div className="flex gap-2 border-t border-tint-subtle bg-tint-subtle px-4 py-1.5">
+                                    {scopeControl}
+                                </div>
+                            ) : null}
                         </div>
                     </React.Suspense>
                 </EmbeddableFrameMain>
@@ -148,31 +155,3 @@ export function SearchFrame(props: {
         </SearchAskProvider>
     );
 }
-
-const SearchFrameKeyboardHints = () => {
-    return (
-        <div className="not-pointer-fine:hidden flex w-full items-center justify-end py-1.5 @container/keyboard-hint">
-            {/* Compact view */}
-            <div className="@max-[6rem]/keyboard-hint:hidden @min-[12rem]/keyboard-hint:hidden flex items-center gap-2">
-                <Tooltip label="Navigate">
-                    <div>
-                        <KeyboardShortcut className="bg-tint-base" keys={['up', 'down']} />
-                    </div>
-                </Tooltip>
-                /
-                <Tooltip label="Close">
-                    <div>
-                        <KeyboardShortcut className="bg-tint-base" keys={['esc']} />
-                    </div>
-                </Tooltip>
-            </div>
-            {/* Normal view */}
-            <div className="@max-[12rem]/keyboard-hint:hidden flex items-center gap-2">
-                <KeyboardShortcut className="bg-tint-base" keys={['up', 'down']} />
-                Navigate
-                <KeyboardShortcut className="ml-1 bg-tint-base" keys={['esc']} />
-                Close
-            </div>
-        </div>
-    );
-};

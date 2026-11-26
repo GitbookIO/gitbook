@@ -1,5 +1,22 @@
 import type * as api from '@gitbook/api';
 
+export type SearchRouteReason =
+    | 'preview'
+    | 'revision'
+    | 'change_request'
+    | 'mcp'
+    | 'no_pass'
+    | 'fallback:401'
+    | 'fallback:403'
+    | 'fallback:429'
+    | 'fallback:5xx'
+    | 'fallback:http'
+    | 'fallback:network'
+    | 'fallback:timeout'
+    | 'fallback:invalid'
+    | 'fallback:unknown_space'
+    | 'unknown';
+
 export type DataFetcherErrorData = {
     code: number;
     message: string;
@@ -33,6 +50,12 @@ export interface GitBookDataFetcher {
      * Create a data fetcher authenticated with a specific token.
      */
     withToken(input: { apiToken: string }): GitBookDataFetcher;
+
+    /**
+     * Create a data fetcher that reads only these spaces at the site revision it previews, and
+     * other spaces live.
+     */
+    withSiteRevisionSpaces(spaceIds: string[]): GitBookDataFetcher;
 
     /**
      * Get a user by its ID.
@@ -180,6 +203,8 @@ export interface GitBookDataFetcher {
         organizationId: string;
         siteId: string;
         query: string;
+        routeReason: SearchRouteReason;
+        searchId?: string;
         scope:
             | { mode: 'all' }
             | {

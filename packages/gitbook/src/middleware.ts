@@ -7,9 +7,9 @@ import rison from 'rison';
 import { getDomain } from 'tldts';
 
 import {
+    ContentType,
     CustomizationDefaultThemeMode,
     CustomizationThemeMode,
-    type PublishedSiteContent,
     SiteInsightsDisplayContext,
     type SiteInsightsEventLocation,
     SiteInsightsLLMSVariant,
@@ -18,6 +18,7 @@ import {
 
 import {
     type ServerInsightsEventInput,
+    getXForwardedFor,
     serveProxyAnalyticsEvent,
     trackServerInsightsEvents,
 } from './lib/tracking';
@@ -30,24 +31,33 @@ import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
 import {
     DataFetcherError,
+    type PublishedSiteContent,
     apiClient,
     getVisitorAuthBasePath,
     lookupPublishedContentByUrl,
     normalizeRequestURL,
     throwIfDataError,
 } from '@/lib/data';
-import { GITBOOK_DISABLE_INSIGHTS, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import {
+    GITBOOK_API_URL,
+    GITBOOK_DISABLE_INSIGHTS,
+    isGitBookAssetsHostURL,
+    isGitBookHostURL,
+} from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { isAITrainingOrIndexingRequest } from '@/lib/indexing-crawlers';
+import { getLogger } from '@/lib/logger';
 import { MCP_SERVER_CARD_PATH, MCP_SERVER_CARD_WELL_KNOWN_PATH } from '@/lib/mcp/paths';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
     createOAuthProtectedResourceMetadataResponse,
+    createOAuthProtectedResourceUnauthResponse,
     handleUnauthedOAuthProtectedResourceRequest,
+    isOAuthProtectedResourceMetadataRequest,
     isOAuthProtectedResourceMetadataRequestForAuthEndpoint,
     isOAuthProtectedResourceRequest,
 } from '@/lib/oauth-protected';
-import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
+import { hasRevisionSelector, removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
 import {
     getPreviewCookieResponse,
     getPreviewRequestIdentifier,
@@ -60,6 +70,11 @@ import {
     createRobotsTxtResponse,
     isRobotsTxtRequest,
 } from '@/lib/robots';
+import {
+    UPDATES_FILTER_SEARCH_PARAM,
+    UPDATES_PAGE_SEARCH_PARAM,
+    parseUpdatesPageParam,
+} from '@/lib/updates-url';
 import {
     type ResponseCookies,
     getPathScopedCookieName,
@@ -81,9 +96,21 @@ export const config = {
 
 type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 
+const REVISION_ROBOTS_TAG = 'noindex, nofollow';
+const DIRECT_SEARCH_PATH = /\/~gitbook\/search-direct\/orgs\/([^/]*)\/sites\/([^/]*)\/?$/;
+const DIRECT_SEARCH_ID = /^[a-zA-Z0-9_-]+$/;
+const DIRECT_SEARCH_PASS =
+    /^[a-zA-Z0-9_-]+\.\.[a-zA-Z0-9_-]{16}\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]{22}$/;
+const DIRECT_SEARCH_TIMEOUT_MS = 5_000;
+
 export async function middleware(request: NextRequest) {
     try {
         const requestURL = new URL(request.url);
+        const siteURL = getSiteURLFromRequest(request);
+        const directSearch = siteURL?.url.pathname.match(DIRECT_SEARCH_PATH);
+        if (directSearch) {
+            return await serveDirectSearch(request, directSearch[1], directSearch[2]);
+        }
 
         // Reject malicious requests
         const rejectResponse = await validateServerActionRequest(request);
@@ -91,14 +118,10 @@ export async function middleware(request: NextRequest) {
             return rejectResponse;
         }
 
-        for (const handler of [serveSiteRoutes, serveSpacePDFRoutes]) {
-            const result = await handler(requestURL, request);
-            if (result) {
-                return result;
-            }
-        }
-
-        return NextResponse.next();
+        const siteResponse = await serveSiteRoutes(requestURL, request, siteURL);
+        return (
+            siteResponse ?? (await serveSpacePDFRoutes(requestURL, request)) ?? NextResponse.next()
+        );
     } catch (error) {
         return serveErrorResponse(error as Error);
     }
@@ -158,12 +181,114 @@ function shouldFilterMaliciousRequests(requestURL: URL): boolean {
 /**
  * Handle request that are targetting the site routes group.
  */
-async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
-    const match = getSiteURLFromRequest(request);
+async function serveSiteRoutes(requestURL: URL, request: NextRequest, match: URLWithMode | null) {
     if (!match) {
         return null;
     }
 
+    const response = await serveSiteRequest(requestURL, request, match);
+    if (
+        response &&
+        hasRevisionSelector(match.url.pathname) &&
+        !response.headers.has('x-robots-tag')
+    ) {
+        const revisionResponse = new Response(response.body, response);
+        revisionResponse.headers.set('x-robots-tag', REVISION_ROBOTS_TAG);
+        return revisionResponse;
+    }
+    return response;
+}
+
+async function serveDirectSearch(request: NextRequest, organizationId = '', siteId = '') {
+    const responseHeaders = new Headers({
+        'Cache-Control': 'no-store',
+        'X-Content-Type-Options': 'nosniff',
+    });
+    if (request.method !== 'POST') {
+        responseHeaders.set('Allow', 'POST');
+        return new Response(null, { status: 405, headers: responseHeaders });
+    }
+    if (!DIRECT_SEARCH_ID.test(organizationId) || !DIRECT_SEARCH_ID.test(siteId)) {
+        return new Response(null, { status: 400, headers: responseHeaders });
+    }
+    const pass = request.headers.get('x-gitbook-search-pass');
+    if (!pass || !DIRECT_SEARCH_PASS.test(pass)) {
+        return new Response(null, { status: 401, headers: responseHeaders });
+    }
+
+    const headers = new Headers({
+        Authorization: `Bearer ${pass}`,
+        'Content-Type': 'application/json',
+    });
+    const userAgent = request.headers.get('User-Agent');
+    if (userAgent) headers.set('User-Agent', userAgent);
+    const ip = request.headers.get('x-gitbook-ip') ?? getXForwardedFor(request.headers);
+    if (ip) headers.set('X-Forwarded-For', ip);
+
+    const controller = new AbortController();
+    const abort = () => controller.abort();
+    if (request.signal.aborted) {
+        abort();
+    }
+    request.signal.addEventListener('abort', abort, { once: true });
+    const timeout = setTimeout(abort, DIRECT_SEARCH_TIMEOUT_MS);
+    const startedAt = performance.now();
+    try {
+        const upstream = await fetch(
+            `${removeTrailingSlash(GITBOOK_API_URL)}/v1/orgs/${organizationId}/sites/${siteId}/search`,
+            {
+                method: 'POST',
+                headers,
+                body: request.body,
+                redirect: 'manual',
+                signal: controller.signal,
+                duplex: 'half',
+            } as RequestInit
+        );
+        let responseBody: ArrayBuffer | null = null;
+        if (upstream.status !== 204 && upstream.status !== 205 && upstream.status !== 304) {
+            responseBody = await upstream.arrayBuffer();
+        }
+        responseHeaders.set(
+            'Server-Timing',
+            `api;dur=${Math.round(performance.now() - startedAt)}`
+        );
+        for (const name of [
+            'Content-Type',
+            'Retry-After',
+            'X-RateLimit-Scope',
+            'X-RateLimit-Reset',
+        ]) {
+            const value = upstream.headers.get(name);
+            if (value !== null) responseHeaders.set(name, value);
+        }
+        const fallback = request.headers.get('x-gitbook-search-fallback');
+        if (upstream.ok && (fallback === 'network' || fallback === 'timeout')) {
+            getLogger().subLogger('directSiteSearch').info('Direct search recovered via proxy', {
+                reason: fallback,
+                organizationId,
+                siteId,
+            });
+        }
+        return new Response(responseBody, { status: upstream.status, headers: responseHeaders });
+    } catch {
+        responseHeaders.set(
+            'Server-Timing',
+            `api;dur=${Math.round(performance.now() - startedAt)}`
+        );
+        getLogger().subLogger('directSiteSearch').warn('Direct search upstream failed', {
+            status: 502,
+            organizationId,
+            siteId,
+        });
+        return new Response(null, { status: 502, headers: responseHeaders });
+    } finally {
+        clearTimeout(timeout);
+        request.signal.removeEventListener('abort', abort);
+    }
+}
+
+async function serveSiteRequest(requestURL: URL, request: NextRequest, match: URLWithMode) {
     const { url: siteRequestURL, mode } = match;
 
     if (isAITrainingOrIndexingRequest(request)) {
@@ -176,6 +301,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     // Normalize URL after extracting the URL from the request to make sure the client is redirected to the proper one
     const normalization = normalizeRequestURL(siteRequestURL, mode);
     if (normalization instanceof Response) {
+        const location = normalization.headers.get('location');
+        if (location && hasRevisionSelector(new URL(location).pathname)) {
+            return NextResponse.redirect(location, {
+                status: normalization.status,
+                headers: { 'x-robots-tag': REVISION_ROBOTS_TAG },
+            });
+        }
         return normalization;
     }
     const isNormalizedURL = normalization.isNormalized;
@@ -233,25 +365,36 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     const visitorCountry = getVisitorCountry(request);
 
     const withAPIToken = async (apiToken: string | null) => {
-        const siteURLData = await throwIfDataError(
-            lookupPublishedContentByUrl({
-                url: siteRequestURL.toString(),
-                visitorPayload: {
-                    jwtToken: visitorToken?.token ?? undefined,
-                    unsignedClaims,
-                    type: getVisitorType(request),
-                    ...(visitorCountry ? { country: visitorCountry } : {}),
-                },
-                // When the visitor auth token is pulled from the cookie, set redirectOnError when calling resolvePublishedContentByUrl to allow
-                // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
-                // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
-                redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
+        const lookup = await lookupPublishedContentByUrl({
+            url: siteRequestURL.toString(),
+            visitorPayload: {
+                jwtToken: visitorToken?.token ?? undefined,
+                unsignedClaims,
+                type: getVisitorType(request),
+                ...(visitorCountry ? { country: visitorCountry } : {}),
+            },
+            // When the visitor auth token is pulled from the cookie, set redirectOnError when calling resolvePublishedContentByUrl to allow
+            // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
+            // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
+            redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
 
-                // Use the API token passed in the request, if any
-                // as it could be used for .preview hostnames
-                apiToken,
-            })
-        );
+            // Use the API token passed in the request, if any
+            // as it could be used for .preview hostnames
+            apiToken,
+        });
+
+        // A bearer token rejected on an OAuth protected resource (like MCP) gets the same challenge
+        // as a missing one, so the client knows to authorize again.
+        if (
+            lookup.error?.code === 401 &&
+            visitorToken?.source === 'visitor-oauth-protected' &&
+            isOAuthProtectedResourceRequest(siteRequestURL) &&
+            !isOAuthProtectedResourceMetadataRequest(siteRequestURL)
+        ) {
+            return createOAuthProtectedResourceUnauthResponse({ siteRequestURL, urlMode: mode });
+        }
+
+        const siteURLData = throwIfDataError(lookup);
 
         const cookies: ResponseCookies = visitorParamsCookie
             ? [
@@ -302,21 +445,25 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             // oxlint-disable-next-line no-console
             console.log('redirect', siteURLData.redirect);
             if (siteURLData.target === 'content') {
-                let contentRedirect = new URL(siteURLData.redirect, request.url);
+                const redirectURL = new URL(siteURLData.redirect, request.url);
+                let contentRedirect = new URL(redirectURL);
 
                 // For content redirects, we redirect using the /url/:url format
                 // during development and testing in 'url' mode.
                 if (mode === 'url') {
-                    const urlObject = new URL(siteURLData.redirect);
                     contentRedirect = new URL(
-                        `/url/${urlObject.host}${urlObject.pathname}${urlObject.search}`,
+                        `/url/${redirectURL.host}${redirectURL.pathname}${redirectURL.search}`,
                         request.url
                     );
                 }
 
-                // Keep the same search params as the original request
-                // as it might contain a VA token
-                contentRedirect.search = request.nextUrl.search;
+                if (!isPreviewRequest(siteRequestURL) && isPreviewRequest(redirectURL)) {
+                    getLogger().info('Redirected disabled published preview to the preview domain');
+                } else {
+                    // Keep the same search params as the original request
+                    // as it might contain a VA token
+                    contentRedirect.search = request.nextUrl.search;
+                }
 
                 return createRedirectResponse(contentRedirect.toString());
             }
@@ -385,6 +532,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             return await serveSearchPrewarm(request, siteURLData);
         }
 
+        if (isSearchPassRequest(siteURLData)) {
+            return await serveSearchPass(request, siteURLData, visitorToken?.token);
+        }
+
         //
         // Render and serve the content
         //
@@ -403,8 +554,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             basePath: siteURLData.basePath,
             space: siteURLData.space,
             organization: siteURLData.organization,
-            changeRequest: siteURLData.changeRequest,
-            revision: siteURLData.revision,
+            ...getPreviewedContent(siteURLData),
             shareKey: siteURLData.shareKey,
             preview: siteURLData.preview,
             apiToken: siteURLData.apiToken,
@@ -599,6 +749,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // noindex search/assistant deep links, kept crawlable so Google sees the directive.
         if (rewrittenURL.searchParams.has('ask') || rewrittenURL.searchParams.has('q')) {
             response.headers.set('x-robots-tag', 'none');
+        } else if (hasRevisionSelector(siteURLData.basePath)) {
+            response.headers.set('x-robots-tag', REVISION_ROBOTS_TAG);
+        } else if (rewrittenURL.searchParams.has(UPDATES_FILTER_SEARCH_PARAM)) {
+            response.headers.set('x-robots-tag', 'noindex, follow');
         }
 
         // Allow cross-origin requests from the same parent domain as the site.
@@ -832,6 +986,68 @@ async function serveSearchPrewarm(request: NextRequest, siteURLData: PublishedSi
     return new NextResponse(null, { status: 204 });
 }
 
+const SEARCH_PASS_TIMEOUT_MS = 1_500;
+
+function isSearchPassRequest(siteURLData: PublishedSiteContent) {
+    return removeLeadingSlash(removeTrailingSlash(siteURLData.pathname)) === '~gitbook/search-pass';
+}
+
+/**
+ * Give the visitor's browser a short-lived pass to search the site with the API directly.
+ */
+async function serveSearchPass(
+    request: NextRequest,
+    siteURLData: PublishedSiteContent,
+    visitorToken: string | undefined
+) {
+    if (request.method !== 'POST') {
+        return new NextResponse(null, { status: 405, headers: { allow: 'POST' } });
+    }
+
+    const api = apiClient({ apiToken: siteURLData.apiToken ?? null });
+    // The published API client has no method for this operation yet.
+    const pass = api
+        .request({
+            path: `/orgs/${siteURLData.organization}/sites/${siteURLData.site}/search/pass`,
+            method: 'POST',
+            secure: true,
+            // The API caps the pass at the visitor token's expiry.
+            ...(visitorToken ? { body: { visitorToken }, type: ContentType.Json } : {}),
+        })
+        .then(
+            (response) =>
+                response.json() as Promise<{
+                    searchPass?: { token?: unknown; expiresAt?: unknown };
+                }>
+        )
+        .catch(() => null);
+
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    const reply = await Promise.race([
+        pass,
+        new Promise<null>((resolve) => {
+            timeout = setTimeout(() => resolve(null), SEARCH_PASS_TIMEOUT_MS);
+        }),
+    ]);
+    clearTimeout(timeout);
+
+    const { token, expiresAt } = reply?.searchPass ?? {};
+    // The browser adds this lifetime to its own clock, so its clock skew does not matter.
+    const expiresIn =
+        typeof expiresAt === 'string' ? Date.parse(expiresAt) - Date.now() : Number.NaN;
+    if (typeof token !== 'string' || !token || !(expiresIn > 0)) {
+        return new NextResponse(null, {
+            status: 204,
+            headers: { 'cache-control': 'private, no-store' },
+        });
+    }
+
+    return NextResponse.json(
+        { token, expiresIn },
+        { headers: { 'cache-control': 'private, no-store' } }
+    );
+}
+
 /**
  * Encode path in a site content.
  * Special paths are not encoded and passed to be handled by the route handlers.
@@ -855,7 +1071,7 @@ function encodePathInSiteContent(
         siteSpace: siteURLData.siteSpace,
         siteShareKey: siteURLData.shareKey,
         space: siteURLData.space,
-        revision: siteURLData.revision,
+        revision: getPreviewedContent(siteURLData).revision,
         displayContext: SiteInsightsDisplayContext.Server,
     };
 
@@ -905,7 +1121,7 @@ function encodePathInSiteContent(
     const embedPage = pathname.match(EMBED_PAGE_PATH_REGEX);
     if (embedPage) {
         return {
-            pathname: `~gitbook/embed/page/${encodePagePath(embedPage[1])}`,
+            pathname: `~gitbook/embed/page/${encodeUpdatesPagePath(embedPage[1], request)}`,
         };
     }
 
@@ -942,6 +1158,7 @@ function encodePathInSiteContent(
         case '~gitbook/embed/script.js':
         case '~gitbook/embed/demo':
         case '~gitbook/site-index':
+        case '~gitbook/opensearch.xml':
             // LLMs.txt, sitemap, sitemap-pages and robots.txt are always static
             // as they only depend on the site structure / pages.
             return { pathname, routeType: 'static' };
@@ -1011,9 +1228,20 @@ function encodePathInSiteContent(
                           ],
                 };
             }
-            return { pathname: encodePagePath(pathname) };
+            return { pathname: encodeUpdatesPagePath(pathname, request) };
         }
     }
+}
+
+function encodeUpdatesPagePath(path: string | undefined, request: Request): string {
+    const pathname = encodePagePath(path);
+    const page = parseUpdatesPageParam(
+        new URL(request.url).searchParams.get(UPDATES_PAGE_SEARCH_PARAM)
+    );
+    if (page !== null) {
+        return `${pathname}/${page}`;
+    }
+    return pathname;
 }
 
 function encodePagePath(path: string | undefined): string {
@@ -1117,4 +1345,22 @@ function acceptsMarkdown(request: Request): boolean {
 
     const htmlIndex = mediaTypes.findIndex((type) => type === 'text/html' || type === '*/*');
     return htmlIndex === -1 || markdownIndex < htmlIndex;
+}
+
+/**
+ * The revision, change request or site revision a URL previews: at most one of them.
+ */
+function getPreviewedContent(
+    content: PublishedSiteContent
+): Pick<SiteURLData, 'revision' | 'changeRequest' | 'siteRevision'> {
+    if ('revision' in content) {
+        return { revision: content.revision };
+    }
+    if ('changeRequest' in content) {
+        return { changeRequest: content.changeRequest };
+    }
+    if ('siteRevision' in content) {
+        return { siteRevision: content.siteRevision };
+    }
+    return {};
 }

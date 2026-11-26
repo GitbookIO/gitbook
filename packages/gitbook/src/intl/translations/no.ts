@@ -44,10 +44,11 @@ export const no: TranslationLanguage = {
     search_ask_no_answer:
         'Et svar på spørsmålet ditt kunne ikke finnes. Prøv å omformulere det eller være mer spesifikk.',
     search_ask_error: 'Noe gikk galt. Vennligst prøv igjen senere.',
-    search_partial_error: 'Noen resultater kunne ikke lastes inn. Viser tilgjengelige resultater.',
     on_this_page: 'På denne siden',
     next_page: 'Neste',
     previous_page: 'Forrige',
+    updates_pagination_navigation: 'Sidenavigasjon',
+    updates_pagination_range: '${1} - ${2} av ${3} oppdateringer',
     toc_back_to_space: 'Tilbake til ${1}',
     page_last_modified: 'Sist oppdatert ${1}',
     was_this_helpful: 'Var dette nyttig?',

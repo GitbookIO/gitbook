@@ -210,7 +210,6 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
             event.preventDefault();
             handleSubmit();
         } else if (event.key === 'Escape') {
-            event.preventDefault();
             event.currentTarget.blur();
         }
     };

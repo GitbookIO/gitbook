@@ -6,6 +6,18 @@ import { TableSearchRecord } from './TableSearch';
 import { ScrollContainer } from '@/components/primitives/ScrollContainer';
 import { tcls } from '@/lib/tailwind';
 
+const gridColumns = {
+    small: '@sm:grid-cols-2 @2xl:grid-cols-3 @3xl:grid-cols-4',
+    medium: '@2xl:grid-cols-3 @sm:grid-cols-2',
+    large: '@xl:grid-cols-2',
+};
+
+const carouselWidths = {
+    small: 'w-[90%] @sm:w-[calc(45%-0.5rem)] @xl:w-[calc(30%-0.66rem)] @3xl:w-[calc(22.5%-0.75rem)] @5xl:w-[calc(25%-0.75rem)]',
+    medium: 'w-[90%] @sm:w-[calc(45%-0.5rem)] @xl:w-[calc(30%-0.66rem)] @5xl:w-[calc(33.33%-0.66rem)]',
+    large: 'w-[90%] @sm:w-[calc(45%-0.5rem)] @5xl:w-[calc(50%-0.5rem)]',
+};
+
 export function ViewCards(props: TableViewProps<DocumentTableViewCards>) {
     // `wrap` defaults to `true` (a wrapping grid); only an explicit `false` opts into the
     // horizontally-scrolling carousel row. Fall back to the grid in print mode: a PDF can't
@@ -30,7 +42,7 @@ function CardsGrid(props: TableViewProps<DocumentTableViewCards>) {
                 'inline-grid',
                 'gap-4',
                 'grid-cols-1',
-                view.cardSize === 'large' ? '@xl:grid-cols-2' : '@2xl:grid-cols-3 @sm:grid-cols-2', // Large cards break earlier to avoid becoming *too* big.
+                gridColumns[view.cardSize] ?? gridColumns.medium,
                 block.data.fullWidth ? 'large:flex-column' : null
             )}
         >
@@ -70,13 +82,6 @@ const PEEK = {
 function CardsCarousel(props: TableViewProps<DocumentTableViewCards>) {
     const { view, records } = props;
 
-    // Cards need a fixed width so the row overflows and scrolls; mirror the grid's
-    // medium/large sizing.
-    const cardWidth =
-        view.cardSize === 'large'
-            ? 'w-[90%] @sm:w-[calc(45%-0.5rem)] @5xl:w-[calc(50%-0.5rem)]'
-            : 'w-[90%] @sm:w-[calc(45%-0.5rem)] @xl:w-[calc(30%-0.66rem)] @5xl:w-[calc(33.33%-0.66rem)]';
-
     return (
         <ScrollContainer
             orientation="horizontal"
@@ -115,7 +120,7 @@ function CardsCarousel(props: TableViewProps<DocumentTableViewCards>) {
                             'grid-cols-1',
                             'shrink-0',
                             'snap-start',
-                            cardWidth
+                            carouselWidths[view.cardSize] ?? carouselWidths.medium
                         )}
                     >
                         <RecordCard {...props} record={record} />

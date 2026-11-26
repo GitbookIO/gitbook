@@ -1,6 +1,5 @@
 'use client';
 
-import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import { addRecentSearchQuery } from './recent-queries';
 import { SearchResultItem } from './SearchResultItem';
 import { useSearchLink } from './useSearch';
@@ -16,10 +15,10 @@ export function SearchAskBar(props: {
     query: string;
     assistant: Assistant;
     active?: boolean;
-    withShortcut?: boolean;
+    onHover?: () => void;
     onSelect?: () => void;
 }) {
-    const { query, assistant, active = false, withShortcut = false, onSelect } = props;
+    const { query, assistant, active = false, onHover, onSelect } = props;
     const language = useLanguage();
     const { siteSpaceId } = useCurrentContent();
     const getSearchLinkProps = useSearchLink();
@@ -43,18 +42,14 @@ export function SearchAskBar(props: {
         <SearchResultItem
             {...linkProps}
             active={active}
+            onHover={onHover}
             action={tString(language, 'ask')}
             leadingIcon={assistant.icon}
             data-testid="search-ask-question"
             className="gutter-stable rounded-none! shrink-0 overflow-y-scroll border-t border-tint-subtle pl-6 pr-5"
         >
-            <div className="flex items-center justify-between gap-2">
-                <div className="line-clamp-1">
-                    {t(language, 'ai_chat_ask_query', assistant.label, query)}
-                </div>
-                {withShortcut ? (
-                    <KeyboardShortcut className="bg-tint-base" keys={['mod', 'i']} />
-                ) : null}
+            <div className="line-clamp-1">
+                {t(language, 'ai_chat_ask_query', assistant.label, query)}
             </div>
         </SearchResultItem>
     );

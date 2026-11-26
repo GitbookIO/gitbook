@@ -127,6 +127,11 @@ frame.configure({
 frame.on('close', () => {
     console.log('Frame closed');
 });
+
+// Escape was pressed inside the frame and nothing in it (a menu, a dialog) used it
+frame.on('escape', () => {
+    closeHelpPanel();
+});
 ```
 
 ## As React components
@@ -222,7 +227,7 @@ function MyComponent() {
 - `frame.postUserMessage(message: string)` → `void`
 - `frame.clearChat()` → `void`
 - `frame.configure(settings: Partial<GitBookEmbeddableConfiguration>)` → `void`
-- `frame.on(event: string, listener: Function)` → `() => void` (unsubscribe)
+- `frame.on(event: string, listener: Function)` → `() => void` (unsubscribe). Events: `close`, `escape`
 
 ### React Components
 
@@ -393,6 +398,8 @@ assistantName: 'Support Assistant'
 Available in: Standalone script, NPM package, React components
 
 Suggested questions displayed in the [Assistant](https://gitbook.com/docs/publishing-documentation/gitbook-ai-assistant) welcome screen.
+
+Omit `suggestions` when creating the embed or pass an empty array to use the site's suggested questions. If the site has no suggested questions, the Assistant shows generic questions. Later `configure` calls keep the current setting unless you pass `suggestions`. To restore the site's questions, remove the React prop or pass `{ suggestions: [] }` or `{ suggestions: undefined }` to `configure`.
 
 - **Type**: `string[]`
 

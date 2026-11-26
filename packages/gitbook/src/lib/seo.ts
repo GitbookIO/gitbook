@@ -1,6 +1,7 @@
 import { type RevisionPageDocument, type RevisionPageGroup, SiteVisibility } from '@gitbook/api';
 
 import type { GitBookSiteContext } from '@/lib/context';
+import { hasRevisionSelector } from '@/lib/paths';
 
 /**
  * Return true if a page is indexable in search.
@@ -29,8 +30,12 @@ export function isSiteIndexable(context: GitBookSiteContext) {
         return false;
     }
 
-    // Prevent indexation of preview of revisions / change-requests
-    if (context.changeRequest || context.revisionId !== context.space.revision) {
+    if (
+        context.changeRequest ||
+        context.siteRevision ||
+        context.revisionId !== context.space.revision ||
+        hasRevisionSelector(context.linker.spaceBasePath)
+    ) {
         return false;
     }
 

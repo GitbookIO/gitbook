@@ -44,10 +44,11 @@ export const ko: TranslationLanguage = {
     search_ask_no_answer:
         '질문에 대한 답변을 찾을 수 없습니다. 질문을 다시 표현하거나 더 구체적으로 작성해 보세요.',
     search_ask_error: '문제가 발생했습니다. 나중에 다시 시도해 주세요.',
-    search_partial_error: '일부 결과를 불러오지 못했습니다. 사용 가능한 결과를 표시합니다.',
     on_this_page: '이 페이지에서',
     next_page: '다음',
     previous_page: '이전',
+    updates_pagination_navigation: '페이지 탐색',
+    updates_pagination_range: '업데이트 ${3}개 중 ${1} - ${2}개',
     toc_back_to_space: '${1}(으)로 돌아가기',
     page_last_modified: '마지막 업데이트 ${1}',
     was_this_helpful: '도움이 되었나요?',

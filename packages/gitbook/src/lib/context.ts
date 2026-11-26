@@ -5,7 +5,6 @@ import { assert } from 'ts-essentials';
 import type {
     ChangeRequest,
     CustomizationDefaultThemeMode,
-    PublishedSiteContent,
     Revision,
     RevisionPageDocument,
     Site,
@@ -20,23 +19,32 @@ import type {
     TranslationLanguage,
 } from '@gitbook/api';
 
-import { GITBOOK_URL } from './env';
+import { GITBOOK_API_PUBLIC_URL, GITBOOK_URL } from './env';
 import { type ImageResizer, createImageResizer } from './images';
-import { type GitBookLinker, createLinker, linkerForPublishedURL } from './links';
+import {
+    type GitBookLinker,
+    type SiteLinkerInput,
+    createSiteLinker,
+    linkerForPublishedURL,
+} from './links';
+import { isPublishedPreviewAllowed } from './preview';
 import type { AskVisitorAgent } from '@/lib/ask-visitor';
 import {
     type GitBookDataFetcher,
+    type PublishedSiteContent,
     createDataFetcher,
     getDataOrNull,
     throwIfDataError,
 } from '@/lib/data';
 import { getLogger } from '@/lib/logger';
+import type { DirectSearchProps } from '@/lib/search-results';
 import {
     findSiteSpaceBy,
     getFallbackSiteSpacePath,
     getLinkerForSiteSpace,
     getLocalizedTitle,
     getSiteStructureSections,
+    listAllSiteSpaces,
 } from '@/lib/sites';
 
 /**
@@ -50,8 +58,6 @@ export type SiteURLData = Pick<
     | 'site'
     | 'siteSpace'
     | 'space'
-    | 'revision'
-    | 'changeRequest'
     | 'shareKey'
     | 'siteSection'
     | 'siteBasePath'
@@ -63,6 +69,14 @@ export type SiteURLData = Pick<
      * Identifier used for image resizing.
      */
     imagesContextId: string;
+
+    /**
+     * Space revision, change request or site revision the URL previews: at most one is set. The
+     * middleware reads them from the resolved content, which types them as exclusive.
+     */
+    revision?: string;
+    changeRequest?: string;
+    siteRevision?: string;
 
     /**
      * Whether this request is a fallback rendering.
@@ -133,6 +147,11 @@ export type GitBookBaseContext = {
      * Translation language of the space.
      */
     locale?: TranslationLanguage;
+
+    /**
+     * Target for the browser to query the site search API directly with a search pass.
+     */
+    directSearch?: Omit<DirectSearchProps, 'spaces' | 'passURL' | 'proxyURL'>;
 };
 
 /**
@@ -205,6 +224,9 @@ export type GitBookSiteContext = GitBookSpaceContext & {
     /** Whether search indexation is blocked for this deployment. */
     noIndexSearch: boolean;
 
+    /** Site revision the URL previews. Content is read as it pins it. */
+    siteRevision?: string;
+
     /** Whether the request included a visitor token. */
     isLoggedInVisitor: boolean;
 
@@ -238,30 +260,23 @@ export function getBaseContext(input: {
 
     const dataFetcher = createDataFetcher({
         apiToken: siteURLData.apiToken ?? null,
+        siteRevision: siteURLData.siteRevision
+            ? {
+                  organizationId: siteURLData.organization,
+                  siteId: siteURLData.site,
+                  siteRevisionId: siteURLData.siteRevision,
+              }
+            : undefined,
     });
 
-    const gitbookURL = GITBOOK_URL ? new URL(GITBOOK_URL) : undefined;
-    const linker =
-        urlMode === 'url-host'
-            ? createLinker({
-                  host: siteURL.host,
-                  siteBasePath: siteURLData.siteBasePath,
-                  spaceBasePath: siteURLData.basePath,
-              })
-            : createLinker({
-                  protocol: gitbookURL?.protocol,
-                  host: gitbookURL?.host,
-                  siteBasePath: `/url/${siteURL.host}${siteURLData.siteBasePath}`,
-                  spaceBasePath: `/url/${siteURL.host}${siteURLData.basePath}`,
-              });
-
-    if (urlMode === 'url') {
-        // Create link in the same format for links to other sites/sections.
-        linker.toLinkForContent = (rawURL: string) => {
-            const urlObject = new URL(rawURL);
-            return `/url/${urlObject.host}${urlObject.pathname}${urlObject.search}${urlObject.hash}`;
-        };
-    }
+    const linkerInput: SiteLinkerInput = {
+        urlMode,
+        siteHost: siteURL.host,
+        siteBasePath: siteURLData.siteBasePath,
+        spaceBasePath: siteURLData.basePath,
+        gitbookURL: GITBOOK_URL || undefined,
+    };
+    const linker = createSiteLinker(linkerInput);
 
     const imageResizer = createImageResizer({
         imagesContextId: siteURLData.imagesContextId,
@@ -270,10 +285,21 @@ export function getBaseContext(input: {
         linker: linker,
     });
 
+    const directSearch: GitBookBaseContext['directSearch'] =
+        !siteURLData.revision && !siteURLData.changeRequest && !siteURLData.preview
+            ? {
+                  apiURL: GITBOOK_API_PUBLIC_URL,
+                  organizationId: siteURLData.organization,
+                  siteId: siteURLData.site,
+                  linker: linkerInput,
+              }
+            : undefined;
+
     return {
         dataFetcher,
         linker,
         imageResizer,
+        directSearch,
     };
 }
 
@@ -296,6 +322,7 @@ export async function fetchSiteContextByURLLookup(
         contextId: data.contextId,
         isFallback: data.isFallback ?? false,
         noIndexSearch: data.noIndexSearch ?? false,
+        siteRevision: data.siteRevision,
         isLoggedInVisitor: data.isLoggedInVisitor ?? false,
         preview: data.preview ?? false,
         displayAgentInstructions: data.displayAgentInstructions,
@@ -320,6 +347,7 @@ export async function fetchSiteContextByIds(
         contextId?: string;
         isFallback: boolean;
         noIndexSearch: boolean;
+        siteRevision?: string;
         isLoggedInVisitor: boolean;
         preview: boolean;
         displayAgentInstructions?: boolean;
@@ -339,6 +367,24 @@ export async function fetchSiteContextByIds(
             ),
             fetchSpaceContextByIds(baseContext, ids),
         ]);
+
+    const { publicChangeRequestPreviews } = orgSite as Site & {
+        publicChangeRequestPreviews?: boolean;
+    };
+    if (
+        !isPublishedPreviewAllowed({
+            publicChangeRequestPreviews,
+            preview: ids.preview,
+            changeRequest: ids.changeRequest,
+            revision: ids.revision,
+        })
+    ) {
+        getLogger().info('Refused disabled published preview', {
+            site: ids.site,
+            selector: ids.changeRequest ? 'change-request' : 'revision',
+        });
+        notFound();
+    }
 
     const sections = ids.siteSection
         ? parseSiteSectionsAndGroups(siteStructure, ids.siteSection)
@@ -435,6 +481,12 @@ export async function fetchSiteContextByIds(
 
     return {
         ...spaceContext,
+        // Only the site's own spaces are read at the site revision it previews.
+        dataFetcher: ids.siteRevision
+            ? spaceContext.dataFetcher.withSiteRevisionSpaces(
+                  listAllSiteSpaces(siteStructure).map((entry) => entry.space.id)
+              )
+            : spaceContext.dataFetcher,
         locale: siteSpace.space.language ?? spaceContext.locale,
         linker: getLinkerForSiteSpace(siteLinker, siteSpace, spaceContext.revision.pages),
         organizationId: ids.organization,
@@ -450,6 +502,7 @@ export async function fetchSiteContextByIds(
         contextId: ids.contextId,
         isFallback: ids.isFallback,
         noIndexSearch: ids.noIndexSearch,
+        siteRevision: ids.siteRevision,
         isLoggedInVisitor: ids.isLoggedInVisitor,
         preview: ids.preview,
         displayAgentInstructions: ids.displayAgentInstructions,

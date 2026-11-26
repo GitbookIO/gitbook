@@ -6,11 +6,13 @@ import * as ReactDOM from 'react-dom';
 import { CustomizationDefaultThemeMode, CustomizationPageActionType } from '@gitbook/api';
 
 import { AIContextProvider } from '../AI';
+import { LLMsTxtDirective } from './LLMsTxtDirective';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
 import { SiteLayoutClientContexts } from './SiteLayoutClientContexts';
 import { AdminToolbar } from '@/components/AdminToolbar';
 import { CookiesToast } from '@/components/Cookies';
 import { LoadIntegrations } from '@/components/Integrations';
+import { getDirectSearchProps } from '@/components/Search/search-props';
 import { SpaceLayout } from '@/components/SpaceLayout';
 import { WebMCP } from '@/components/WebMCP/WebMCP';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
@@ -20,6 +22,7 @@ import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@
 import { getResizedImageURL } from '@/lib/images';
 import { removeTrailingSlash } from '@/lib/paths';
 import { isSiteIndexable } from '@/lib/seo';
+import { getOpenSearchURL } from '@/routes/opensearch';
 
 // Pure trackers with no visitor-facing UI, safe to load after `load` + idle. Anything not
 // listed (consent managers, chats, assistants…) keeps loading eagerly.
@@ -71,17 +74,6 @@ export async function SiteLayout(props: {
         }
     });
 
-    // Start the search-index download from the HTML itself. `crossOrigin` must match the
-    // client `fetch()` (cors + same-origin credentials) or the preload is ignored and the
-    // index downloads twice — the omission was exactly that bug before.
-    // Low priority: it's only needed once search opens and must not compete with the LCP.
-    ReactDOM.preload(`${context.linker.siteBasePath}~gitbook/site-index`, {
-        as: 'fetch',
-        type: 'application/json',
-        crossOrigin: 'anonymous',
-        fetchPriority: 'low',
-    });
-
     scripts.forEach(({ script }) => {
         if (!isDeferrableScript(script)) {
             ReactDOM.preload(script, {
@@ -91,61 +83,72 @@ export async function SiteLayout(props: {
     });
 
     return (
-        <SiteLayoutClientContexts
-            contextId={context.contextId}
-            forcedTheme={
-                forcedTheme ??
-                // Only force concrete light/dark; System stays unforced so next-themes resolves prefers-color-scheme pre-paint (avoids the flash). A theme saved while the toggle was previously on still wins — see the PR's "Known limitation". RND-11643
-                (customization.themes.toggeable ||
-                customization.themes.default === CustomizationDefaultThemeMode.System
-                    ? undefined
-                    : customization.themes.default)
-            }
-            defaultTheme={customization.themes.default}
-            externalLinksTarget={customization.externalLinks.target}
-            proxyOrigin={context.site.proxy?.origin}
-            siteURL={removeTrailingSlash(
-                context.linker.toAbsoluteURL(context.linker.toPathInSite(''))
-            )}
-            searchPrewarmURL={context.linker.toPathInSite('~gitbook/search-prewarm')}
-        >
-            <AIContextProvider
-                aiMode={customization.ai?.mode}
-                suggestions={context.customization.ai?.suggestions}
-                trademark={customization.trademark.enabled}
-                greeting={aiGreeting ? { subtitle: aiGreeting } : undefined}
+        <>
+            {/* First in <body> so agents reading the HTML find it before the navigation. */}
+            <LLMsTxtDirective context={context} />
+            <link
+                rel="search"
+                type="application/opensearchdescription+xml"
+                href={getOpenSearchURL(context)}
+                title={context.site.title}
+            />
+            <SiteLayoutClientContexts
+                contextId={context.contextId}
+                forcedTheme={
+                    forcedTheme ??
+                    // Only force concrete light/dark; System stays unforced so next-themes resolves prefers-color-scheme pre-paint (avoids the flash). A theme saved while the toggle was previously on still wins — see the PR's "Known limitation". RND-11643
+                    (customization.themes.toggeable ||
+                    customization.themes.default === CustomizationDefaultThemeMode.System
+                        ? undefined
+                        : customization.themes.default)
+                }
+                defaultTheme={customization.themes.default}
+                externalLinksTarget={customization.externalLinks.target}
+                proxyOrigin={context.site.proxy?.origin}
+                siteURL={removeTrailingSlash(
+                    context.linker.toAbsoluteURL(context.linker.toPathInSite(''))
+                )}
+                searchPrewarmURL={context.linker.toPathInSite('~gitbook/search-prewarm')}
+                directSearch={getDirectSearchProps(context)}
             >
-                <SpaceLayout
-                    context={context}
-                    withTracking={withTracking}
-                    visitorAuthClaims={visitorAuthClaims}
+                <AIContextProvider
+                    aiMode={customization.ai?.mode}
+                    suggestions={context.customization.ai?.suggestions}
+                    trademark={customization.trademark.enabled}
+                    greeting={aiGreeting ? { subtitle: aiGreeting } : undefined}
                 >
-                    {children}
-                </SpaceLayout>
-            </AIContextProvider>
+                    <SpaceLayout
+                        context={context}
+                        withTracking={withTracking}
+                        visitorAuthClaims={visitorAuthClaims}
+                    >
+                        {children}
+                    </SpaceLayout>
+                </AIContextProvider>
 
-            <LoadIntegrations />
-            {customization.pageActions.items.includes(CustomizationPageActionType.Mcp) ? (
-                <WebMCP mcpURL={context.linker.toPathInSite('~gitbook/mcp')} />
-            ) : null}
-            {scripts.map(({ script }) =>
-                isDeferrableScript(script) ? (
-                    <Script key={script} src={script} strategy="lazyOnload" />
-                ) : (
-                    <script key={script} async src={script} />
-                )
-            )}
+                <LoadIntegrations />
+                {customization.pageActions.items.includes(CustomizationPageActionType.Mcp) ? (
+                    <WebMCP mcpURL={context.linker.toPathInSite('~gitbook/mcp')} />
+                ) : null}
+                {scripts.map(({ script }) =>
+                    isDeferrableScript(script) ? (
+                        <Script key={script} src={script} strategy="lazyOnload" />
+                    ) : (
+                        <script key={script} async src={script} />
+                    )
+                )}
 
-            {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (
-                <React.Suspense fallback={null}>
-                    <CookiesToast privacyPolicy={customization.privacyPolicy.url} />
-                </React.Suspense>
-            ) : null}
+                {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (
+                    <React.Suspense fallback={null}>
+                        <CookiesToast privacyPolicy={customization.privacyPolicy.url} />
+                    </React.Suspense>
+                ) : null}
 
-            <RocketLoaderDetector />
+                <RocketLoaderDetector />
 
-            <AdminToolbar context={context} />
-        </SiteLayoutClientContexts>
+                <AdminToolbar context={context} />
+            </SiteLayoutClientContexts>
+        </>
     );
 }
 

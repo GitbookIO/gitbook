@@ -1,22 +1,35 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
-import { orderSearchResultGroups } from './orderSearchResults';
-import type {
-    OrderedComputedResult,
-    SearchSiteContentRequest,
-} from '@/components/Search/search-types';
-import { throwIfDataError } from '@/lib/data';
+import { SEARCH_FALLBACK_HEADER } from '@/components/Search/search-pass-store';
+import type { SearchSiteContentRequest } from '@/components/Search/search-types';
+import type { SiteURLData } from '@/lib/context';
+import { type SearchRouteReason, throwIfDataError } from '@/lib/data';
+import { getLogger } from '@/lib/logger';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { transformSitePageResult } from '@/lib/search';
+import { computeSearchResults } from '@/lib/search-results';
 import { getServerActionBaseContext } from '@/lib/server-actions';
 import { findSiteSpaceBy, getLinkerForSiteSpace } from '@/lib/sites';
 
+const SEARCH_FALLBACK_REASON =
+    /^(\d{3}|expired|pass_request|network|timeout|invalid|unknown_space)$/;
+
 export async function POST(request: NextRequest) {
-    const { asEmbeddable, query, scope } = (await request.json()) as SearchSiteContentRequest;
+    const { asEmbeddable, query, scope, searchId } =
+        (await request.json()) as SearchSiteContentRequest;
     const [context, siteURLData] = await Promise.all([
         getServerActionBaseContext({ isEmbeddable: asEmbeddable }),
         getSiteURLDataFromMiddleware(),
     ]);
+
+    const fallback = request.headers.get(SEARCH_FALLBACK_HEADER);
+    if (fallback && SEARCH_FALLBACK_REASON.test(fallback)) {
+        getLogger()
+            .subLogger('search')
+            .info(
+                `Search pass fallback to the route (reason=${fallback}, organization=${siteURLData.organization}, site=${siteURLData.site})`
+            );
+    }
 
     if (query.length <= 1) {
         return NextResponse.json([]);
@@ -29,6 +42,8 @@ export async function POST(request: NextRequest) {
                 siteId: siteURLData.site,
                 query,
                 scope,
+                searchId,
+                routeReason: getSearchRouteReason(siteURLData, fallback),
             })
         ),
         throwIfDataError(
@@ -56,49 +71,59 @@ export async function POST(request: NextRequest) {
             ? getLinkerForSiteSpace(context.linker, currentSiteSpace.siteSpace, revision.pages)
             : context.linker;
 
-    const results = orderSearchResultGroups<OrderedComputedResult>(
-        searchResults.map((resultItem) => {
-            if (resultItem.type === 'record') {
-                const result: OrderedComputedResult = {
-                    type: 'record',
-                    id: resultItem.id,
-                    title: resultItem.title,
-                    description: resultItem.description,
-                    href: resultItem.url,
-                    score: resultItem.score,
-                };
+    const results = computeSearchResults(searchResults, (spaceItem, pageItem) => {
+        const isCurrentRevisionSpace = Boolean(revision && spaceItem.id === siteURLData.space);
+        const found =
+            isCurrentRevisionSpace && currentSiteSpace
+                ? currentSiteSpace
+                : findSiteSpaceBy(structure, (siteSpace) => siteSpace.space.id === spaceItem.id);
 
-                return { type: 'context' as const, results: [result] };
-            }
-
-            const isCurrentRevisionSpace = Boolean(revision && resultItem.id === siteURLData.space);
-            const found =
-                isCurrentRevisionSpace && currentSiteSpace
-                    ? currentSiteSpace
-                    : findSiteSpaceBy(
-                          structure,
-                          (siteSpace) => siteSpace.space.id === resultItem.id
-                      );
-
-            return {
-                type: 'pages' as const,
-                results: resultItem.pages.flatMap((pageItem) => {
-                    const result = transformSitePageResult({
-                        asEmbeddable: Boolean(asEmbeddable),
-                        linker: isCurrentRevisionSpace ? revisionLinker : context.linker,
-                        pageItem,
-                        spaceItem: resultItem,
-                        siteSpace: found?.siteSpace,
-                        siteSection: found?.siteSection ?? undefined,
-                        siteSectionGroup: found?.siteSectionGroup ?? undefined,
-                        revisionPages: isCurrentRevisionSpace ? revision?.pages : undefined,
-                    });
-
-                    return result ? [{ rank: pageItem.rank, result }] : [];
-                }),
-            };
-        })
-    );
+        return transformSitePageResult({
+            asEmbeddable: Boolean(asEmbeddable),
+            linker: isCurrentRevisionSpace ? revisionLinker : context.linker,
+            pageItem,
+            spaceItem,
+            siteSpace: found?.siteSpace,
+            siteSection: found?.siteSection ?? undefined,
+            siteSectionGroup: found?.siteSectionGroup ?? undefined,
+            revisionPages: isCurrentRevisionSpace ? revision?.pages : undefined,
+        });
+    });
 
     return NextResponse.json(results);
+}
+
+function getSearchRouteReason(
+    siteURLData: SiteURLData,
+    fallback: string | null
+): SearchRouteReason {
+    if (siteURLData.changeRequest) {
+        return 'change_request';
+    }
+    if (siteURLData.revision) {
+        return 'revision';
+    }
+    if (siteURLData.preview) {
+        return 'preview';
+    }
+
+    switch (fallback) {
+        case null:
+        case 'expired':
+        case 'pass_request':
+            return 'no_pass';
+        case '401':
+        case '403':
+        case '429':
+        case 'network':
+        case 'timeout':
+        case 'invalid':
+        case 'unknown_space':
+            return `fallback:${fallback}`;
+        default:
+            if (/^5\d{2}$/.test(fallback)) {
+                return 'fallback:5xx';
+            }
+            return /^\d{3}$/.test(fallback) ? 'fallback:http' : 'unknown';
+    }
 }

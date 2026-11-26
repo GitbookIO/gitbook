@@ -44,10 +44,11 @@ export const ja: TranslationLanguage = {
     search_ask_no_answer:
         'ご質問への回答が見つかりませんでした。質問を言い換えるか、もう少し具体的にしてください。',
     search_ask_error: '何らかのエラーが発生しました。後ほど再度お試しください。',
-    search_partial_error: '一部の結果を読み込めませんでした。利用可能な結果を表示しています。',
     on_this_page: 'このページ内',
     next_page: '次へ',
     previous_page: '前へ',
+    updates_pagination_navigation: 'ページナビゲーション',
+    updates_pagination_range: '全${3}件の更新のうち${1}〜${2}件',
     toc_back_to_space: '${1}に戻る',
     page_last_modified: '最終更新 ${1}',
     was_this_helpful: '役に立ちましたか？',

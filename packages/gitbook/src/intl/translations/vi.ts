@@ -43,10 +43,11 @@ export const vi: TranslationLanguage = {
     search_ask_no_answer:
         'Không tìm thấy câu trả lời cho câu hỏi của bạn. Bạn có thể thử diễn đạt lại hoặc hỏi cụ thể hơn.',
     search_ask_error: 'Đã xảy ra lỗi. Vui lòng thử lại sau.',
-    search_partial_error: 'Không thể tải một số kết quả. Đang hiển thị các kết quả có sẵn.',
     on_this_page: 'Trên trang này',
     next_page: 'Tiếp theo',
     previous_page: 'Trước',
+    updates_pagination_navigation: 'Điều hướng trang',
+    updates_pagination_range: '${1} - ${2} trong số ${3} bản cập nhật',
     toc_back_to_space: 'Quay lại ${1}',
     page_last_modified: 'Cập nhật lần cuối ${1}',
     was_this_helpful: 'Nội dung này có hữu ích không?',

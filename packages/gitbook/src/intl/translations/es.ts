@@ -44,11 +44,11 @@ export const es: TranslationLanguage = {
     search_ask_no_answer:
         'No se pudo encontrar una respuesta para su pregunta. Puede intentar reformularla o ser más específico.',
     search_ask_error: 'Algo salió mal. Por favor, inténtalo de nuevo más tarde.',
-    search_partial_error:
-        'No se pudieron cargar algunos resultados. Se muestran los resultados disponibles.',
     on_this_page: 'En esta página',
     next_page: 'Siguiente',
     previous_page: 'Anterior',
+    updates_pagination_navigation: 'Navegación entre páginas',
+    updates_pagination_range: '${1} - ${2} de ${3} actualizaciones',
     toc_back_to_space: 'Volver a ${1}',
     page_last_modified: 'Última actualización ${1}',
     was_this_helpful: '¿Te fue útil?',

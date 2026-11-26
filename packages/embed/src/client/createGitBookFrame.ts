@@ -38,7 +38,10 @@ export type GitBookFrameClient = {
     configure: (settings: Partial<GitBookEmbeddableConfiguration>) => void;
 
     /**
-     * Register an event listener.
+     * Register an event listener and get back a function that removes it.
+     *
+     * - `close`: the built-in close button was clicked.
+     * - `escape`: Escape was pressed inside the frame and nothing in it (a menu, a dialog) used it.
      */
     on: (event: string, listener: (...args: any[]) => void) => () => void;
 };
@@ -64,11 +67,9 @@ export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClien
 
     channel.receive((message: FrameToParentMessage) => {
         console.log('[gitbook:embed] received message', message);
-        if (message.type === 'close') {
-            const listeners = events.get('close') || [];
-            if (listeners) {
-                listeners.forEach((listener) => listener());
-            }
+        if (message.type === 'close' || message.type === 'escape') {
+            const listeners = events.get(message.type) || [];
+            listeners.forEach((listener) => listener());
         }
     });
 
@@ -83,7 +84,7 @@ export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClien
         tabs: ['assistant', 'search', 'docs'],
         actions: [],
         greeting: { title: '', subtitle: '' },
-        suggestions: [],
+        suggestions: undefined,
         tools: [],
         trademark: true,
     };
@@ -108,7 +109,7 @@ export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClien
             return () => {
                 events.set(
                     event,
-                    listeners.filter((l) => l !== listener)
+                    (events.get(event) || []).filter((l) => l !== listener)
                 );
             };
         },

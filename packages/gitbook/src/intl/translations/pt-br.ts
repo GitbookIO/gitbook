@@ -44,11 +44,11 @@ export const pt_br: TranslationLanguage = {
     search_ask_no_answer:
         'Não foi possível encontrar uma resposta para sua pergunta. Você pode tentar reformulá-la ou ser mais específico.',
     search_ask_error: 'Algo deu errado. Por favor, tente novamente mais tarde.',
-    search_partial_error:
-        'Alguns resultados não puderam ser carregados. Mostrando os resultados disponíveis.',
     on_this_page: 'Nesta página',
     next_page: 'Próximo',
     previous_page: 'Anterior',
+    updates_pagination_navigation: 'Navegação entre páginas',
+    updates_pagination_range: '${1} - ${2} de ${3} atualizações',
     toc_back_to_space: 'Voltar para ${1}',
     page_last_modified: 'Atualizado ${1}',
     was_this_helpful: 'Isto foi útil?',

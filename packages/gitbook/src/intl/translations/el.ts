@@ -43,11 +43,11 @@ export const el: TranslationLanguage = {
     search_ask_no_answer:
         'Δεν ήταν δυνατή η εύρεση απάντησης στην ερώτησή σας. Δοκιμάστε να τη διατυπώσετε διαφορετικά ή πιο συγκεκριμένα.',
     search_ask_error: 'Κάτι πήγε στραβά. Δοκιμάστε ξανά αργότερα.',
-    search_partial_error:
-        'Δεν ήταν δυνατή η φόρτωση ορισμένων αποτελεσμάτων. Εμφανίζονται τα διαθέσιμα αποτελέσματα.',
     on_this_page: 'Σε αυτήν τη σελίδα',
     next_page: 'Επόμενη',
     previous_page: 'Προηγούμενη',
+    updates_pagination_navigation: 'Πλοήγηση σελίδων',
+    updates_pagination_range: '${1} - ${2} από ${3} ενημερώσεις',
     toc_back_to_space: 'Επιστροφή σε ${1}',
     page_last_modified: 'Τελευταία ενημέρωση ${1}',
     was_this_helpful: 'Ήταν χρήσιμο αυτό;',

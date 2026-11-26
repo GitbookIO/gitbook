@@ -1,8 +1,8 @@
 import { permanentRedirect, redirect } from 'next/navigation';
 
 import {
-    CustomizationPageActionType,
     type RevisionPageDocument,
+    type SiteRedirect,
     SITE_REDIRECT_SOURCE_PATH_MAX_LENGTH,
     SITE_REDIRECT_SOURCE_PATH_PATTERN,
 } from '@gitbook/api';
@@ -11,7 +11,12 @@ import { type GitBookSiteContext, fetchSiteContextForSiteSpace } from '@/lib/con
 import { getDataOrNull } from '@/lib/data';
 import { type ResolvedPagePath, resolvePageId } from '@/lib/pages';
 import { withLeadingSlash } from '@/lib/paths';
-import { findSiteSpaceByUrl, resolveSiteSpacePagePath } from '@/lib/sites';
+import {
+    findSiteSpaceBy,
+    findSiteSpaceByUrl,
+    getSiteStructureSections,
+    resolveSiteSpacePagePath,
+} from '@/lib/sites';
 
 const MAX_PAGE_URL_REDIRECTS = 5;
 
@@ -30,34 +35,7 @@ export type PageParams = PagePathParams | PageIdParams;
  * Optimized to fetch in parallel as much as possible.
  */
 export async function fetchPageData(context: GitBookSiteContext, params: PageParams) {
-    let pageTarget = await resolvePage(context, params);
-
-    // Revision trees omit metadata for cache efficiency, so load it only when this action needs the Git path.
-    if (
-        pageTarget &&
-        !pageTarget.page.git &&
-        context.space.gitSync?.url &&
-        context.customization.pageActions.items.includes(CustomizationPageActionType.Git)
-    ) {
-        const response = await context.dataFetcher.getRevisionPageByPath({
-            spaceId: context.space.id,
-            revisionId: context.revisionId,
-            path: pageTarget.page.path,
-            metadata: true,
-            cachedMetadata: true,
-        });
-        const pageWithMetadata = response.data;
-
-        if (pageWithMetadata?.type === 'document' && pageWithMetadata.git) {
-            pageTarget = {
-                ...pageTarget,
-                page: {
-                    ...pageTarget.page,
-                    git: pageWithMetadata.git,
-                },
-            };
-        }
-    }
+    const pageTarget = await resolvePage(context, params);
 
     return {
         context: {
@@ -141,6 +119,14 @@ export async function resolveMissingPagePath(
             .filter((source) => SITE_REDIRECT_SOURCE_PATH_REGEX.test(source))
     );
 
+    const currentPath = linker.toPathInSpace(redirectPathname);
+    let currentPathWithDefaultVariant: string | null = null;
+    if (context.siteSpace.default && context.siteSpace.path) {
+        currentPathWithDefaultVariant = linker.toPathInSpace(
+            `/${context.siteSpace.path}${redirectPathname}`
+        );
+    }
+
     for (const source of redirectSources) {
         // We try to resolve the site redirect
         const resolvedSiteRedirect =
@@ -154,6 +140,18 @@ export async function resolveMissingPagePath(
                 })
             ));
         if (resolvedSiteRedirect) {
+            const destination = linker.toLinkForContent(resolvedSiteRedirect.target);
+            // Skip self-redirects (including default-variant canonical aliases) and hidden adaptive targets.
+            const targetsCurrentPath =
+                isSameRedirectPath(currentPath, destination) ||
+                (currentPathWithDefaultVariant !== null &&
+                    isSameRedirectPath(currentPathWithDefaultVariant, destination));
+            if (
+                targetsCurrentPath ||
+                !(await isRedirectDestinationAccessible(context, resolvedSiteRedirect.redirect))
+            ) {
+                break;
+            }
             const isPublicLiveContext =
                 !shareKey &&
                 !context.changeRequest &&
@@ -162,7 +160,7 @@ export async function resolveMissingPagePath(
                 !context.isLoggedInVisitor;
             return {
                 type: 'redirect',
-                destination: linker.toLinkForContent(resolvedSiteRedirect.target),
+                destination,
                 permanent: Boolean(
                     resolvedSiteRedirect.redirect?.permanent &&
                     !resolvedSiteRedirect.redirect.draft &&
@@ -230,6 +228,17 @@ export async function resolveSitePageFromURL(
     return null;
 }
 
+export function isSameRedirectPath(currentPath: string, destination: string): boolean {
+    if (!destination.startsWith('/') || destination.startsWith('//')) {
+        return false;
+    }
+
+    const destinationPathname = new URL(destination, 'https://gitbook.invalid').pathname;
+    return (
+        normalizeRedirectPathname(currentPath) === normalizeRedirectPathname(destinationPathname)
+    );
+}
+
 /**
  * Transform a pathname into a candidate source for site redirect matching.
  * The pathname is already percent-encoded, so each segment is decoded before being encoded
@@ -252,6 +261,60 @@ function safeDecodeURIComponent(segment: string): string {
     } catch {
         return segment;
     }
+}
+
+async function isRedirectDestinationAccessible(
+    context: GitBookSiteContext,
+    siteRedirect: SiteRedirect | null
+): Promise<boolean> {
+    if (!context.contextId || !siteRedirect?.destination) {
+        return true;
+    }
+
+    const { destination } = siteRedirect;
+    switch (destination.kind) {
+        case 'external':
+            return true;
+        case 'site-section':
+            return getSiteStructureSections(context.structure, { ignoreGroups: true }).some(
+                (section) => section.id === destination.siteSectionId
+            );
+        case 'site-space':
+            return Boolean(
+                findSiteSpaceBy(context.structure, (entry) => entry.id === destination.siteSpaceId)
+            );
+        case 'site-page': {
+            const target = findSiteSpaceBy(
+                context.structure,
+                (entry) => entry.id === destination.siteSpaceId
+            );
+            if (!target) {
+                return false;
+            }
+            if (destination.siteSpaceId === context.siteSpace.id) {
+                return Boolean(resolvePageId(context.revision.pages, destination.pageId));
+            }
+            const targetRevision = await getDataOrNull(
+                context.dataFetcher.getRevision({
+                    spaceId: target.siteSpace.space.id,
+                    revisionId: target.siteSpace.space.revision,
+                })
+            );
+            if (!targetRevision) {
+                return false;
+            }
+            return Boolean(resolvePageId(targetRevision.pages, destination.pageId));
+        }
+    }
+}
+
+function normalizeRedirectPathname(pathname: string): string {
+    const normalized = pathname
+        .split('/')
+        .filter(Boolean)
+        .map((segment) => safeDecodeURIComponent(segment).toLowerCase())
+        .join('/');
+    return `/${normalized}`;
 }
 
 /**

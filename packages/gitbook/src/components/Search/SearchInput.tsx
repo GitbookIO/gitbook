@@ -13,6 +13,8 @@ interface SearchInputProps {
     onChange: (value: string) => void;
     onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
     onFocus?: () => void;
+    onInput?: (event: React.FormEvent<HTMLInputElement>) => void;
+    onCompositionEnd?: (event: React.CompositionEvent<HTMLInputElement>) => void;
     value: string;
     withAI: boolean;
     isOpen: boolean;
@@ -133,7 +135,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                               }
                     }
                     trailing={
-                        !showAsk && value && resultsCount > 0 ? (
+                        !showAsk && !fetching && value && resultsCount > 0 ? (
                             <div className="animate-blur-in mr-2 text-sm text-tint-subtle">
                                 {t(language, 'search_results_count', resultsCount.toString())}
                             </div>

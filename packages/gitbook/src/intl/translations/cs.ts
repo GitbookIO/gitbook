@@ -43,10 +43,11 @@ export const cs: TranslationLanguage = {
     search_ask_no_answer:
         'Na vaši otázku se nepodařilo najít odpověď. Zkuste ji přeformulovat nebo být konkrétnější.',
     search_ask_error: 'Něco se pokazilo. Zkuste to prosím znovu později.',
-    search_partial_error: 'Některé výsledky se nepodařilo načíst. Zobrazují se dostupné výsledky.',
     on_this_page: 'Na této stránce',
     next_page: 'Další',
     previous_page: 'Předchozí',
+    updates_pagination_navigation: 'Navigace mezi stránkami',
+    updates_pagination_range: '${1} - ${2} z ${3} aktualizací',
     toc_back_to_space: 'Zpět na ${1}',
     page_last_modified: 'Poslední aktualizace ${1}',
     was_this_helpful: 'Bylo to užitečné?',

@@ -4,23 +4,35 @@ import { Icon } from '@gitbook/icons';
 
 import { Favicon } from '../utils';
 import { HighlightQuery } from './HighlightQuery';
-import type { ComputedRecordResult } from './search-types';
+import type { ComputedRecordResult, SearchResultSource } from './search-types';
 import { SearchResultItem } from './SearchResultItem';
 import { tString, useLanguage } from '@/intl/client';
 
 export const SearchRecordResultItem = React.forwardRef(function SearchRecordResultItem(
     props: {
         query: string;
-        item: ComputedRecordResult;
+        item: ComputedRecordResult & SearchResultSource;
+        position: number;
+        resultsCount: number;
         active: boolean;
         style?: React.CSSProperties;
     },
     ref: React.Ref<HTMLAnchorElement>
 ) {
-    const { query, item, active, style, ...rest } = props;
+    const { query, item, active, position, resultsCount, style, ...rest } = props;
     const language = useLanguage();
 
     const domain = getDomain(item.href);
+
+    const insights = {
+        type: 'search_open_result' as const,
+        ...item.search,
+        position,
+        resultsCount,
+        result: {
+            recordId: item.id,
+        },
+    };
 
     return (
         <SearchResultItem
@@ -36,13 +48,7 @@ export const SearchRecordResultItem = React.forwardRef(function SearchRecordResu
                     fallback={<Icon icon="memo" className="size-4" />}
                 />
             }
-            insights={{
-                type: 'search_open_result',
-                query,
-                result: {
-                    recordId: item.id,
-                },
-            }}
+            insights={insights}
             aria-label={tString(language, 'search_page_result_title', item.title)}
             style={{ ...style }}
             {...rest}

@@ -59,6 +59,36 @@ Run a specific test file:
 cd packages/gitbook && bun test src/lib/cache.test.ts
 ```
 
+## Changes customers see on their live site
+
+Published sites are our customers' product. If a change alters how their content looks or behaves without them changing anything, it needs a comms decision before it merges.
+
+It counts if it ships on by default and any of these are true:
+- It changes structure or navigation: outline/"On this page", sidebar, TOC, headings, breadcrumbs, pagination, header or footer.
+- Something new appears on every page (or every page of a type), or something existing disappears or moves.
+- Layout or typography shifts enough that a customer would notice in a screenshot.
+- URLs, anchors, redirects, SEO/meta tags or search/Ask behaviour change.
+- A default changes for existing sites.
+
+It does not count when:
+- It's behind a flag, a site setting or opt-in that stays off for existing sites until comms go out.
+- It's a bug fix that restores the intended behaviour.
+- It only affects the editor/app, not published content.
+
+When it counts:
+1. Warn the engineer before the PR is opened: "This changes customers' live sites. Have the support and sales leads agreed the rollout and announcement?"
+2. Suggest a flag or staged rollout if there isn't one, so it can ship dark and be turned on after the notice goes out.
+
+## Bumping Next.js or OpenNext
+
+Type checks and unit tests miss runtime regressions: OpenNext 4.1.15 changed the composable cache key format, and every `'use cache'` call silently missed for days. Before committing a bump of `next`, `@opennextjs/aws` or `@opennextjs/cloudflare`, run both runtimes locally from `packages/gitbook`:
+
+1. **Next**: `bun run build:local && bun run start`, then load several distinct pages under `http://localhost:3000/url/gitbook.com/docs`.
+2. **OpenNext**: `bun run build:cloudflare`, delete `openNext/customWorkers/.wrangler` (stale cache hits otherwise skip the server), then run `bun run dev:cf:server` and `bun run dev:cf:middleware` and load several distinct pages under `http://127.0.0.1:8771/url/gitbook.com/docs`.
+3. Diff the changed OpenNext versions' adapters that call our overrides in `openNext/` (incremental, composable and tag cache, queue), e.g. with `npm pack` of the old and new versions.
+
+The bump is safe when every page returns 200 on both runtimes and the server logs show no cache errors (grep `Failed to` and `regional cache`). Report the pages checked and the log result in the PR.
+
 ## Changesets
 
 After committing code changes, create a changeset for the affected package:

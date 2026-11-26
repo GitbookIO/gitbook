@@ -43,10 +43,11 @@ export const ms: TranslationLanguage = {
     search_ask_no_answer:
         'Jawapan untuk soalan anda tidak ditemui. Anda boleh cuba menyusunnya semula atau bertanya dengan lebih khusus.',
     search_ask_error: 'Ada sesuatu yang tidak kena. Sila cuba lagi kemudian.',
-    search_partial_error: 'Sesetengah hasil tidak dapat dimuatkan. Memaparkan hasil yang tersedia.',
     on_this_page: 'Pada halaman ini',
     next_page: 'Seterusnya',
     previous_page: 'Sebelumnya',
+    updates_pagination_navigation: 'Navigasi halaman',
+    updates_pagination_range: '${1} - ${2} daripada ${3} kemas kini',
     toc_back_to_space: 'Kembali ke ${1}',
     page_last_modified: 'Terakhir dikemas kini ${1}',
     was_this_helpful: 'Adakah ini membantu?',

@@ -51,3 +51,31 @@ jobs:
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
+    linear-release:
+        name: Track the production release in Linear
+        needs: [deploy-v2-vercel, deploy-v2-cloudflare]
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        # Release tracking must never fail a deployment that already succeeded.
+        continue-on-error: true
+        permissions:
+            contents: read
+        env:
+            LINEAR_ACCESS_KEY: ${{ secrets.PRODUCTION_LINEAR_RELEASE_ACCESS_KEY }}
+        steps:
+            - name: Skip release tracking without an access key
+              if: env.LINEAR_ACCESS_KEY == ''
+              run: echo "::warning::No Linear pipeline access key is configured, skipped tracking the release."
+            - name: Checkout
+              if: env.LINEAR_ACCESS_KEY != ''
+              uses: actions/checkout@v4
+              with:
+                  # The Linear CLI scans commit metadata since the last release, so it needs history but no blobs.
+                  fetch-depth: 0
+                  filter: blob:none
+                  persist-credentials: false
+            - name: Sync the release to Linear
+              if: env.LINEAR_ACCESS_KEY != ''
+              uses: linear/linear-release-action@dd4fc407f860b9460d2cf0b3fb1edd8985cf443f # v0.18.2
+              with:
+                  access_key: ${{ env.LINEAR_ACCESS_KEY }}

@@ -43,11 +43,11 @@ export const ro: TranslationLanguage = {
     search_ask_no_answer:
         'Nu s-a putut găsi un răspuns la întrebarea ta. Poți încerca să o reformulezi sau să fii mai specific.',
     search_ask_error: 'Ceva nu a mers bine. Te rugăm să încerci din nou mai târziu.',
-    search_partial_error:
-        'Unele rezultate nu au putut fi încărcate. Se afișează rezultatele disponibile.',
     on_this_page: 'Pe această pagină',
     next_page: 'Următoarea',
     previous_page: 'Anterioara',
+    updates_pagination_navigation: 'Navigare între pagini',
+    updates_pagination_range: '${1} - ${2} din ${3} actualizări',
     toc_back_to_space: 'Înapoi la ${1}',
     page_last_modified: 'Ultima actualizare ${1}',
     was_this_helpful: 'A fost util?',

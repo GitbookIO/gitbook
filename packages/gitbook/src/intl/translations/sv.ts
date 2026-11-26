@@ -43,10 +43,11 @@ export const sv: TranslationLanguage = {
     search_ask_no_answer:
         'Det gick inte att hitta ett svar på din fråga. Du kan försöka formulera om den eller vara mer specifik.',
     search_ask_error: 'Något gick fel. Försök igen senare.',
-    search_partial_error: 'Vissa resultat kunde inte läsas in. Visar tillgängliga resultat.',
     on_this_page: 'På den här sidan',
     next_page: 'Nästa',
     previous_page: 'Föregående',
+    updates_pagination_navigation: 'Sidnavigering',
+    updates_pagination_range: '${1} - ${2} av ${3} uppdateringar',
     toc_back_to_space: 'Tillbaka till ${1}',
     page_last_modified: 'Senast uppdaterad ${1}',
     was_this_helpful: 'Var detta till hjälp?',

@@ -1,20 +1,15 @@
 'use client';
 
-import {
-    type Values,
-    parseAsBoolean,
-    parseAsString,
-    parseAsStringLiteral,
-    useQueryStates,
-} from 'nuqs';
+import { type Values, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs';
 import React from 'react';
 
 import type { LinkProps } from '../primitives';
+import { type SearchPassStore, createSearchPassStore } from './search-pass-store';
+import { createSearchPrewarmer } from './search-prewarm';
 import { useSearchPrewarm } from './useSearchPrewarm';
+import type { DirectSearchProps } from '@/lib/search-results';
 
 export type SearchScope =
-    /** Search all content on the site */
-    | 'all'
     /** Search the current section's variant + matched/default variant for other sections */
     | 'default'
     /** Search all variants of the current section */
@@ -38,9 +33,8 @@ export interface SearchState {
 const keyMap = {
     q: parseAsString,
     ask: parseAsString,
-    scope: parseAsStringLiteral(['all', 'default', 'extended', 'current']).withDefault('default'),
+    scope: parseAsStringLiteral(['default', 'extended', 'current']).withDefault('default'),
     section: parseAsString,
-    global: parseAsBoolean, // Legacy support for global=true
 };
 
 export type UpdateSearchState = (
@@ -49,6 +43,7 @@ export type UpdateSearchState = (
 
 const SetSearchStateContext = React.createContext<UpdateSearchState | undefined>(undefined);
 const SearchStateContext = React.createContext<SearchState | null | undefined>(undefined);
+const SearchPassContext = React.createContext<SearchPassStore | null>(null);
 
 /**
  * Normalize the raw state to handle legacy formats.
@@ -58,11 +53,6 @@ function normalizeRawState(values: Values<typeof keyMap>) {
     if (values.ask === 'true' && values.q) {
         return { ...values, q: null, ask: values.q };
     }
-    // Handle legacy global=true
-    if (values.global === true) {
-        return { ...values, scope: 'all' as const, global: null };
-    }
-
     return values;
 }
 
@@ -73,9 +63,9 @@ export function shouldKeepSearchState(
 }
 
 export function SearchContextProvider(
-    props: React.PropsWithChildren<{ prewarmURL: string }>
+    props: React.PropsWithChildren<{ prewarmURL: string; directSearch?: DirectSearchProps }>
 ): React.ReactElement {
-    const { children, prewarmURL } = props;
+    const { children, prewarmURL, directSearch } = props;
 
     // URL-backed state
     const [rawState, setRawState] = useQueryStates(keyMap, {
@@ -100,6 +90,12 @@ export function SearchContextProvider(
     }, [rawState, open]);
 
     useSearchPrewarm(Boolean(state?.open), prewarmURL);
+
+    const searchPass = React.useMemo(() => createSearchPassStore(directSearch), [directSearch]);
+    const passRequester = React.useMemo(() => createSearchPrewarmer(false), []);
+    React.useEffect(() => {
+        passRequester.update(Boolean(state?.open), searchPass.requestPass);
+    }, [state?.open, searchPass, passRequester]);
 
     const stateRef = React.useRef(state);
     React.useLayoutEffect(() => {
@@ -136,10 +132,16 @@ export function SearchContextProvider(
     return (
         <SearchStateContext.Provider value={state}>
             <SetSearchStateContext.Provider value={setState}>
-                {children}
+                <SearchPassContext.Provider value={searchPass}>
+                    {children}
+                </SearchPassContext.Provider>
             </SetSearchStateContext.Provider>
         </SearchStateContext.Provider>
     );
+}
+
+export function useSearchPass() {
+    return React.useContext(SearchPassContext);
 }
 
 export function useSetSearchState() {

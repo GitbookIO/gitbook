@@ -94,8 +94,8 @@ export type GitBookEmbeddableConfiguration = {
      */
     assistantName?: string;
 
-    /** Suggestions of questions to be displayed in the welcome page. */
-    suggestions: string[];
+    /** Welcome questions. Omit or pass [] to inherit the site's questions. */
+    suggestions?: string[] | undefined;
 
     /** Tools to be provided to the assistant. */
     tools: GitBookToolDefinition[];
@@ -137,6 +137,11 @@ export type ParentToFrameMessage =
 /**
  * Messages sent from the frame to the parent.
  */
-export type FrameToParentMessage = {
-    type: 'close';
-};
+export type FrameToParentMessage =
+    | {
+          type: 'close';
+      }
+    | {
+          /** Escape was pressed inside the frame and nothing in the frame handled it. */
+          type: 'escape';
+      };

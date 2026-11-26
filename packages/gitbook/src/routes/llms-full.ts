@@ -11,6 +11,7 @@ import {
     fetchSiteContextForSiteSpace,
 } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
+import { renderMcpMarkdownDirective } from '@/lib/llms-directive';
 import { fromPageMarkdown, toPageMarkdown } from '@/lib/markdownPage';
 import { getIndexablePages } from '@/lib/sitemap';
 import { filterSiteSpacesByLocale, getSiteStructureSections } from '@/lib/sites';
@@ -260,6 +261,11 @@ async function streamMarkdownPart(
     }
 
     // Rendered up front, on every part, since agents may only read the start of the file.
+    const mcpDirective = renderMcpMarkdownDirective(context);
+    if (mcpDirective) {
+        stream.enqueue(new TextEncoder().encode(`> ${mcpDirective}\n\n`));
+    }
+
     const agentInstructions = renderSiteAgentInstructions(context);
     if (agentInstructions) {
         stream.enqueue(new TextEncoder().encode(`${agentInstructions}\n---\n\n`));

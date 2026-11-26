@@ -9,6 +9,14 @@ export function TableOfContentsScript() {
     useEffect(() => {
         const root = document.documentElement;
 
+        // Older Chrome (e.g. 130) emits a mutation record even when the value is unchanged,
+        // which would make the observer below re-trigger itself forever.
+        const setRootProperty = (name: string, value: string) => {
+            if (root.style.getPropertyValue(name) !== value) {
+                root.style.setProperty(name, value);
+            }
+        };
+
         // Calculate and set TOC dimensions
         const updateTocLayout = () => {
             // Get key elements
@@ -42,8 +50,8 @@ export function TableOfContentsScript() {
             }
 
             // Update height
-            root.style.setProperty('--toc-height', `${Math.max(height, 0)}px`);
-            root.style.setProperty('--toc-top-offset', `${Math.max(offset, 0)}px`);
+            setRootProperty('--toc-height', `${Math.max(height, 0)}px`);
+            setRootProperty('--toc-top-offset', `${Math.max(offset, 0)}px`);
 
             // Subtract visible pageCover (if any)
             if (
@@ -64,8 +72,8 @@ export function TableOfContentsScript() {
                 }
             }
 
-            root.style.setProperty('--outline-height', `${Math.max(height, 0)}px`);
-            root.style.setProperty('--outline-top-offset', `${Math.max(offset, 0)}px`);
+            setRootProperty('--outline-height', `${Math.max(height, 0)}px`);
+            setRootProperty('--outline-top-offset', `${Math.max(offset, 0)}px`);
         };
 
         // Initial update
@@ -76,8 +84,15 @@ export function TableOfContentsScript() {
         window.addEventListener('resize', updateTocLayout, { passive: true });
 
         // Use MutationObserver for DOM changes
+        let pendingFrame: number | null = null;
         const observer = new MutationObserver(() => {
-            requestAnimationFrame(updateTocLayout);
+            if (pendingFrame !== null) {
+                return;
+            }
+            pendingFrame = requestAnimationFrame(() => {
+                pendingFrame = null;
+                updateTocLayout();
+            });
         });
 
         // Only observe what matters
@@ -89,6 +104,9 @@ export function TableOfContentsScript() {
 
         return () => {
             observer.disconnect();
+            if (pendingFrame !== null) {
+                cancelAnimationFrame(pendingFrame);
+            }
             window.removeEventListener('scroll', updateTocLayout);
             window.removeEventListener('resize', updateTocLayout);
         };

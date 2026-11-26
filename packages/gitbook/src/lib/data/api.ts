@@ -6,14 +6,14 @@ import {
     GitBookAPI,
     type HttpResponse,
     type RenderIntegrationUI,
-    type SiteSearchScope,
 } from '@gitbook/api';
 import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
 
 import { cache } from '../cache';
-import { DataFetcherError, isTransientDataFetcherError, wrapDataFetcherError } from './errors';
-import type { GitBookDataFetcher } from './types';
+import { DataFetcherError, wrapDataFetcherError } from './errors';
+import type { DataFetcherResponse, GitBookDataFetcher } from './types';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@/lib/env';
+import { toSearchSiteContentBody } from '@/lib/search-results';
 import { trace } from '@/lib/tracing';
 
 interface DataFetcherInput {
@@ -21,6 +21,25 @@ interface DataFetcherInput {
      * API token.
      */
     apiToken: string | null;
+
+    /**
+     * Site revision being previewed. The site's spaces and OpenAPI specs are read at it.
+     */
+    siteRevision?: DataFetcherSiteRevision;
+}
+
+/**
+ * A site revision, as a preview URL resolves it.
+ */
+export interface DataFetcherSiteRevision {
+    organizationId: string;
+    siteId: string;
+    siteRevisionId: string;
+    /**
+     * Spaces of the site, read at the site revision. Other spaces are read live. Until the site
+     * structure is known, every space is read at the site revision.
+     */
+    spaceIds?: string[];
 }
 
 /**
@@ -46,7 +65,15 @@ export function createDataFetcher(
 
         withToken({ apiToken }) {
             return createDataFetcher({
+                ...input,
                 apiToken,
+            });
+        },
+
+        withSiteRevisionSpaces(spaceIds) {
+            return createDataFetcher({
+                ...input,
+                siteRevision: input.siteRevision ? { ...input.siteRevision, spaceIds } : undefined,
             });
         },
 
@@ -77,61 +104,120 @@ export function createDataFetcher(
             });
         },
         getRevision(params) {
-            return getRevision(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                metadata: params.metadata ?? false,
-            });
+            return readAtSiteRevision(
+                input,
+                params.spaceId,
+                (siteRevisionInput) =>
+                    getRevisionAtSiteRevision(siteRevisionInput, {
+                        spaceId: params.spaceId,
+                        metadata: params.metadata ?? false,
+                    }),
+                () =>
+                    getRevision(input, {
+                        spaceId: params.spaceId,
+                        revisionId: params.revisionId,
+                        metadata: params.metadata ?? false,
+                    })
+            );
         },
         getRevisionPageByPath(params) {
-            return getRevisionPageByPath(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                path: params.path,
-                metadata: params.metadata,
-                cachedMetadata: params.cachedMetadata,
-            });
+            return readAtSiteRevision(
+                input,
+                params.spaceId,
+                (siteRevisionInput) =>
+                    getPageByPathAtSiteRevision(siteRevisionInput, {
+                        spaceId: params.spaceId,
+                        path: params.path,
+                        metadata: params.metadata ?? false,
+                        cachedMetadata: params.cachedMetadata ?? false,
+                    }),
+                () =>
+                    getRevisionPageByPath(input, {
+                        spaceId: params.spaceId,
+                        revisionId: params.revisionId,
+                        path: params.path,
+                        metadata: params.metadata,
+                        cachedMetadata: params.cachedMetadata,
+                    })
+            );
         },
         getRevisionPageMarkdown(params) {
-            return getRevisionPageMarkdown(
+            return readAtSiteRevision(
                 input,
-                {
-                    spaceId: params.spaceId,
-                    revisionId: params.revisionId,
-                    pageId: params.pageId,
-                },
-                // We pass the name of the function to distinguish between cache entries
-                // By default Next only uses the arguments, the filename and the position of the function inside the file
-                // By adding a dummy argument with the function name, we can change the order without breaking anything
-                'getRevisionPageMarkdown'
+                params.spaceId,
+                (siteRevisionInput) =>
+                    getPageMarkdownAtSiteRevision(siteRevisionInput, {
+                        spaceId: params.spaceId,
+                        pageId: params.pageId,
+                    }),
+                () =>
+                    getRevisionPageMarkdown(
+                        input,
+                        {
+                            spaceId: params.spaceId,
+                            revisionId: params.revisionId,
+                            pageId: params.pageId,
+                        },
+                        // We pass the name of the function to distinguish between cache entries
+                        // By default Next only uses the arguments, the filename and the position of the function inside the file
+                        // By adding a dummy argument with the function name, we can change the order without breaking anything
+                        'getRevisionPageMarkdown'
+                    )
             );
         },
         getRevisionPageDocument(params) {
-            return getRevisionPageDocument(
+            return readAtSiteRevision(
                 input,
-                {
-                    spaceId: params.spaceId,
-                    revisionId: params.revisionId,
-                    pageId: params.pageId,
-                },
-                // We pass the name of the function to distinguish between cache entries
-                // By default Next only uses the arguments, the filename and the position of the function inside the file
-                // By adding a dummy argument with the function name, we can change the order without breaking anything
-                'getRevisionPageDocument'
+                params.spaceId,
+                (siteRevisionInput) =>
+                    getPageDocumentAtSiteRevision(siteRevisionInput, {
+                        spaceId: params.spaceId,
+                        pageId: params.pageId,
+                    }),
+                () =>
+                    getRevisionPageDocument(
+                        input,
+                        {
+                            spaceId: params.spaceId,
+                            revisionId: params.revisionId,
+                            pageId: params.pageId,
+                        },
+                        // We pass the name of the function to distinguish between cache entries
+                        // By default Next only uses the arguments, the filename and the position of the function inside the file
+                        // By adding a dummy argument with the function name, we can change the order without breaking anything
+                        'getRevisionPageDocument'
+                    )
             );
         },
         getRevisionReusableContentDocument(params) {
-            return getRevisionReusableContentDocument(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                reusableContentId: params.reusableContentId,
-            });
+            return readAtSiteRevision(
+                input,
+                params.spaceId,
+                (siteRevisionInput) =>
+                    getReusableContentDocumentAtSiteRevision(siteRevisionInput, {
+                        spaceId: params.spaceId,
+                        reusableContentId: params.reusableContentId,
+                    }),
+                () =>
+                    getRevisionReusableContentDocument(input, {
+                        spaceId: params.spaceId,
+                        revisionId: params.revisionId,
+                        reusableContentId: params.reusableContentId,
+                    })
+            );
         },
         getLatestOpenAPISpecVersionContent(params) {
-            return getLatestOpenAPISpecVersionContent(input, {
-                organizationId: params.organizationId,
-                slug: params.slug,
-            });
+            return readAtSiteRevision(
+                input,
+                null,
+                (siteRevisionInput) =>
+                    getOpenAPISpecContentAtSiteRevision(siteRevisionInput, { slug: params.slug }),
+                () =>
+                    getLatestOpenAPISpecVersionContent(input, {
+                        organizationId: params.organizationId,
+                        slug: params.slug,
+                    })
+            );
         },
         getSpace(params) {
             return getSpace(input, {
@@ -195,13 +281,231 @@ export function createDataFetcher(
         },
 
         listRevisionPageMetaLinks(params) {
-            return listRevisionPageMetaLinks(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                pageId: params.pageId,
-            });
+            return readAtSiteRevision(
+                input,
+                params.spaceId,
+                (siteRevisionInput) =>
+                    listPageMetaLinksAtSiteRevision(siteRevisionInput, {
+                        spaceId: params.spaceId,
+                        pageId: params.pageId,
+                    }),
+                () =>
+                    listRevisionPageMetaLinks(input, {
+                        spaceId: params.spaceId,
+                        revisionId: params.revisionId,
+                        pageId: params.pageId,
+                    })
+            );
         },
     };
+}
+
+/**
+ * Data fetcher input to read at a site revision. It leaves out the site's space IDs, which only
+ * choose what to read at the site revision, so they stay out of cache keys.
+ */
+type SiteRevisionDataFetcherInput = DataFetcherInput & {
+    siteRevision: Omit<DataFetcherSiteRevision, 'spaceIds'>;
+};
+
+/**
+ * Read content at the site revision of the input, or `live` when there is no site revision or
+ * for a space outside the site. An OpenAPI spec (no space) is always read at the site revision.
+ */
+async function readAtSiteRevision<T>(
+    input: DataFetcherInput,
+    spaceId: string | null,
+    atSiteRevision: (input: SiteRevisionDataFetcherInput) => Promise<DataFetcherResponse<T>>,
+    live: () => Promise<DataFetcherResponse<T>>
+): Promise<DataFetcherResponse<T>> {
+    const { siteRevision } = input;
+    if (!siteRevision || (spaceId && siteRevision.spaceIds?.includes(spaceId) === false)) {
+        return live();
+    }
+
+    const { spaceIds: _spaceIds, ...cacheableSiteRevision } = siteRevision;
+    return atSiteRevision({ ...input, siteRevision: cacheableSiteRevision });
+}
+
+// Each read at a site revision sends the same query as its live counterpart.
+
+const getRevisionAtSiteRevision = cache(
+    async (input: SiteRevisionDataFetcherInput, params: { spaceId: string; metadata: boolean }) => {
+        'use cache';
+        return fetchAtSiteRevision(
+            input,
+            `getRevisionAtSiteRevision(${params.spaceId})`,
+            (api, { organizationId, siteId, siteRevisionId }) =>
+                api.orgs.getRevisionInSiteRevision(
+                    organizationId,
+                    siteId,
+                    siteRevisionId,
+                    params.spaceId,
+                    { metadata: params.metadata },
+                    { ...noCacheFetchOptions }
+                )
+        );
+    }
+);
+
+const getPageByPathAtSiteRevision = cache(
+    async (
+        input: SiteRevisionDataFetcherInput,
+        params: { spaceId: string; path: string; metadata: boolean; cachedMetadata: boolean }
+    ) => {
+        'use cache';
+        return fetchAtSiteRevision(
+            input,
+            `getPageByPathAtSiteRevision(${params.spaceId}, ${params.path})`,
+            (api, { organizationId, siteId, siteRevisionId }) =>
+                api.orgs.getPageByPathInSiteRevision(
+                    organizationId,
+                    siteId,
+                    siteRevisionId,
+                    params.spaceId,
+                    encodeURIComponent(params.path),
+                    { metadata: params.metadata, cachedMetadata: params.cachedMetadata },
+                    { ...noCacheFetchOptions }
+                )
+        );
+    }
+);
+
+const getPageMarkdownAtSiteRevision = cache(
+    async (input: SiteRevisionDataFetcherInput, params: { spaceId: string; pageId: string }) => {
+        'use cache';
+        return wrapDataFetcherError(async () => {
+            return trace(
+                `getPageMarkdownAtSiteRevision(${params.spaceId}, ${params.pageId})`,
+                async () => {
+                    const { organizationId, siteId, siteRevisionId } = input.siteRevision;
+                    const res = await apiClient(input).orgs.getPageInSiteRevision(
+                        organizationId,
+                        siteId,
+                        siteRevisionId,
+                        params.spaceId,
+                        params.pageId,
+                        {
+                            format: 'markdown',
+                            'format.markdown.refs': 'stable',
+                            evaluated: 'deterministic-only',
+                            metadata: false,
+                        },
+                        { ...noCacheFetchOptions }
+                    );
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('max');
+
+                    if (!('markdown' in res.data)) {
+                        throw new DataFetcherError('Page is not a document', 404);
+                    }
+                    return res.data.markdown;
+                }
+            );
+        });
+    }
+);
+
+const getPageDocumentAtSiteRevision = cache(
+    async (input: SiteRevisionDataFetcherInput, params: { spaceId: string; pageId: string }) => {
+        'use cache';
+        return fetchAtSiteRevision(
+            input,
+            `getPageDocumentAtSiteRevision(${params.spaceId}, ${params.pageId})`,
+            (api, { organizationId, siteId, siteRevisionId }) =>
+                api.orgs.getPageDocumentInSiteRevision(
+                    organizationId,
+                    siteId,
+                    siteRevisionId,
+                    params.spaceId,
+                    params.pageId,
+                    { evaluated: 'deterministic-only', dereferenced: 'reusable-contents' },
+                    { ...noCacheFetchOptions }
+                )
+        );
+    }
+);
+
+const getReusableContentDocumentAtSiteRevision = cache(
+    async (
+        input: SiteRevisionDataFetcherInput,
+        params: { spaceId: string; reusableContentId: string }
+    ) => {
+        'use cache';
+        return fetchAtSiteRevision(
+            input,
+            `getReusableContentDocumentAtSiteRevision(${params.spaceId}, ${params.reusableContentId})`,
+            (api, { organizationId, siteId, siteRevisionId }) =>
+                api.orgs.getReusableContentDocumentInSiteRevision(
+                    organizationId,
+                    siteId,
+                    siteRevisionId,
+                    params.spaceId,
+                    params.reusableContentId,
+                    { evaluated: 'deterministic-only' },
+                    { ...noCacheFetchOptions }
+                )
+        );
+    }
+);
+
+const listPageMetaLinksAtSiteRevision = cache(
+    async (input: SiteRevisionDataFetcherInput, params: { spaceId: string; pageId: string }) => {
+        'use cache';
+        return fetchAtSiteRevision(
+            input,
+            `listPageMetaLinksAtSiteRevision(${params.spaceId}, ${params.pageId})`,
+            (api, { organizationId, siteId, siteRevisionId }) =>
+                api.orgs.listPageMetaLinksInSiteRevision(
+                    organizationId,
+                    siteId,
+                    siteRevisionId,
+                    params.spaceId,
+                    params.pageId,
+                    { ...noCacheFetchOptions }
+                )
+        );
+    }
+);
+
+const getOpenAPISpecContentAtSiteRevision = cache(
+    async (input: SiteRevisionDataFetcherInput, params: { slug: string }) => {
+        'use cache';
+        return fetchAtSiteRevision(
+            input,
+            `getOpenAPISpecContentAtSiteRevision(${params.slug})`,
+            (api, { organizationId, siteId, siteRevisionId }) =>
+                api.orgs.getOpenApiSpecContentInSiteRevision(
+                    organizationId,
+                    siteId,
+                    siteRevisionId,
+                    params.slug,
+                    { ...noCacheFetchOptions }
+                )
+        );
+    }
+);
+
+/**
+ * Fetch from an endpoint at a site revision. What a site revision pins never changes, so the
+ * response is cached forever.
+ */
+function fetchAtSiteRevision<T>(
+    input: SiteRevisionDataFetcherInput,
+    name: string,
+    request: (
+        api: ReturnType<typeof apiClient>,
+        siteRevision: SiteRevisionDataFetcherInput['siteRevision']
+    ) => Promise<HttpResponse<T, unknown>>
+): Promise<DataFetcherResponse<T>> {
+    return wrapDataFetcherError(async () => {
+        return trace(name, async () => {
+            const res = await request(apiClient(input), input.siteRevision);
+            cacheTag(...getCacheTagsFromResponse(res));
+            cacheLife('max');
+            return res.data;
+        });
+    });
 }
 
 /**
@@ -704,7 +1008,7 @@ const getPublishedContentSite = cache(
                         }
                     );
                     cacheTag(...getCacheTagsFromResponse(res));
-                    cacheLife('days');
+                    cacheLifeFromResponse(res, 'days');
                     return res.data;
                 }
             );
@@ -785,64 +1089,31 @@ const getEmbedByUrl = cache(
     }
 );
 
-// We don't use remote cache for this one because of the number of potential cache entry causing 429 on vercel runtime cache when revalidating
-const searchSiteContent = cache(
-    async (
-        input: DataFetcherInput,
-        params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
-    ) => {
-        'use cache';
-        cacheTag(
-            getCacheTag({
-                tag: 'site',
-                site: params.siteId,
-            })
+async function searchSiteContent(
+    input: DataFetcherInput,
+    params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
+) {
+    return wrapDataFetcherError(async () => {
+        return trace(
+            `searchSiteContent(${params.organizationId}, ${params.siteId}, ${params.query})`,
+            async () => {
+                const { organizationId, siteId, query, scope, searchId, routeReason } = params;
+                const api = apiClient(input);
+                const res = await api.orgs.searchSiteContent(
+                    organizationId,
+                    siteId,
+                    toSearchSiteContentBody(query, scope, searchId),
+                    {},
+                    {
+                        ...noCacheFetchOptions,
+                        headers: { 'x-gitbook-search-route-reason': routeReason },
+                    }
+                );
+                return res.data.items;
+            }
         );
-
-        const result = await wrapDataFetcherError(async () => {
-            return trace(
-                `searchSiteContent(${params.organizationId}, ${params.siteId}, ${params.query})`,
-                async () => {
-                    const { organizationId, siteId, query, scope } = params;
-                    const api = apiClient(input);
-                    const res = await api.orgs.searchSiteContent(
-                        organizationId,
-                        siteId,
-                        {
-                            query,
-                            ...(scope.mode === 'current' && scope.restrictTo
-                                ? {
-                                      // `restrictTo` only exists in the newer `scope` request shape,
-                                      // and the published @gitbook/api types don't include it yet.
-                                      scope: {
-                                          mode: 'default',
-                                          currentSiteSpace: scope.siteSpaceId,
-                                          restrictTo: scope.restrictTo,
-                                      } as SiteSearchScope,
-                                  }
-                                : scope),
-                        },
-                        {},
-                        {
-                            ...noCacheFetchOptions,
-                        }
-                    );
-                    cacheTag(...getCacheTagsFromResponse(res));
-                    cacheLife('hours');
-                    return res.data.items;
-                }
-            );
-        });
-
-        // Don't serve transient errors for the default 15 minutes. Only safe because search runs in
-        // request handlers: a page cache calling it would inherit this short life during API incidents.
-        if (result.error && isTransientDataFetcherError(result.error)) {
-            cacheLife({ stale: 0, revalidate: 0, expire: 0 });
-        }
-
-        return result;
-    }
-);
+    });
+}
 
 const renderIntegrationUi = cache(
     async (

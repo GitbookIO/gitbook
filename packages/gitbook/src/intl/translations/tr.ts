@@ -43,10 +43,11 @@ export const tr: TranslationLanguage = {
     search_ask_no_answer:
         'Sorunuz için bir cevap bulunamadı. Soruyu yeniden ifade etmeyi veya daha spesifik olmayı deneyebilirsiniz.',
     search_ask_error: 'Bir şeyler ters gitti. Lütfen daha sonra tekrar deneyin.',
-    search_partial_error: 'Bazı sonuçlar yüklenemedi. Kullanılabilir sonuçlar gösteriliyor.',
     on_this_page: 'Bu sayfada',
     next_page: 'Sonraki',
     previous_page: 'Önceki',
+    updates_pagination_navigation: 'Sayfa gezinme',
+    updates_pagination_range: '${3} güncellemeden ${1} - ${2}',
     toc_back_to_space: 'Şuraya dön: ${1}',
     page_last_modified: 'Son güncelleme ${1}',
     was_this_helpful: 'Bu yararlı oldu mu?',

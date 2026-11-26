@@ -34,6 +34,49 @@ it(
 );
 
 it(
+    'should search the language of the MCP endpoint unless the client passes one',
+    async () => {
+        const client = await connectMCPClient(
+            getContentTestURL('https://gitbook.com/docs/~gitbook/mcp')
+        );
+        const translatedLink = /\/documentation\/(fr|ja|zh)(\/|$)/;
+
+        async function searchLinks(args: { query: string; language?: string }) {
+            const response = await client.callTool({
+                name: 'searchDocumentation',
+                arguments: args,
+            });
+            const content = response.content as { text: string }[];
+            return content.map((item) => item.text.match(/^Link: (.+)$/m)?.[1] ?? '');
+        }
+
+        const endpointLinks = await searchLinks({ query: 'table' });
+        expect(endpointLinks.length).toBeGreaterThan(0);
+        expect(endpointLinks.filter((link) => translatedLink.test(link))).toEqual([]);
+
+        const frenchLinks = await searchLinks({ query: 'table', language: 'fr' });
+        expect(frenchLinks.some((link) => link.includes('/documentation/fr/'))).toBe(true);
+        expect(frenchLinks.filter((link) => /\/documentation\/(ja|zh)(\/|$)/.test(link))).toEqual(
+            []
+        );
+
+        const unknownLanguageLinks = await searchLinks({ query: 'table', language: 'de' });
+        expect(unknownLanguageLinks.length).toBeGreaterThan(0);
+        expect(unknownLanguageLinks.filter((link) => translatedLink.test(link))).toEqual([]);
+    },
+    { timeout: 15_000 }
+);
+
+it('should refuse to open a notification stream', async () => {
+    const response = await fetch(getContentTestURL('https://gitbook.com/docs/~gitbook/mcp'), {
+        headers: { accept: 'text/event-stream' },
+    });
+
+    expect(response.status).toBe(405);
+    expect(response.headers.get('allow')).toBe('POST');
+});
+
+it(
     'should get a page from another site space through MCP',
     async () => {
         const client = await connectMCPClient(
@@ -88,6 +131,25 @@ describe('MCP on a site behind visitor authentication', () => {
         'should challenge unauthenticated requests to %s with a pointer to the PRM document',
         async (endpoint) => {
             const response = await fetch(getContentTestURL(`${VA_SITE_URL}/${endpoint}`));
+
+            expect(response.status).toBe(401);
+            expect(response.headers.get('WWW-Authenticate')).toMatch(
+                new RegExp(
+                    `^Bearer realm="mcp", resource_metadata="https?://.+/\\.well-known/oauth-protected-resource/${endpoint}"$`
+                )
+            );
+        },
+        15_000
+    );
+
+    it.each(protectedEndpoints)(
+        'should challenge requests to %s with a rejected bearer token',
+        async (endpoint) => {
+            const response = await fetch(getContentTestURL(`${VA_SITE_URL}/${endpoint}`), {
+                headers: {
+                    Authorization: `Bearer ${jwt.sign({ name: 'visitor' }, 'not-the-site-key')}`,
+                },
+            });
 
             expect(response.status).toBe(401);
             expect(response.headers.get('WWW-Authenticate')).toMatch(

@@ -1,16 +1,16 @@
+import type { OrderedComputedResult } from './search-types';
 import type { SearchScope } from './useSearch';
 
-/**
- * Map UI search scope to local FlexSearch filtering.
- *
- * Rationale: when a site has no sections (only variants), the remote search
- * "default" scope effectively queries the current variant. To keep local
- * results consistent with remote ones, we also restrict "default" to the
- * current `siteSpaceId` when `withSections` is false. Otherwise (sections
- * present), local "default" stays unfiltered to match the broader section UI.
- * An explicitly selected section takes precedence over these legacy scopes.
- */
+// Keep aligned with SiteInsightsSearchResultNumber in the GitBook API schema.
+const MAX_DISPLAYED_SEARCH_RESULTS = 20;
 
+/**
+ * Site spaces whose pages may be shown for a UI search scope, or `undefined` for no restriction.
+ *
+ * The server's "default" scope also returns pages from other site spaces. Without sections
+ * (only variants) the UI presents "default" as the current variant, so it is restricted to
+ * the current `siteSpaceId`. An explicitly selected section takes precedence.
+ */
 export function computeFilterSiteSpaceIds(
     scope: SearchScope,
     siteSpaceId: string,
@@ -30,4 +30,22 @@ export function computeFilterSiteSpaceIds(
         default:
             return withSections ? undefined : [siteSpaceId];
     }
+}
+
+/** Keep the first results in server order within the selected site spaces. */
+export function getDisplayedSearchResults<Result extends OrderedComputedResult>(
+    results: Result[],
+    allowedSiteSpaceIds: string[] | undefined
+): Result[] {
+    const allowed = allowedSiteSpaceIds && new Set(allowedSiteSpaceIds);
+    const matching = allowed
+        ? results.filter(
+              (result) =>
+                  result.type === 'record' ||
+                  (result.siteSpaceId !== undefined && allowed.has(result.siteSpaceId))
+          )
+        : results;
+    return matching.length > MAX_DISPLAYED_SEARCH_RESULTS
+        ? matching.slice(0, MAX_DISPLAYED_SEARCH_RESULTS)
+        : matching;
 }

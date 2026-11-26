@@ -43,10 +43,11 @@ export const da: TranslationLanguage = {
     search_ask_no_answer:
         'Der kunne ikke findes et svar på dit spørgsmål. Prøv at omformulere det eller være mere specifik.',
     search_ask_error: 'Noget gik galt. Prøv igen senere.',
-    search_partial_error: 'Nogle resultater kunne ikke indlæses. Viser tilgængelige resultater.',
     on_this_page: 'På denne side',
     next_page: 'Næste',
     previous_page: 'Forrige',
+    updates_pagination_navigation: 'Sidenavigation',
+    updates_pagination_range: '${1} - ${2} af ${3} opdateringer',
     toc_back_to_space: 'Tilbage til ${1}',
     page_last_modified: 'Sidst opdateret ${1}',
     was_this_helpful: 'Var dette nyttigt?',
