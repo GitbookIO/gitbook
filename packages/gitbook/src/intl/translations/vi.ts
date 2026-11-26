@@ -211,4 +211,11 @@ export const vi: TranslationLanguage = {
     auth_error_invalid_request: 'Yêu cầu không hợp lệ. Vui lòng bắt đầu lại từ ứng dụng.',
     auth_error_failed:
         'Chúng tôi không thể hoàn tất việc cấp quyền. Yêu cầu có thể đã hết hạn — vui lòng bắt đầu lại từ ứng dụng.',
+    country_picker_label: 'Quốc gia: ${1}',
+    country_picker_automatic: 'Tự động',
+    country_picker_automatic_detected: 'Tự động (${1})',
+    country_picker_auto_hint: 'tự động',
+    country_picker_search: 'Tìm quốc gia',
+    country_picker_no_results: 'Không tìm thấy quốc gia nào',
+    country_picker_other: 'Khác',
 };

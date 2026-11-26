@@ -7,6 +7,7 @@ import {
     encodeClientSiteSections,
     shouldRenderSiteSectionNavigation,
 } from '../SiteSections';
+import { CountryPicker } from './CountryPicker';
 import { HeaderLink } from './HeaderLink';
 import { HeaderLinkMore } from './HeaderLinkMore';
 import { HeaderLinks } from './HeaderLinks';
@@ -155,7 +156,8 @@ export async function Header(props: {
 
                         {customization.header.links.length > 0 ||
                         headerSocialAccounts.length > 0 ||
-                        (!withSections && variants.translations.length > 1) ? (
+                        (!withSections &&
+                            (variants.translations.length > 1 || context.countryPicker)) ? (
                             <HeaderLinks>
                                 {customization.header.links.map((link) => {
                                     return (
@@ -189,6 +191,12 @@ export async function Header(props: {
                                         context={context}
                                     />
                                 ) : null}
+                                {!withSections && context.countryPicker ? (
+                                    <CountryPicker
+                                        context={context}
+                                        className="flex! -mx-3 site-header:theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 focus-visible:site-header:theme-bold:bg-header-link/3 aria-expanded:site-header:theme-bold:bg-header-link/5"
+                                    />
+                                ) : null}
                                 {!withSections && variants.translations.length > 1 ? (
                                     <TranslationsDropdown
                                         context={context}
@@ -210,6 +218,12 @@ export async function Header(props: {
             {visibleSections && withSections ? (
                 <div className="lg:chat-open:pr-(--ai-chat-width) transition-[padding] duration-300 motion-reduce:transition-none">
                     <SiteSectionTabs sections={encodeClientSiteSections(context, visibleSections)}>
+                        {context.countryPicker ? (
+                            <CountryPicker
+                                context={context}
+                                className="-mx-3 my-1.5 ml-2 self-start"
+                            />
+                        ) : null}
                         {variants.translations.length > 1 ? (
                             <TranslationsDropdown
                                 context={context}

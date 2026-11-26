@@ -213,4 +213,11 @@ export const pl: TranslationLanguage = {
     auth_error_invalid_request: 'Nieprawidłowe żądanie. Rozpocznij ponownie z aplikacji.',
     auth_error_failed:
         'Nie udało się zakończyć autoryzacji. Żądanie mogło wygasnąć — rozpocznij ponownie z aplikacji.',
+    country_picker_label: 'Kraj: ${1}',
+    country_picker_automatic: 'Automatycznie',
+    country_picker_automatic_detected: 'Automatycznie (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Szukaj kraju',
+    country_picker_no_results: 'Nie znaleziono krajów',
+    country_picker_other: 'Inne',
 };

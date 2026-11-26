@@ -210,4 +210,11 @@ export const en = {
     auth_error_invalid_request: 'Invalid request. Please start again from the application.',
     auth_error_failed:
         'We could not complete the authorization. The request may have expired — please start again from the application.',
+    country_picker_label: 'Country: ${1}',
+    country_picker_automatic: 'Automatic',
+    country_picker_automatic_detected: 'Automatic (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Search countries',
+    country_picker_no_results: 'No countries found',
+    country_picker_other: 'Other',
 };

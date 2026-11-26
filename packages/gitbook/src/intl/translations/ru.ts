@@ -213,4 +213,11 @@ export const ru: TranslationLanguage = {
     auth_error_invalid_request: 'Неверный запрос. Начните заново из приложения.',
     auth_error_failed:
         'Не удалось завершить авторизацию. Возможно, срок действия запроса истёк — начните заново из приложения.',
+    country_picker_label: 'Страна: ${1}',
+    country_picker_automatic: 'Автоматически',
+    country_picker_automatic_detected: 'Автоматически (${1})',
+    country_picker_auto_hint: 'авто',
+    country_picker_search: 'Поиск страны',
+    country_picker_no_results: 'Страны не найдены',
+    country_picker_other: 'Другие',
 };

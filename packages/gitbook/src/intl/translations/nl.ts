@@ -212,4 +212,11 @@ export const nl: TranslationLanguage = {
     auth_error_invalid_request: 'Ongeldig verzoek. Begin opnieuw vanuit de applicatie.',
     auth_error_failed:
         'We konden de autorisatie niet voltooien. Het verzoek is mogelijk verlopen — begin opnieuw vanuit de applicatie.',
+    country_picker_label: 'Land: ${1}',
+    country_picker_automatic: 'Automatisch',
+    country_picker_automatic_detected: 'Automatisch (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Land zoeken',
+    country_picker_no_results: 'Geen landen gevonden',
+    country_picker_other: 'Overige',
 };

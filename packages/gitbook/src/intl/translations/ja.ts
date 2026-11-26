@@ -211,4 +211,11 @@ export const ja: TranslationLanguage = {
     auth_error_invalid_request: '無効なリクエストです。アプリケーションからやり直してください。',
     auth_error_failed:
         '認証を完了できませんでした。リクエストの有効期限が切れた可能性があります — アプリケーションからやり直してください。',
+    country_picker_label: '国: ${1}',
+    country_picker_automatic: '自動',
+    country_picker_automatic_detected: '自動（${1}）',
+    country_picker_auto_hint: '自動',
+    country_picker_search: '国を検索',
+    country_picker_no_results: '国が見つかりません',
+    country_picker_other: 'その他',
 };

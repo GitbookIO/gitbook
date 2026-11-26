@@ -213,4 +213,11 @@ export const sk: TranslationLanguage = {
     auth_error_invalid_request: 'Neplatná požiadavka. Začnite znova z aplikácie.',
     auth_error_failed:
         'Autorizáciu sa nepodarilo dokončiť. Požiadavka mohla vypršať — začnite znova z aplikácie.',
+    country_picker_label: 'Krajina: ${1}',
+    country_picker_automatic: 'Automaticky',
+    country_picker_automatic_detected: 'Automaticky (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Hľadať krajinu',
+    country_picker_no_results: 'Nenašla sa žiadna krajina',
+    country_picker_other: 'Ostatné',
 };

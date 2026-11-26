@@ -25,10 +25,10 @@ const DropdownMenuContext = createContext<{
     setOpen: () => {},
 });
 
-const DROPDOWN_POSITIONER_CLASS =
+export const DROPDOWN_POSITIONER_CLASS =
     'z-50 flex max-h-(--available-height) min-w-28 xs:min-w-40 max-w-(--available-width) flex-col pt-2 outline-hidden data-anchor-hidden:hidden';
 // The exit animation has to live on the popup: Base UI keeps it mounted until *its* animations end.
-const DROPDOWN_POPUP_CLASS =
+export const DROPDOWN_POPUP_CLASS =
     'flex origin-(--transform-origin) animate-scale-in flex-col gap-1 overflow-auto circular-corners:rounded-xl rounded-md straight-corners:rounded-none border border-tint bg-tint-base p-2 shadow-lg outline-hidden data-closed:animate-scale-out';
 
 const HOVER_CLOSE_DELAY_MS = 150;

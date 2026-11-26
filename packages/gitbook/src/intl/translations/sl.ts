@@ -212,4 +212,11 @@ export const sl: TranslationLanguage = {
     auth_error_invalid_request: 'Neveljavna zahteva. Znova začnite v aplikaciji.',
     auth_error_failed:
         'Avtorizacije nismo mogli dokončati. Zahteva je morda potekla — znova začnite v aplikaciji.',
+    country_picker_label: 'Država: ${1}',
+    country_picker_automatic: 'Samodejno',
+    country_picker_automatic_detected: 'Samodejno (${1})',
+    country_picker_auto_hint: 'samodejno',
+    country_picker_search: 'Iskanje države',
+    country_picker_no_results: 'Ni najdenih držav',
+    country_picker_other: 'Drugo',
 };

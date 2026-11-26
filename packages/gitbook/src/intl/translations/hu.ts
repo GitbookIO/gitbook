@@ -214,4 +214,11 @@ export const hu: TranslationLanguage = {
     auth_error_invalid_request: 'Érvénytelen kérés. Kérjük, kezdje újra az alkalmazásból.',
     auth_error_failed:
         'Nem tudtuk befejezni az engedélyezést. A kérés lejárhatott — kérjük, kezdje újra az alkalmazásból.',
+    country_picker_label: 'Ország: ${1}',
+    country_picker_automatic: 'Automatikus',
+    country_picker_automatic_detected: 'Automatikus (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Ország keresése',
+    country_picker_no_results: 'Nincs találat',
+    country_picker_other: 'Egyéb',
 };

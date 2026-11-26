@@ -75,16 +75,18 @@ import {
     UPDATES_PAGE_SEARCH_PARAM,
     parseUpdatesPageParam,
 } from '@/lib/updates-url';
+import { VISITOR_COUNTRY_PATH } from '@/lib/visitor-country';
 import {
     type ResponseCookies,
     getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
-    getVisitorCountry,
+    getVisitorCountryData,
     getVisitorData,
     getVisitorType,
     isRevalidationRequest,
     normalizeVisitorURL,
     serveVisitorClaimsDataRequest,
+    serveVisitorCountryRequest,
 } from '@/lib/visitors';
 import { waitUntil } from '@/lib/waitUntil';
 import { serveResizedImage } from '@/routes/image';
@@ -347,6 +349,9 @@ async function serveSiteRequest(requestURL: URL, request: NextRequest, match: UR
     if (siteRequestURL.pathname.endsWith('/~gitbook/visitor')) {
         return serveVisitorClaimsDataRequest(request, siteRequestURL);
     }
+    if (siteRequestURL.pathname.endsWith(`/${VISITOR_COUNTRY_PATH}`)) {
+        return serveVisitorCountryRequest(request);
+    }
 
     //
     // Detect and extract the visitor authentication token from the request
@@ -362,7 +367,13 @@ async function serveSiteRequest(requestURL: URL, request: NextRequest, match: UR
     //
     request.headers.delete('x-gitbook-disable-tracking');
 
-    const visitorCountry = getVisitorCountry(request);
+    // The country picker's choice is honoured on every site: the lookup doesn't return the
+    // customization that enables the picker, and fetching it here would slow down every request.
+    const visitorCountry = getVisitorCountryData({
+        cookies: request.cookies.getAll(),
+        headers: request.headers,
+        url: siteRequestURL,
+    });
 
     const withAPIToken = async (apiToken: string | null) => {
         const lookup = await lookupPublishedContentByUrl({
@@ -371,7 +382,7 @@ async function serveSiteRequest(requestURL: URL, request: NextRequest, match: UR
                 jwtToken: visitorToken?.token ?? undefined,
                 unsignedClaims,
                 type: getVisitorType(request),
-                ...(visitorCountry ? { country: visitorCountry } : {}),
+                ...(visitorCountry.country ? { country: visitorCountry.country } : {}),
             },
             // When the visitor auth token is pulled from the cookie, set redirectOnError when calling resolvePublishedContentByUrl to allow
             // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
@@ -402,6 +413,9 @@ async function serveSiteRequest(requestURL: URL, request: NextRequest, match: UR
                   visitorParamsCookie,
               ]
             : [];
+        if (visitorCountry.responseCookie) {
+            cookies.push(visitorCountry.responseCookie);
+        }
 
         //
         // Handle redirects

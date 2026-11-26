@@ -212,4 +212,11 @@ export const hr: TranslationLanguage = {
     auth_error_invalid_request: 'Nevažeći zahtjev. Molimo ponovno započnite iz aplikacije.',
     auth_error_failed:
         'Nismo mogli dovršiti autorizaciju. Zahtjev je možda istekao — molimo ponovno započnite iz aplikacije.',
+    country_picker_label: 'Država: ${1}',
+    country_picker_automatic: 'Automatski',
+    country_picker_automatic_detected: 'Automatski (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Pretraži države',
+    country_picker_no_results: 'Nije pronađena nijedna država',
+    country_picker_other: 'Ostale',
 };

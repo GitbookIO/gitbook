@@ -205,4 +205,11 @@ export const zh_tw: TranslationLanguage = {
     auth_expired_description: '請從應用程式重新開始登入。',
     auth_error_invalid_request: '請求無效。請從應用程式重新開始。',
     auth_error_failed: '我們無法完成授權。請求可能已過期 — 請從應用程式重新開始。',
+    country_picker_label: '國家/地區：${1}',
+    country_picker_automatic: '自動',
+    country_picker_automatic_detected: '自動（${1}）',
+    country_picker_auto_hint: '自動',
+    country_picker_search: '搜尋國家/地區',
+    country_picker_no_results: '找不到國家/地區',
+    country_picker_other: '其他',
 };

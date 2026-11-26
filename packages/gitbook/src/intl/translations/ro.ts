@@ -214,4 +214,11 @@ export const ro: TranslationLanguage = {
     auth_error_invalid_request: 'Cerere invalidă. Reia din aplicație.',
     auth_error_failed:
         'Nu am putut finaliza autorizarea. Cererea poate să fi expirat — reia din aplicație.',
+    country_picker_label: 'Țară: ${1}',
+    country_picker_automatic: 'Automată',
+    country_picker_automatic_detected: 'Automată (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Caută o țară',
+    country_picker_no_results: 'Nu s-a găsit nicio țară',
+    country_picker_other: 'Altele',
 };

@@ -214,4 +214,11 @@ export const bg: TranslationLanguage = {
     auth_error_invalid_request: 'Невалидна заявка. Моля, започнете отново от приложението.',
     auth_error_failed:
         'Не успяхме да завършим оторизацията. Заявката може да е изтекла — моля, започнете отново от приложението.',
+    country_picker_label: 'Държава: ${1}',
+    country_picker_automatic: 'Автоматично',
+    country_picker_automatic_detected: 'Автоматично (${1})',
+    country_picker_auto_hint: 'авто',
+    country_picker_search: 'Търсене на държава',
+    country_picker_no_results: 'Няма намерени държави',
+    country_picker_other: 'Други',
 };

@@ -212,4 +212,11 @@ export const lt: TranslationLanguage = {
     auth_error_invalid_request: 'Neteisinga užklausa. Pradėkite iš programos iš naujo.',
     auth_error_failed:
         'Nepavyko užbaigti autorizacijos. Užklausos laikas galėjo pasibaigti — pradėkite iš programos iš naujo.',
+    country_picker_label: 'Šalis: ${1}',
+    country_picker_automatic: 'Automatinė',
+    country_picker_automatic_detected: 'Automatinė (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Ieškoti šalies',
+    country_picker_no_results: 'Šalių nerasta',
+    country_picker_other: 'Kitos',
 };

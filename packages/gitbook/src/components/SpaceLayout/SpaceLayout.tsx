@@ -7,6 +7,7 @@ import { AIChatProvider } from '../AI';
 import type { RenderAIMessageOptions } from '../AI';
 import { AIChat, AskAIParagraphButton, AskAITextSelection } from '../AIChat';
 import { Announcement } from '../Announcement';
+import { CountryPicker } from '../Header/CountryPicker';
 import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
 import { CurrentContentProvider } from '../hooks';
 import { InsightsProvider, VisitorProvider } from '../Insights';
@@ -145,7 +146,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
             ) : null}
 
             {/* Chat panel shifts content left when open. Clipped so blocks bleeding into the gutters (card carousels) can't widen the page. */}
-            <div className="overflow-x-clip lg:chat-open:mr-(--ai-chat-width) motion-safe:transition-all motion-safe:duration-300">
+            <div className="lg:chat-open:mr-(--ai-chat-width) overflow-x-clip motion-safe:transition-all motion-safe:duration-300">
                 <div
                     className={tcls(
                         'flex',
@@ -187,6 +188,13 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                 )}
                             >
                                 <HeaderLogo context={context} />
+                                {context.countryPicker ? (
+                                    <CountryPicker
+                                        context={context}
+                                        className="[&_.button-leading-icon]:block! ml-auto py-2 [&_.button-content]:hidden"
+                                        variant="header"
+                                    />
+                                ) : null}
                                 {variants.translations.length > 1 ? (
                                     <TranslationsDropdown
                                         context={context}
@@ -196,7 +204,10 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                             ) ?? siteSpace
                                         }
                                         siteSpaces={variants.translations}
-                                        className="[&_.button-leading-icon]:block! ml-auto py-2 [&_.button-content]:hidden"
+                                        className={tcls(
+                                            '[&_.button-leading-icon]:block! py-2 [&_.button-content]:hidden',
+                                            context.countryPicker ? '' : 'ml-auto'
+                                        )}
                                         variant="header"
                                     />
                                 ) : null}

@@ -217,4 +217,11 @@ export const de: TranslationLanguage = {
     auth_error_invalid_request: 'Ungültige Anfrage. Bitte starten Sie erneut in der Anwendung.',
     auth_error_failed:
         'Die Autorisierung konnte nicht abgeschlossen werden. Die Anfrage ist möglicherweise abgelaufen — bitte starten Sie erneut in der Anwendung.',
+    country_picker_label: 'Land: ${1}',
+    country_picker_automatic: 'Automatisch',
+    country_picker_automatic_detected: 'Automatisch (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Land suchen',
+    country_picker_no_results: 'Keine Länder gefunden',
+    country_picker_other: 'Andere',
 };

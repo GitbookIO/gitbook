@@ -211,4 +211,11 @@ export const fr: TranslationLanguage = {
     auth_error_invalid_request: 'Requête invalide. Veuillez recommencer depuis l’application.',
     auth_error_failed:
         'Nous n’avons pas pu finaliser l’autorisation. La requête a peut-être expiré — veuillez recommencer depuis l’application.',
+    country_picker_label: 'Pays : ${1}',
+    country_picker_automatic: 'Automatique',
+    country_picker_automatic_detected: 'Automatique (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Rechercher un pays',
+    country_picker_no_results: 'Aucun pays trouvé',
+    country_picker_other: 'Autres',
 };

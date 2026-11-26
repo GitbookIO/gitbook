@@ -205,4 +205,11 @@ export const yue: TranslationLanguage = {
     auth_expired_description: '請由應用程式重新開始登入。',
     auth_error_invalid_request: '請求無效。請由應用程式重新開始。',
     auth_error_failed: '我們無法完成授權。請求可能已經過期 — 請由應用程式重新開始。',
+    country_picker_label: '國家：${1}',
+    country_picker_automatic: '自動',
+    country_picker_automatic_detected: '自動（${1}）',
+    country_picker_auto_hint: '自動',
+    country_picker_search: '搜尋國家',
+    country_picker_no_results: '搵唔到國家',
+    country_picker_other: '其他',
 };

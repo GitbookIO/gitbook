@@ -46,6 +46,7 @@ import {
     getSiteStructureSections,
     listAllSiteSpaces,
 } from '@/lib/sites';
+import { type SiteRegions, getCountryPickerRegions } from '@/lib/visitor-country';
 
 /**
  * Data about the site URL. Provided by the middleware.
@@ -218,6 +219,9 @@ export type GitBookSiteContext = GitBookSpaceContext & {
     /** Context ID used by adaptive content. It represents an unique identifier for the authentication context */
     contextId?: string;
 
+    /** Regions grouping the country picker, or null when the site doesn't show it. */
+    countryPicker: SiteRegions | null;
+
     /** Whether this request is a fallback rendering. */
     isFallback: boolean;
 
@@ -356,17 +360,17 @@ export async function fetchSiteContextByIds(
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
 
-    const [{ site: orgSite, structure: siteStructure, customizations, scripts }, spaceContext] =
-        await Promise.all([
-            throwIfDataError(
-                dataFetcher.getPublishedContentSite({
-                    organizationId: ids.organization,
-                    siteId: ids.site,
-                    siteShareKey: ids.shareKey,
-                })
-            ),
-            fetchSpaceContextByIds(baseContext, ids),
-        ]);
+    const [publishedSite, spaceContext] = await Promise.all([
+        throwIfDataError(
+            dataFetcher.getPublishedContentSite({
+                organizationId: ids.organization,
+                siteId: ids.site,
+                siteShareKey: ids.shareKey,
+            })
+        ),
+        fetchSpaceContextByIds(baseContext, ids),
+    ]);
+    const { site: orgSite, structure: siteStructure, customizations, scripts } = publishedSite;
 
     const { publicChangeRequestPreviews } = orgSite as Site & {
         publicChangeRequestPreviews?: boolean;
@@ -500,6 +504,7 @@ export async function fetchSiteContextByIds(
         visibleSections,
         scripts,
         contextId: ids.contextId,
+        countryPicker: getCountryPickerRegions(publishedSite),
         isFallback: ids.isFallback,
         noIndexSearch: ids.noIndexSearch,
         siteRevision: ids.siteRevision,

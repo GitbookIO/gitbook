@@ -211,4 +211,11 @@ export const uk: TranslationLanguage = {
     auth_error_invalid_request: 'Некоректний запит. Почніть знову із застосунку.',
     auth_error_failed:
         'Не вдалося завершити авторизацію. Можливо, термін дії запиту сплив — почніть знову із застосунку.',
+    country_picker_label: 'Країна: ${1}',
+    country_picker_automatic: 'Автоматично',
+    country_picker_automatic_detected: 'Автоматично (${1})',
+    country_picker_auto_hint: 'авто',
+    country_picker_search: 'Пошук країни',
+    country_picker_no_results: 'Країн не знайдено',
+    country_picker_other: 'Інші',
 };

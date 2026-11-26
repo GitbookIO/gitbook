@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import type { JwtPayload } from 'jwt-decode';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import {
     type ResponseCookies,
@@ -9,11 +9,13 @@ import {
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
     getVisitorCountry,
+    getVisitorCountryData,
     getVisitorToken,
     getVisitorType,
     getVisitorUnsignedClaims,
     isRevalidationRequest,
     normalizeVisitorURL,
+    serveVisitorCountryRequest,
 } from './visitors';
 
 describe('getVisitorAuthToken', () => {
@@ -709,5 +711,154 @@ describe('getVisitorCountry', () => {
                 })
             )
         ).toBe('FR');
+    });
+});
+
+describe('getVisitorCountryData', () => {
+    const revalidationHeaders = new Headers({
+        'user-agent': 'GitBook-Open-Revalidation-Worker',
+        'x-gitbook-country': 'DE',
+    });
+    const detectedHeaders = () => new Headers({ 'x-open-next-country': 'FR' });
+    const countryCookie = { name: 'gitbook-visitor-country', value: 'JP' };
+
+    it('sends the detected country without a choice', () => {
+        expect(
+            getVisitorCountryData({
+                cookies: [],
+                headers: detectedHeaders(),
+                url: new URL('https://example.com/docs'),
+            })
+        ).toEqual({ country: 'FR', chosen: undefined, responseCookie: undefined });
+    });
+
+    it('reads the country from the gitbook.country param and persists it in a cookie', () => {
+        const data = getVisitorCountryData({
+            cookies: [countryCookie],
+            headers: detectedHeaders(),
+            url: new URL('https://example.com/docs?gitbook.country=us'),
+        });
+
+        expect(data.country).toBe('US');
+        expect(data.chosen).toBe('US');
+        expect(data.responseCookie).toMatchObject({
+            name: 'gitbook-visitor-country',
+            value: 'US',
+            options: { path: '/', sameSite: 'lax', maxAge: 365 * 24 * 60 * 60 },
+        });
+    });
+
+    it('clears the choice with an empty gitbook.country param', () => {
+        const data = getVisitorCountryData({
+            cookies: [countryCookie],
+            headers: detectedHeaders(),
+            url: new URL('https://example.com/docs?gitbook.country='),
+        });
+
+        expect(data.country).toBe('FR');
+        expect(data.chosen).toBeUndefined();
+        expect(data.responseCookie).toMatchObject({
+            name: 'gitbook-visitor-country',
+            value: '',
+            options: { maxAge: 0 },
+        });
+    });
+
+    it('replaces the detected country with the one from the cookie', () => {
+        expect(
+            getVisitorCountryData({
+                cookies: [countryCookie],
+                headers: detectedHeaders(),
+                url: new URL('https://example.com/docs'),
+            })
+        ).toEqual({ country: 'JP', chosen: 'JP', responseCookie: undefined });
+    });
+
+    it('uses the chosen country when none is detected', () => {
+        expect(
+            getVisitorCountryData({
+                cookies: [countryCookie],
+                headers: new Headers(),
+                url: new URL('https://example.com/docs'),
+            }).country
+        ).toBe('JP');
+    });
+
+    it.each(['XX', 'T1', 'ZZ', 'FRA', 'F', '1A', 'é', ' '])(
+        'ignores the invalid country %p',
+        (value) => {
+            expect(
+                getVisitorCountryData({
+                    cookies: [{ name: 'gitbook-visitor-country', value }],
+                    headers: detectedHeaders(),
+                    url: new URL('https://example.com/docs'),
+                })
+            ).toEqual({ country: 'FR', chosen: undefined, responseCookie: undefined });
+
+            const fromParam = getVisitorCountryData({
+                cookies: [],
+                headers: detectedHeaders(),
+                url: new URL(
+                    `https://example.com/docs?gitbook.country=${encodeURIComponent(value)}`
+                ),
+            });
+            expect(fromParam.country).toBe('FR');
+            expect(fromParam.chosen).toBeUndefined();
+        }
+    );
+
+    it('keeps the saved choice when the gitbook.country param is invalid', () => {
+        expect(
+            getVisitorCountryData({
+                cookies: [countryCookie],
+                headers: detectedHeaders(),
+                url: new URL('https://example.com/docs?gitbook.country=Europe'),
+            })
+        ).toEqual({ country: 'JP', chosen: 'JP', responseCookie: undefined });
+    });
+
+    it('ignores the param and cookie on revalidation requests', () => {
+        expect(
+            getVisitorCountryData({
+                cookies: [countryCookie],
+                headers: revalidationHeaders,
+                url: new URL('https://example.com/docs?gitbook.country=US'),
+            })
+        ).toEqual({ country: 'DE', chosen: undefined, responseCookie: undefined });
+    });
+
+    it('leaves visitor.country to the unsigned claims', () => {
+        const url = new URL('https://example.com/docs?visitor.country=fr');
+
+        expect(
+            getVisitorCountryData({ cookies: [], headers: detectedHeaders(), url }).chosen
+        ).toBeUndefined();
+        expect(getVisitorUnsignedClaims({ cookies: [], url }).all).toEqual({ country: 'fr' });
+    });
+
+    it('keeps the country out of the unsigned claims but strips it from the URL', () => {
+        const url = new URL('https://example.com/docs?gitbook.country=US&visitor.plan=pro&page=2');
+
+        expect(getVisitorUnsignedClaims({ cookies: [], url })).toEqual({
+            all: { plan: 'pro' },
+            fromVisitorParams: { plan: 'pro' },
+        });
+        expect(normalizeVisitorURL(url).toString()).toBe('https://example.com/docs?page=2');
+    });
+});
+
+describe('serveVisitorCountryRequest', () => {
+    it('returns the detected and chosen countries without caching', async () => {
+        const request = new NextRequest('https://example.com/docs/~gitbook/visitor/country', {
+            headers: {
+                'x-open-next-country': 'fr',
+                cookie: 'gitbook-visitor-country=JP',
+            },
+        });
+
+        const response = serveVisitorCountryRequest(request);
+
+        expect(response.headers.get('cache-control')).toBe('private, no-store');
+        expect(JSON.parse(await response.text())).toEqual({ detected: 'FR', chosen: 'JP' });
     });
 });

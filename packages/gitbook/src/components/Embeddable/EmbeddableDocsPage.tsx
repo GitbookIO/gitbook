@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 
 import { PaginatedUpdatesProvider } from '../DocumentView/PaginatedUpdates';
+import { CountryPicker } from '../Header/CountryPicker';
 import { HeaderMobileMenu } from '../Header/HeaderMobileMenu';
 import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
 import { PageBody } from '../PageBody';
@@ -84,6 +85,19 @@ export async function EmbeddableDocsPage(
 
     const variants = categorizeVariants(context);
     const pageInput = { linker: context.linker, pages: context.revision.pages, page };
+    const translationsDropdown =
+        variants.translations.length > 1 ? (
+            <TranslationsDropdown
+                context={context}
+                siteSpace={
+                    variants.translations.find((space) => space.id === context.siteSpace.id) ??
+                    context.siteSpace
+                }
+                siteSpaces={variants.translations}
+                asEmbeddable
+                className="max-md:[&_.button-content]:block"
+            />
+        ) : null;
 
     return (
         <EmbeddableFrame className="site-background">
@@ -120,6 +134,12 @@ export async function EmbeddableDocsPage(
                                 asEmbeddable: true,
                             })}
                         >
+                            {context.countryPicker ? (
+                                <CountryPicker
+                                    context={context}
+                                    className="my-1.5 ml-2 self-start"
+                                />
+                            ) : null}
                             {variants.translations.length > 1 ? (
                                 <TranslationsDropdown
                                     context={context}
@@ -149,18 +169,16 @@ export async function EmbeddableDocsPage(
                             context={context}
                             withTrademark={false}
                             header={
-                                !context.sections && variants.translations.length > 1 ? (
-                                    <TranslationsDropdown
-                                        context={context}
-                                        siteSpace={
-                                            variants.translations.find(
-                                                (space) => space.id === context.siteSpace.id
-                                            ) ?? context.siteSpace
-                                        }
-                                        siteSpaces={variants.translations}
-                                        asEmbeddable
-                                        className="max-md:[&_.button-content]:block"
-                                    />
+                                !context.sections && context.countryPicker ? (
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <CountryPicker
+                                            context={context}
+                                            className="max-md:[&_.button-content]:block"
+                                        />
+                                        {translationsDropdown}
+                                    </div>
+                                ) : !context.sections ? (
+                                    translationsDropdown
                                 ) : null
                             }
                             innerHeader={

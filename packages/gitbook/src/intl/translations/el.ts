@@ -216,4 +216,11 @@ export const el: TranslationLanguage = {
     auth_error_invalid_request: 'Μη έγκυρο αίτημα. Ξεκινήστε ξανά από την εφαρμογή.',
     auth_error_failed:
         'Δεν μπορέσαμε να ολοκληρώσουμε την εξουσιοδότηση. Το αίτημα μπορεί να έχει λήξει — ξεκινήστε ξανά από την εφαρμογή.',
+    country_picker_label: 'Χώρα: ${1}',
+    country_picker_automatic: 'Αυτόματα',
+    country_picker_automatic_detected: 'Αυτόματα (${1})',
+    country_picker_auto_hint: 'αυτόματα',
+    country_picker_search: 'Αναζήτηση χώρας',
+    country_picker_no_results: 'Δεν βρέθηκαν χώρες',
+    country_picker_other: 'Άλλες',
 };

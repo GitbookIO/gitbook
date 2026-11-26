@@ -211,4 +211,11 @@ export const ko: TranslationLanguage = {
     auth_error_invalid_request: '잘못된 요청입니다. 애플리케이션에서 다시 시작하세요.',
     auth_error_failed:
         '인증을 완료할 수 없습니다. 요청이 만료되었을 수 있습니다 — 애플리케이션에서 다시 시작하세요.',
+    country_picker_label: '국가: ${1}',
+    country_picker_automatic: '자동',
+    country_picker_automatic_detected: '자동 (${1})',
+    country_picker_auto_hint: '자동',
+    country_picker_search: '국가 검색',
+    country_picker_no_results: '국가를 찾을 수 없습니다',
+    country_picker_other: '기타',
 };

@@ -212,4 +212,11 @@ export const ms: TranslationLanguage = {
     auth_error_invalid_request: 'Permintaan tidak sah. Sila mulakan semula dari aplikasi.',
     auth_error_failed:
         'Kami tidak dapat melengkapkan kebenaran. Permintaan mungkin telah tamat tempoh — sila mulakan semula dari aplikasi.',
+    country_picker_label: 'Negara: ${1}',
+    country_picker_automatic: 'Automatik',
+    country_picker_automatic_detected: 'Automatik (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Cari negara',
+    country_picker_no_results: 'Tiada negara ditemui',
+    country_picker_other: 'Lain-lain',
 };

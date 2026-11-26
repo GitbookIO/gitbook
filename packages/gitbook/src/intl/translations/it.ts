@@ -214,4 +214,11 @@ export const it: TranslationLanguage = {
     auth_error_invalid_request: 'Richiesta non valida. Ricomincia dall’applicazione.',
     auth_error_failed:
         'Non è stato possibile completare l’autorizzazione. La richiesta potrebbe essere scaduta: ricomincia dall’applicazione.',
+    country_picker_label: 'Paese: ${1}',
+    country_picker_automatic: 'Automatico',
+    country_picker_automatic_detected: 'Automatico (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Cerca un paese',
+    country_picker_no_results: 'Nessun paese trovato',
+    country_picker_other: 'Altri',
 };

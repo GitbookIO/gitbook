@@ -214,4 +214,11 @@ export const sv: TranslationLanguage = {
     auth_error_invalid_request: 'Ogiltig förfrågan. Börja om från programmet.',
     auth_error_failed:
         'Vi kunde inte slutföra auktoriseringen. Förfrågan kan ha upphört att gälla — börja om från programmet.',
+    country_picker_label: 'Land: ${1}',
+    country_picker_automatic: 'Automatisk',
+    country_picker_automatic_detected: 'Automatisk (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Sök land',
+    country_picker_no_results: 'Inga länder hittades',
+    country_picker_other: 'Övriga',
 };

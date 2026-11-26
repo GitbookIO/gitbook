@@ -211,4 +211,11 @@ export const lv: TranslationLanguage = {
     auth_error_invalid_request: 'Nederīgs pieprasījums. Lūdzu, sāciet no lietotnes vēlreiz.',
     auth_error_failed:
         'Neizdevās pabeigt autorizāciju. Pieprasījuma derīgums, iespējams, ir beidzies — lūdzu, sāciet no lietotnes vēlreiz.',
+    country_picker_label: 'Valsts: ${1}',
+    country_picker_automatic: 'Automātiski',
+    country_picker_automatic_detected: 'Automātiski (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Meklēt valsti',
+    country_picker_no_results: 'Neviena valsts nav atrasta',
+    country_picker_other: 'Citas',
 };
