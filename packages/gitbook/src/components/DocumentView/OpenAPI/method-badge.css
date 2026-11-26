@@ -10,6 +10,11 @@
     @apply m-0 px-2.5 py-1 h-6 text-[0.813rem];
 }
 
+/* The uppercase label renders 1px above center in page cards. */
+.page-card-method .openapi-method-medium {
+    @apply pt-[5px] pb-[3px];
+}
+
 .toclink .openapi-method {
     @apply text-[0.625rem] flex items-center justify-center;
 }
