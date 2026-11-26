@@ -331,11 +331,6 @@ function expectNotPaginated(document: JSONDocument, eligibility: UpdatesPaginati
     });
     expect(result.document).toBe(document);
     expect(findUpdateAnchorPage(document, undefined, { anchor: 'update-1' })).toEqual({
-        found: true,
-        page: null,
-        clearTags: false,
-    });
-    expect(findUpdateAnchorPage(document, undefined, { anchor: 'missing' })).toEqual({
         found: false,
     });
 }

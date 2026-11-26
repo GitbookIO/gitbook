@@ -252,12 +252,9 @@ export function findUpdateAnchorPage(
     document: JSONDocument,
     revision: Revision | undefined,
     { anchor, tags }: { anchor: string; tags?: string[] }
-): { found: true; page: number | null; clearTags: boolean } | { found: false } {
+): { found: true; page: number; clearTags: boolean } | { found: false } {
     const eligibility = getUpdatesPaginationEligibility(document);
     if (eligibility.status !== 'eligible') {
-        if (hasMoreThan(document, (node) => matchesUpdateAnchor(node, anchor), 0)) {
-            return { found: true, page: null, clearTags: false };
-        }
         return { found: false };
     }
 

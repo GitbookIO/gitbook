@@ -260,11 +260,6 @@ function useFilteredUpdatesView(options: {
                 }
 
                 const url = new URL(window.location.href);
-                if (result.status === 'unpaginated') {
-                    setUpdatesPageParam(url.searchParams, 1);
-                    reloadToURL(url);
-                    return;
-                }
                 if (result.status === 'unfiltered') {
                     url.searchParams.delete(UPDATES_FILTER_SEARCH_PARAM);
                     setUpdatesPageParam(url.searchParams, initialPage);
@@ -344,12 +339,6 @@ function useResolveUpdatesAnchor(options: {
                     return;
                 }
 
-                if (result.page === null) {
-                    setUpdatesPageParam(url.searchParams, 1);
-                    reloadToURL(url);
-                    return;
-                }
-
                 setUpdatesPageParam(url.searchParams, result.page);
                 if (result.clearTags) {
                     url.searchParams.delete(UPDATES_FILTER_SEARCH_PARAM);
@@ -415,14 +404,6 @@ function findScrollContainer(element: HTMLElement | null): HTMLElement | null {
         parent = parent.parentElement;
     }
     return null;
-}
-
-function reloadToURL(url: URL) {
-    if (url.href === window.location.href) {
-        window.location.reload();
-        return;
-    }
-    window.location.replace(relativeURL(url));
 }
 
 function relativeURL(url: URL): string {
