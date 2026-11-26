@@ -8,8 +8,6 @@ import type { OpenAPIServerWithCustomProperties } from './types';
 import { getDefaultServerURL, interpolateServerURL } from './util/server';
 import { createStateKey } from './utils';
 
-export const serversStateKey = createStateKey('servers');
-
 /**
  * Display the path of an operation.
  */
@@ -20,7 +18,6 @@ export function OpenAPIPathMultipleServers(
     const { path, servers } = data;
 
     const defaultServer = getDefaultServerURL(servers);
-    const { key, setKey } = useSelectState(serversStateKey, defaultServer);
     const formattedPath = formatPath(path);
 
     const items = servers
@@ -36,14 +33,15 @@ export function OpenAPIPathMultipleServers(
             };
         });
 
-    // The store outlives client-side navigation, so it can hold a server from another spec.
-    const selectedServer = items.find((item) => item.key === key)?.key ?? defaultServer;
+    // The store outlives client-side navigation: one key per server list keeps another spec's choice out.
+    const stateKey = createStateKey('servers', items.map((item) => item.key).join(' '));
+    const { key, setKey } = useSelectState(stateKey, defaultServer);
 
     return (
         <OpenAPIPathItem
             copyType="button"
             {...props}
-            value={`${withServer ? selectedServer : ''}${path}`}
+            value={`${withServer ? key : ''}${path}`}
             context={context}
         >
             {withServer ? (
@@ -51,7 +49,7 @@ export function OpenAPIPathMultipleServers(
                     className="openapi-select openapi-select-unstyled"
                     items={items}
                     itemClassName="openapi-select-item-column"
-                    stateKey={serversStateKey}
+                    stateKey={stateKey}
                     placement="bottom start"
                     icon={context.icons.chevronDown}
                     defaultValue={defaultServer}
