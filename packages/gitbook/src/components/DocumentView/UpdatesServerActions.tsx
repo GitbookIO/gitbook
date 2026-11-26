@@ -42,6 +42,10 @@ export type FilteredUpdatesPageResult =
           revisionId: string;
       }
     | {
+          status: 'unpaginated';
+          revisionId: string;
+      }
+    | {
           status: 'error';
       };
 
@@ -70,7 +74,7 @@ export async function getFilteredUpdatesPage(
         });
         if (!result.pagination) {
             logger.info('Current revision no longer needs updates pagination', { pageId: page.id });
-            return { status: 'unfiltered', revisionId: context.revisionId };
+            return { status: 'unpaginated', revisionId: context.revisionId };
         }
 
         const [sections, iconSources] = await Promise.all([
@@ -117,7 +121,7 @@ export async function resolveUpdatesAnchor(options: UpdatesPageAction & { anchor
             found: result.found,
             page: result.found && result.page,
         });
-        if (result.found && result.page <= UPDATES_MAX_PAGE) {
+        if (result.found && (result.page === null || result.page <= UPDATES_MAX_PAGE)) {
             return result;
         }
     } catch {

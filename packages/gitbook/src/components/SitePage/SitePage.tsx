@@ -39,11 +39,10 @@ import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 import { getSiteSpacePagePaths, resolveSiteSpaceCustomHomePage } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 import {
-    countDocumentUpdates,
     generateUpdatesFilterCSS,
     getUpdatesPageRange,
+    getUpdatesPaginationEligibility,
     paginateUpdatesDocument,
-    UPDATES_PAGINATION_THRESHOLD,
     getDocumentFilterableTags,
     updatesFilterStyleHref,
 } from '@/lib/updates';
@@ -249,9 +248,12 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     if (props.updatesPage) {
         const document = await getPageDocument(context, page);
         if (document) {
-            const count = countDocumentUpdates(document);
-            if (count > UPDATES_PAGINATION_THRESHOLD) {
-                const { page: pageNumber } = getUpdatesPageRange(props.updatesPage, count);
+            const eligibility = getUpdatesPaginationEligibility(document);
+            if (eligibility.status === 'eligible') {
+                const { page: pageNumber } = getUpdatesPageRange(
+                    props.updatesPage,
+                    eligibility.updates.length
+                );
                 title = `${title} (Page ${pageNumber})`;
                 if (!pageMetaLinks?.canonical) {
                     const url = new URL(canonical);
@@ -378,17 +380,29 @@ export async function getSitePageData(props: SitePageProps) {
     let filterableTags: RevisionTag[] = [];
     let document = fullDocument;
     let pagination = null;
+    let eligibility = null;
     if (fullDocument) {
         filterableTags = getDocumentFilterableTags(fullDocument, context.revision);
-        ({ document, pagination } = paginateUpdatesDocument(fullDocument, context.revision, {
-            page: props.updatesPage ?? 1,
-        }));
+        ({ document, pagination, eligibility } = paginateUpdatesDocument(
+            fullDocument,
+            context.revision,
+            {
+                page: props.updatesPage ?? 1,
+            }
+        ));
     }
 
-    if (pagination || props.updatesPage) {
+    if (eligibility?.status === 'skipped' || pagination || props.updatesPage) {
         const logger = getLogger().subLogger('updatesPagination', {
             labels: { siteId: context.site.id, pageId: page.id },
         });
+        if (eligibility?.status === 'skipped') {
+            logger.info('Skipped updates pagination', {
+                reason: eligibility.reason,
+                totalUpdates: eligibility.totalUpdates,
+                updatesBlocks: eligibility.updatesBlocks,
+            });
+        }
         if (props.updatesPage && (!pagination || pagination.isClamped)) {
             const targetPage = pagination?.page ?? 1;
             logger.info('Redirected out-of-range updates page', {
