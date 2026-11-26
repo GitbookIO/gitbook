@@ -58,12 +58,12 @@ export function applyUpdatesFilterScript(
  * Inline script that applies the URL's `?tag=` filter to `<html>` before first paint. Rendered only
  * on pages with filterable updates (see SitePage), not globally.
  */
-export function UpdatesFilterScript(props: { tagSlugs: string[] }) {
-    const { tagSlugs } = props;
+export function UpdatesFilterScript(props: { tagSlugs: string[]; filterAttribute?: string }) {
+    const { tagSlugs, filterAttribute = UPDATES_TAG_FILTER_ATTR } = props;
     const inserted = useRef(false);
     const scriptArgs = serializeUpdatesFilterScriptArgs([
         UPDATES_FILTER_SEARCH_PARAM,
-        UPDATES_TAG_FILTER_ATTR,
+        filterAttribute,
         UPDATES_TAG_FILTER_CAP,
         tagSlugs,
         UPDATES_FILTER_KEY_ATTR,

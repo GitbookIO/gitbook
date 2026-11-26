@@ -46,6 +46,8 @@ export const fi: TranslationLanguage = {
     on_this_page: 'Tällä sivulla',
     next_page: 'Seuraava',
     previous_page: 'Edellinen',
+    updates_pagination_navigation: 'Sivujen selaus',
+    updates_pagination_range: '${1} - ${2} / ${3} päivitystä',
     toc_back_to_space: 'Takaisin: ${1}',
     page_last_modified: 'Päivitetty viimeksi ${1}',
     was_this_helpful: 'Oliko tästä apua?',

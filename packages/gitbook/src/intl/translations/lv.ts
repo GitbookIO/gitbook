@@ -46,6 +46,8 @@ export const lv: TranslationLanguage = {
     on_this_page: 'Šajā lapā',
     next_page: 'Nākamā',
     previous_page: 'Iepriekšējā',
+    updates_pagination_navigation: 'Lapu navigācija',
+    updates_pagination_range: '${1} - ${2} no ${3} atjauninājumiem',
     toc_back_to_space: 'Atpakaļ uz ${1}',
     page_last_modified: 'Pēdoreiz atjaunināts ${1}',
     was_this_helpful: 'Vai tas bija noderīgi?',

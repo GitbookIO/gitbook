@@ -44,6 +44,8 @@ export const en = {
     on_this_page: 'On this page',
     next_page: 'Next',
     previous_page: 'Previous',
+    updates_pagination_navigation: 'Pagination Navigation',
+    updates_pagination_range: '${1} - ${2} of ${3} updates',
     toc_back_to_space: 'Back to ${1}',
     page_last_modified: 'Last updated ${1}',
     was_this_helpful: 'Was this helpful?',

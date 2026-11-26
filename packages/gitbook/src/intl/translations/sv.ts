@@ -46,6 +46,8 @@ export const sv: TranslationLanguage = {
     on_this_page: 'På den här sidan',
     next_page: 'Nästa',
     previous_page: 'Föregående',
+    updates_pagination_navigation: 'Sidnavigering',
+    updates_pagination_range: '${1} - ${2} av ${3} uppdateringar',
     toc_back_to_space: 'Tillbaka till ${1}',
     page_last_modified: 'Senast uppdaterad ${1}',
     was_this_helpful: 'Var detta till hjälp?',

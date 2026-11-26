@@ -46,6 +46,8 @@ export const cs: TranslationLanguage = {
     on_this_page: 'Na této stránce',
     next_page: 'Další',
     previous_page: 'Předchozí',
+    updates_pagination_navigation: 'Navigace mezi stránkami',
+    updates_pagination_range: '${1} - ${2} z ${3} aktualizací',
     toc_back_to_space: 'Zpět na ${1}',
     page_last_modified: 'Poslední aktualizace ${1}',
     was_this_helpful: 'Bylo to užitečné?',

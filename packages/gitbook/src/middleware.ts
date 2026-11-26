@@ -71,6 +71,11 @@ import {
     isRobotsTxtRequest,
 } from '@/lib/robots';
 import {
+    UPDATES_FILTER_SEARCH_PARAM,
+    UPDATES_PAGE_SEARCH_PARAM,
+    parseUpdatesPageParam,
+} from '@/lib/updates-url';
+import {
     type ResponseCookies,
     getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
@@ -746,6 +751,8 @@ async function serveSiteRequest(requestURL: URL, request: NextRequest, match: UR
             response.headers.set('x-robots-tag', 'none');
         } else if (hasRevisionSelector(siteURLData.basePath)) {
             response.headers.set('x-robots-tag', REVISION_ROBOTS_TAG);
+        } else if (rewrittenURL.searchParams.has(UPDATES_FILTER_SEARCH_PARAM)) {
+            response.headers.set('x-robots-tag', 'noindex, follow');
         }
 
         // Allow cross-origin requests from the same parent domain as the site.
@@ -1114,7 +1121,7 @@ function encodePathInSiteContent(
     const embedPage = pathname.match(EMBED_PAGE_PATH_REGEX);
     if (embedPage) {
         return {
-            pathname: `~gitbook/embed/page/${encodePagePath(embedPage[1])}`,
+            pathname: `~gitbook/embed/page/${encodeUpdatesPagePath(embedPage[1], request)}`,
         };
     }
 
@@ -1221,9 +1228,20 @@ function encodePathInSiteContent(
                           ],
                 };
             }
-            return { pathname: encodePagePath(pathname) };
+            return { pathname: encodeUpdatesPagePath(pathname, request) };
         }
     }
+}
+
+function encodeUpdatesPagePath(path: string | undefined, request: Request): string {
+    const pathname = encodePagePath(path);
+    const page = parseUpdatesPageParam(
+        new URL(request.url).searchParams.get(UPDATES_PAGE_SEARCH_PARAM)
+    );
+    if (page !== null) {
+        return `${pathname}/${page}`;
+    }
+    return pathname;
 }
 
 function encodePagePath(path: string | undefined): string {

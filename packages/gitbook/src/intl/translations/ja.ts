@@ -47,6 +47,8 @@ export const ja: TranslationLanguage = {
     on_this_page: 'このページ内',
     next_page: '次へ',
     previous_page: '前へ',
+    updates_pagination_navigation: 'ページナビゲーション',
+    updates_pagination_range: '全${3}件の更新のうち${1}〜${2}件',
     toc_back_to_space: '${1}に戻る',
     page_last_modified: '最終更新 ${1}',
     was_this_helpful: '役に立ちましたか？',
