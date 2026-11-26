@@ -1,5 +1,4 @@
 import './style.css';
-
 import {
     type CreateGitBookOptions,
     type GetFrameURLOptions,
@@ -39,7 +38,9 @@ type StandaloneCalls =
     // Navigate to the assistant
     | ['navigateToAssistant']
     // Listen to an event from the embed, returns a function to stop listening
-    | { [E in keyof GitBookFrameEvents]: ['on', E, GitBookFrameEvents[E]] }[keyof GitBookFrameEvents];
+    | {
+          [E in keyof GitBookFrameEvents]: ['on', E, GitBookFrameEvents[E]];
+      }[keyof GitBookFrameEvents];
 
 type StandaloneConfiguration = {
     /** Configure the button to open the embed */
