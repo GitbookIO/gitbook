@@ -14,6 +14,7 @@ import {
     resolveUpdatesAnchor,
 } from './UpdatesServerActions';
 import { tString, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 import {
     UPDATES_FILTER_KEY_ATTR,
     UPDATES_FILTER_SEARCH_PARAM,
@@ -30,6 +31,12 @@ import {
 
 const PENDING_FILTER_ATTR = 'data-updates-pending-filter';
 export const HIDE_PENDING_UPDATES = '[html[data-updates-pending-filter]_&]:hidden';
+
+let pendingScrollTargetPage: number | null = null;
+
+export function markUpdatesPaginationScroll(targetPage: number) {
+    pendingScrollTargetPage = targetPage;
+}
 
 type FilteredPage = Extract<FilteredUpdatesPageResult, { status: 'ok' }>;
 type FilterView =
@@ -90,6 +97,14 @@ export function PaginatedUpdatesProvider(props: {
         }
     }, [view.status]);
 
+    React.useEffect(() => {
+        if (pendingScrollTargetPage !== page) {
+            return;
+        }
+        pendingScrollTargetPage = null;
+        scrollUpdatesToTop();
+    }, [page]);
+
     useResolveUpdatesAnchor({ pageId, isEmbeddable, tags, view });
 
     function toggleTag(tag: string) {
@@ -136,13 +151,22 @@ export function PaginatedUpdatesBody(props: { children: React.ReactNode }) {
     const updates = usePaginatedUpdates();
     const language = useLanguage();
     if (updates?.view.status === 'loading') {
-        return <SkeletonUpdate className={CONTENT_STYLE_REDUCED} />;
+        return (
+            <div className={tcls(CONTENT_STYLE_REDUCED, 'flex flex-col gap-20')}>
+                <SkeletonUpdate />
+                <SkeletonUpdate />
+                <SkeletonUpdate />
+            </div>
+        );
     }
     if (updates?.view.status === 'error') {
         return (
             <div
                 role="alert"
-                className={`${CONTENT_STYLE_REDUCED} flex items-center justify-between gap-4 rounded-lg border border-tint-subtle p-4 text-sm text-tint`}
+                className={tcls(
+                    CONTENT_STYLE_REDUCED,
+                    'flex items-center justify-between gap-4 rounded-lg border border-tint-subtle p-4 text-sm text-tint'
+                )}
             >
                 <span>{tString(language, 'unexpected_error')}</span>
                 <Button
@@ -345,18 +369,41 @@ function navigate(nextTags: string[], nextPage: number, history: 'push' | 'repla
     }
     setUpdatesPageParam(url.searchParams, nextPage);
     url.hash = '';
+    pendingScrollTargetPage = null;
     if (history === 'push') {
         window.history.pushState(null, '', relativeURL(url));
     } else {
         window.history.replaceState(null, '', relativeURL(url));
     }
 
+    scrollUpdatesToTop();
+}
+
+function scrollUpdatesToTop() {
     const main = document.getElementById(MAIN_CONTENT_ID);
-    if (main) {
-        main.scrollIntoView({ block: 'start', behavior: 'instant' });
-        // Keeps focus off document.body when the clicked pagination button unmounts.
-        main.focus({ preventScroll: true });
+    const scrollContainer = findScrollContainer(main);
+    if (scrollContainer) {
+        scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+    } else {
+        window.scrollTo({ top: 0, behavior: 'instant' });
     }
+    // Keeps focus off document.body when the clicked pagination button unmounts.
+    main?.focus({ preventScroll: true });
+}
+
+function findScrollContainer(element: HTMLElement | null): HTMLElement | null {
+    let parent = element?.parentElement ?? null;
+    while (parent && parent !== document.body && parent !== document.documentElement) {
+        const overflowY = window.getComputedStyle(parent).overflowY;
+        if (
+            (overflowY === 'auto' || overflowY === 'scroll') &&
+            parent.scrollHeight > parent.clientHeight
+        ) {
+            return parent;
+        }
+        parent = parent.parentElement;
+    }
+    return null;
 }
 
 function relativeURL(url: URL): string {
