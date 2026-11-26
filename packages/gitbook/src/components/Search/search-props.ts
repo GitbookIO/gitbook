@@ -132,9 +132,13 @@ export function getDirectSearchProps(context: GitBookSiteContext): DirectSearchP
         return undefined;
     }
 
+    const { organizationId, siteId } = context.directSearch;
     return {
         ...context.directSearch,
         spaces: getSearchSpaceLookup(context.structure),
         passURL: context.linker.toPathInSite('~gitbook/search-pass'),
+        proxyURL: context.linker.toPathInSite(
+            `~gitbook/search-direct/orgs/${organizationId}/sites/${siteId}`
+        ),
     };
 }

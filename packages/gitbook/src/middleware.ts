@@ -18,6 +18,7 @@ import {
 
 import {
     type ServerInsightsEventInput,
+    getXForwardedFor,
     serveProxyAnalyticsEvent,
     trackServerInsightsEvents,
 } from './lib/tracking';
@@ -37,7 +38,12 @@ import {
     normalizeRequestURL,
     throwIfDataError,
 } from '@/lib/data';
-import { GITBOOK_DISABLE_INSIGHTS, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import {
+    GITBOOK_API_URL,
+    GITBOOK_DISABLE_INSIGHTS,
+    isGitBookAssetsHostURL,
+    isGitBookHostURL,
+} from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { isAITrainingOrIndexingRequest } from '@/lib/indexing-crawlers';
 import { getLogger } from '@/lib/logger';
@@ -86,10 +92,20 @@ export const config = {
 type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 
 const REVISION_ROBOTS_TAG = 'noindex, nofollow';
+const DIRECT_SEARCH_PATH = /\/~gitbook\/search-direct\/orgs\/([^/]*)\/sites\/([^/]*)\/?$/;
+const DIRECT_SEARCH_ID = /^[a-zA-Z0-9_-]+$/;
+const DIRECT_SEARCH_PASS =
+    /^[a-zA-Z0-9_-]+\.\.[a-zA-Z0-9_-]{16}\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]{22}$/;
+const DIRECT_SEARCH_TIMEOUT_MS = 5_000;
 
 export async function middleware(request: NextRequest) {
     try {
         const requestURL = new URL(request.url);
+        const siteURL = getSiteURLFromRequest(request);
+        const directSearch = siteURL?.url.pathname.match(DIRECT_SEARCH_PATH);
+        if (directSearch) {
+            return await serveDirectSearch(request, directSearch[1], directSearch[2]);
+        }
 
         // Reject malicious requests
         const rejectResponse = await validateServerActionRequest(request);
@@ -97,14 +113,10 @@ export async function middleware(request: NextRequest) {
             return rejectResponse;
         }
 
-        for (const handler of [serveSiteRoutes, serveSpacePDFRoutes]) {
-            const result = await handler(requestURL, request);
-            if (result) {
-                return result;
-            }
-        }
-
-        return NextResponse.next();
+        const siteResponse = await serveSiteRoutes(requestURL, request, siteURL);
+        return (
+            siteResponse ?? (await serveSpacePDFRoutes(requestURL, request)) ?? NextResponse.next()
+        );
     } catch (error) {
         return serveErrorResponse(error as Error);
     }
@@ -164,8 +176,7 @@ function shouldFilterMaliciousRequests(requestURL: URL): boolean {
 /**
  * Handle request that are targetting the site routes group.
  */
-async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
-    const match = getSiteURLFromRequest(request);
+async function serveSiteRoutes(requestURL: URL, request: NextRequest, match: URLWithMode | null) {
     if (!match) {
         return null;
     }
@@ -181,6 +192,95 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         return revisionResponse;
     }
     return response;
+}
+
+async function serveDirectSearch(request: NextRequest, organizationId = '', siteId = '') {
+    const responseHeaders = new Headers({
+        'Cache-Control': 'no-store',
+        'X-Content-Type-Options': 'nosniff',
+    });
+    if (request.method !== 'POST') {
+        responseHeaders.set('Allow', 'POST');
+        return new Response(null, { status: 405, headers: responseHeaders });
+    }
+    if (!DIRECT_SEARCH_ID.test(organizationId) || !DIRECT_SEARCH_ID.test(siteId)) {
+        return new Response(null, { status: 400, headers: responseHeaders });
+    }
+    const pass = request.headers.get('x-gitbook-search-pass');
+    if (!pass || !DIRECT_SEARCH_PASS.test(pass)) {
+        return new Response(null, { status: 401, headers: responseHeaders });
+    }
+
+    const headers = new Headers({
+        Authorization: `Bearer ${pass}`,
+        'Content-Type': 'application/json',
+    });
+    const userAgent = request.headers.get('User-Agent');
+    if (userAgent) headers.set('User-Agent', userAgent);
+    const ip = request.headers.get('x-gitbook-ip') ?? getXForwardedFor(request.headers);
+    if (ip) headers.set('X-Forwarded-For', ip);
+
+    const controller = new AbortController();
+    const abort = () => controller.abort();
+    if (request.signal.aborted) {
+        abort();
+    }
+    request.signal.addEventListener('abort', abort, { once: true });
+    const timeout = setTimeout(abort, DIRECT_SEARCH_TIMEOUT_MS);
+    const startedAt = performance.now();
+    try {
+        const upstream = await fetch(
+            `${removeTrailingSlash(GITBOOK_API_URL)}/v1/orgs/${organizationId}/sites/${siteId}/search`,
+            {
+                method: 'POST',
+                headers,
+                body: request.body,
+                redirect: 'manual',
+                signal: controller.signal,
+                duplex: 'half',
+            } as RequestInit
+        );
+        let responseBody: ArrayBuffer | null = null;
+        if (upstream.status !== 204 && upstream.status !== 205 && upstream.status !== 304) {
+            responseBody = await upstream.arrayBuffer();
+        }
+        responseHeaders.set(
+            'Server-Timing',
+            `api;dur=${Math.round(performance.now() - startedAt)}`
+        );
+        for (const name of [
+            'Content-Type',
+            'Retry-After',
+            'X-RateLimit-Scope',
+            'X-RateLimit-Reset',
+        ]) {
+            const value = upstream.headers.get(name);
+            if (value !== null) responseHeaders.set(name, value);
+        }
+        const fallback = request.headers.get('x-gitbook-search-fallback');
+        if (upstream.ok && (fallback === 'network' || fallback === 'timeout')) {
+            getLogger().subLogger('directSiteSearch').info('Direct search recovered via proxy', {
+                reason: fallback,
+                organizationId,
+                siteId,
+            });
+        }
+        return new Response(responseBody, { status: upstream.status, headers: responseHeaders });
+    } catch {
+        responseHeaders.set(
+            'Server-Timing',
+            `api;dur=${Math.round(performance.now() - startedAt)}`
+        );
+        getLogger().subLogger('directSiteSearch').warn('Direct search upstream failed', {
+            status: 502,
+            organizationId,
+            siteId,
+        });
+        return new Response(null, { status: 502, headers: responseHeaders });
+    } finally {
+        clearTimeout(timeout);
+        request.signal.removeEventListener('abort', abort);
+    }
 }
 
 async function serveSiteRequest(requestURL: URL, request: NextRequest, match: URLWithMode) {

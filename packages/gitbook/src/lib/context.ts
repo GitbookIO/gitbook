@@ -151,7 +151,7 @@ export type GitBookBaseContext = {
     /**
      * Target for the browser to query the site search API directly with a search pass.
      */
-    directSearch?: Omit<DirectSearchProps, 'spaces' | 'passURL'>;
+    directSearch?: Omit<DirectSearchProps, 'spaces' | 'passURL' | 'proxyURL'>;
 };
 
 /**

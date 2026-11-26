@@ -32,6 +32,11 @@ type DirectSearchOutcome =
     | { type: 'results'; results: OrderedComputedResult[] }
     | { type: 'route'; reason?: string };
 
+type SearchAttempt =
+    | { type: 'success'; body: string }
+    | { type: 'http'; response: Response }
+    | { type: 'failure'; reason: 'network' | 'timeout' };
+
 export type SearchPassStore = ReturnType<typeof createSearchPassStore>;
 
 /**
@@ -39,6 +44,7 @@ export type SearchPassStore = ReturnType<typeof createSearchPassStore>;
  */
 export function createSearchPassStore(directSearch: DirectSearchProps | undefined) {
     let state: SearchPassState = { status: 'none' };
+    let useProxy = false;
     let pendingRequest: Promise<void> | null = null;
 
     const sendPassRequest = async () => {
@@ -77,7 +83,9 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
                         (current.status === 'none' && current.reason === '401') ||
                         (current.status === 'ready' && current.replacesRejectedPass),
                 };
-                ReactDOM.preconnect(directSearch.apiURL, { crossOrigin: 'anonymous' });
+                if (!useProxy) {
+                    ReactDOM.preconnect(directSearch.apiURL, { crossOrigin: 'anonymous' });
+                }
             } else if (current.status === 'ready') {
                 state = { status: 'none' };
             }
@@ -146,76 +154,142 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
             return { type: 'results', results: [] };
         }
 
-        const { token, replacesRejectedPass } = state;
-        const { apiURL, organizationId, siteId } = directSearch;
-        // A request dropped on the way to the API never settles, so it gets its own time limit.
-        // The browser targets predate `AbortSignal.any`.
-        const request = new AbortController();
-        if (signal.aborted) {
-            request.abort();
+        let pass = state;
+        const { apiURL, organizationId, siteId, proxyURL } = directSearch;
+        const usingProxy = useProxy;
+        let url = `${apiURL}/v1/orgs/${organizationId}/sites/${siteId}/search`;
+        if (usingProxy) {
+            url = proxyURL;
         }
-        signal.addEventListener('abort', () => request.abort(), { once: true });
-        const timeout = setTimeout(() => request.abort(), DIRECT_SEARCH_TIMEOUT_MS);
-        let response: Response;
-        try {
-            response = await fetch(`${apiURL}/v1/orgs/${organizationId}/sites/${siteId}/search`, {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(toSearchSiteContentBody(query, scope, searchId)),
-                credentials: 'omit',
-                signal: request.signal,
-            });
-        } catch (error) {
-            if (signal.aborted) {
-                throw error;
+        const body = JSON.stringify(toSearchSiteContentBody(query, scope, searchId));
+        let attempt = await sendSearch(url, usingProxy, pass.token, body, signal);
+
+        if (attempt.type === 'failure' && !usingProxy) {
+            const current = state as SearchPassState;
+            // TODO: timeout can mean a slow API rather than a blocked host, so consider not sticking to the proxy for the session.
+            if (current.status === 'ready') {
+                useProxy = true;
+                pass = current;
+                attempt = await sendSearch(
+                    proxyURL,
+                    true,
+                    pass.token,
+                    body,
+                    signal,
+                    attempt.reason
+                );
+            } else if (current.status === 'none') {
+                useProxy = true;
+                return { type: 'route', reason: attempt.reason };
             }
-            return fallBack(request.signal.aborted ? 'timeout' : 'network');
         }
 
-        if (response.status === 401) {
-            return replacesRejectedPass ? fallBack('401') : dropPass(token, '401');
+        if (attempt.type === 'failure') {
+            const current = state as SearchPassState;
+            if (current.status === 'route') {
+                return waitForCooldown(current, signal);
+            }
+            return fallBack(attempt.reason);
         }
-        if (response.status === 429) {
-            state = {
-                status: 'route',
-                reason: '429',
-                cooldownUntil: Date.now() + getRateLimitWaitMs(response),
-            };
-            return waitForCooldown(state, signal);
-        }
-        if (!response.ok) {
+        if (attempt.type === 'http') {
+            const { response } = attempt;
+            if (response.status === 401) {
+                if (pass.replacesRejectedPass) {
+                    return fallBack('401');
+                }
+                return dropPass(pass.token, '401');
+            }
+            if (response.status === 429) {
+                state = {
+                    status: 'route',
+                    reason: '429',
+                    cooldownUntil: Date.now() + getRateLimitWaitMs(response),
+                };
+                return waitForCooldown(state, signal);
+            }
             return fallBack(String(response.status));
         }
 
-        let results: OrderedComputedResult[] | null;
         try {
-            const { items } = (await response.json()) as {
+            const { items } = JSON.parse(attempt.body) as {
                 items: (SearchSpaceResult | SearchRecordResult)[];
             };
-            const linker = createSiteLinker(directSearch.linker);
-            results = computePublishedSearchResults({
+            let linker = createSiteLinker(directSearch.linker);
+            if (asEmbeddable) {
+                linker = getEmbeddableLinker(linker);
+            }
+            const results = computePublishedSearchResults({
                 asEmbeddable,
-                linker: asEmbeddable ? getEmbeddableLinker(linker) : linker,
+                linker,
                 searchResults: items,
                 spaces: directSearch.spaces,
             });
-        } catch (error) {
-            if (signal.aborted) {
-                throw error;
+            if (!results) {
+                return { type: 'route', reason: 'unknown_space' };
             }
-            return fallBack(request.signal.aborted ? 'timeout' : 'invalid');
-        } finally {
-            clearTimeout(timeout);
+            return { type: 'results', results };
+        } catch {
+            return fallBack('invalid');
         }
-
-        // An unmapped space can come from a structure change after page load; fall back for this query only.
-        return results ? { type: 'results', results } : { type: 'route', reason: 'unknown_space' };
     };
 
     return { requestPass, search };
+}
+
+async function sendSearch(
+    url: string,
+    useProxy: boolean,
+    token: string,
+    body: string,
+    signal: AbortSignal,
+    fallbackReason?: 'network' | 'timeout'
+): Promise<SearchAttempt> {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    let mode: RequestMode | undefined;
+    let credentials: RequestCredentials = 'omit';
+    if (useProxy) {
+        mode = 'same-origin';
+        credentials = 'same-origin';
+        headers['x-gitbook-search-pass'] = token;
+        if (fallbackReason) {
+            headers[SEARCH_FALLBACK_HEADER] = fallbackReason;
+        }
+    } else {
+        headers.Authorization = `Bearer ${token}`;
+    }
+
+    const request = new AbortController();
+    const abort = () => request.abort();
+    if (signal.aborted) {
+        abort();
+    }
+    signal.addEventListener('abort', abort, { once: true });
+    const timeout = setTimeout(abort, DIRECT_SEARCH_TIMEOUT_MS);
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers,
+            body,
+            credentials,
+            mode,
+            signal: request.signal,
+        });
+        if (!response.ok) {
+            return { type: 'http', response };
+        }
+        return { type: 'success', body: await response.text() };
+    } catch (error) {
+        if (signal.aborted) {
+            throw error;
+        }
+        if (request.signal.aborted) {
+            return { type: 'failure', reason: 'timeout' };
+        }
+        return { type: 'failure', reason: 'network' };
+    } finally {
+        clearTimeout(timeout);
+        signal.removeEventListener('abort', abort);
+    }
 }
 
 /**
