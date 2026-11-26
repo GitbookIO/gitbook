@@ -1,12 +1,17 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
+import type React from 'react';
 
 import { Icon } from '@gitbook/icons';
 
 import { CONTENT_STYLE_REDUCED } from '../layout';
 import { Button } from '../primitives';
-import { HIDE_PENDING_UPDATES, usePaginatedUpdates } from './PaginatedUpdates';
+import {
+    HIDE_PENDING_UPDATES,
+    markUpdatesPaginationScroll,
+    usePaginatedUpdates,
+} from './PaginatedUpdates';
 import { tString } from '@/intl/translate';
 import type { TranslationLanguage } from '@/intl/translations';
 import { tcls } from '@/lib/tailwind';
@@ -42,7 +47,22 @@ export function UpdatesPagination(props: { language: TranslationLanguage; baseHr
         if (query) {
             href += `?${query}`;
         }
-        return { href, rel };
+        return {
+            href,
+            rel,
+            onClick: (event: React.MouseEvent) => {
+                if (
+                    event.metaKey ||
+                    event.ctrlKey ||
+                    event.shiftKey ||
+                    event.altKey ||
+                    event.button !== 0
+                ) {
+                    return;
+                }
+                markUpdatesPaginationScroll(targetPage);
+            },
+        };
     }
 
     return (

@@ -136,13 +136,12 @@ export function SkeletonUpdate(props: { id?: string; className?: ClassValue }) {
             id={id}
             role="status"
             aria-busy
-            className={tcls(
-                'flex flex-col gap-2 md:flex-row md:gap-4 lg:gap-12 xl:gap-20',
-                className
-            )}
+            className={tcls('flex flex-col gap-2 md:flex-row md:gap-4 lg:gap-8', className)}
         >
-            <SkeletonSmall id={id} className={tcls('w-48', className)} />
-            <LoadingPane tile={96} delay={0} style={['rounded-md', 'w-full']} />
+            <div className="w-40 shrink-0">
+                <LoadingItem className="h-4 w-28" />
+            </div>
+            <SkeletonParagraph lines={6} className="min-w-0 flex-1" />
         </div>
     );
 }
