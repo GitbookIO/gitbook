@@ -1,5 +1,17 @@
 # gitbook
 
+## 0.30.0
+
+### Minor Changes
+
+- 0f7ca03: Let visitors choose their country in a country picker, overriding the detected one, on sites that enable it and declare regions. Countries are grouped by the site's regions, then under "Other".
+
+### Patch Changes
+
+- 1c8da29: Strip the trailing slash from the API URL used by browser site search.
+- d51605f: Advertise the public URL in the MCP OAuth metadata of sites served from a custom subdirectory, so MCP clients accept the connection.
+- c2daee4: Fix MCP sign-in showing "This authorization link has expired" after login on sites served from a custom subdirectory.
+
 ## 0.29.0
 
 ### Minor Changes
