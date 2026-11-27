@@ -113,7 +113,7 @@
         "tailwindcss": "^4.1.11",
         "ts-essentials": "^10.0.1",
         "typescript": "catalog:",
-        "vercel": "50.37.3",
+        "vercel": "52.2.0",
         "wrangler": "^4.79.0",
         "rss-parser": "^3.13.0"
     },
