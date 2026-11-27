@@ -1,5 +1,12 @@
 # @gitbook/react-openapi
 
+## 2.0.2
+
+### Patch Changes
+
+- 262749a: Copy the current spec's server in OpenAPI endpoint URLs instead of a server kept from a previously visited page.
+- b1cfef2: Keep the selected server separate for each OpenAPI spec, so a server from a previously visited API page no longer shows or gets copied on another spec's endpoints.
+
 ## 2.0.1
 
 ### Patch Changes
