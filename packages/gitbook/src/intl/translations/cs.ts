@@ -212,4 +212,11 @@ export const cs: TranslationLanguage = {
     auth_error_invalid_request: 'Neplatný požadavek. Začněte prosím znovu z aplikace.',
     auth_error_failed:
         'Autorizaci se nepodařilo dokončit. Požadavek mohl vypršet — začněte prosím znovu z aplikace.',
+    country_picker_label: 'Země: ${1}',
+    country_picker_automatic: 'Automaticky',
+    country_picker_automatic_detected: 'Automaticky (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Hledat zemi',
+    country_picker_no_results: 'Žádná země nenalezena',
+    country_picker_other: 'Ostatní',
 };

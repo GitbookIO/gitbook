@@ -211,4 +211,11 @@ export const id: TranslationLanguage = {
     auth_error_invalid_request: 'Permintaan tidak valid. Silakan mulai lagi dari aplikasi.',
     auth_error_failed:
         'Kami tidak dapat menyelesaikan otorisasi. Permintaan mungkin telah kedaluwarsa — silakan mulai lagi dari aplikasi.',
+    country_picker_label: 'Negara: ${1}',
+    country_picker_automatic: 'Otomatis',
+    country_picker_automatic_detected: 'Otomatis (${1})',
+    country_picker_auto_hint: 'otomatis',
+    country_picker_search: 'Cari negara',
+    country_picker_no_results: 'Negara tidak ditemukan',
+    country_picker_other: 'Lainnya',
 };

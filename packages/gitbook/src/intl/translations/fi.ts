@@ -212,4 +212,11 @@ export const fi: TranslationLanguage = {
     auth_error_invalid_request: 'Virheellinen pyyntö. Aloita uudelleen sovelluksesta.',
     auth_error_failed:
         'Valtuutusta ei voitu viimeistellä. Pyyntö on saattanut vanhentua — aloita uudelleen sovelluksesta.',
+    country_picker_label: 'Maa: ${1}',
+    country_picker_automatic: 'Automaattinen',
+    country_picker_automatic_detected: 'Automaattinen (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Hae maata',
+    country_picker_no_results: 'Maita ei löytynyt',
+    country_picker_other: 'Muut',
 };

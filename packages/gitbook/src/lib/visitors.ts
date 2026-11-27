@@ -10,6 +10,13 @@ import {
     getChunkedCookieValue,
     getChunkedResponseCookies,
 } from './chunked-cookies';
+import { normalizeCountryCode, parseCountryChoice } from './countries';
+import { withLeadingSlash, withTrailingSlash } from './paths';
+import {
+    VISITOR_COUNTRY_COOKIE,
+    VISITOR_COUNTRY_COOKIE_MAX_AGE,
+    VISITOR_COUNTRY_PARAM,
+} from './visitor-country';
 
 const VISITOR_AUTH_PARAM = 'jwt_token';
 const VISITOR_PARAM_PREFIX = 'visitor.';
@@ -114,21 +121,11 @@ export function getVisitorType(request: {
  */
 export function getVisitorCountry(request: { headers: Headers }): string | undefined {
     // The revalidation worker forwards the original visitor country; only trust it from there.
-    const country = (
+    return normalizeCountryCode(
         (isRevalidationRequest(request.headers) && request.headers.get('x-gitbook-country')) ||
-        request.headers.get('x-open-next-country') ||
-        request.headers.get('x-vercel-ip-country') ||
-        ''
-    )
-        .trim()
-        .toUpperCase();
-
-    // Cloudflare uses XX for unknown and T1 for Tor, which are not ISO codes.
-    if (!/^[A-Z]{2}$/.test(country) || country === 'XX' || country === 'T1') {
-        return undefined;
-    }
-
-    return country;
+            request.headers.get('x-open-next-country') ||
+            request.headers.get('x-vercel-ip-country')
+    );
 }
 
 /**
@@ -166,6 +163,117 @@ export function getVisitorData({
  */
 export function isRevalidationRequest(headers: Headers): boolean {
     return headers.get('user-agent')?.toLowerCase() === 'gitbook-open-revalidation-worker';
+}
+
+/**
+ * The visitor's country, as sent to the API.
+ */
+export type VisitorCountryData = {
+    /** Country sent to the API: the chosen one, otherwise the detected one. */
+    country: string | undefined;
+    /** Country the visitor chose in the country picker. */
+    chosen: string | undefined;
+    /** Choice passed in the URL, to persist once the site's base path is known. */
+    choiceFromParam: { country: string | undefined } | undefined;
+};
+
+/**
+ * Get the name of the country cookie for a site. Scoped to the site so that sites sharing a host
+ * keep their own choice.
+ */
+export function getVisitorCountryCookieName(siteBasePath: string): string {
+    return getPathScopedCookieName(
+        VISITOR_COUNTRY_COOKIE,
+        withTrailingSlash(withLeadingSlash(siteBasePath))
+    );
+}
+
+/**
+ * Get the visitor's country: the one chosen through the `gitbook.country` param or else the
+ * country cookie, otherwise the detected one. An empty param clears the choice.
+ */
+export function getVisitorCountryData({
+    cookies,
+    headers,
+    url,
+}: {
+    cookies: RequestCookies;
+    headers: Headers;
+    url: URL | NextRequest['nextUrl'];
+}): VisitorCountryData {
+    const detected = getVisitorCountry({ headers });
+
+    // The revalidation worker pins the country it forwards.
+    if (isRevalidationRequest(headers)) {
+        return { country: detected, chosen: undefined, choiceFromParam: undefined };
+    }
+
+    const fromParam = url.searchParams.get(VISITOR_COUNTRY_PARAM);
+    const chosenFromParam = parseCountryChoice(fromParam);
+    // An invalid value is ignored rather than clearing a saved choice.
+    if (fromParam !== null && (chosenFromParam || fromParam.trim() === '')) {
+        return {
+            country: chosenFromParam ?? detected,
+            chosen: chosenFromParam,
+            choiceFromParam: { country: chosenFromParam },
+        };
+    }
+
+    // The site isn't resolved yet, so the most specific base path with a choice wins.
+    let chosen: string | undefined;
+    for (const basePath of getUrlBasePathCombinations(url)) {
+        const name = getVisitorCountryCookieName(basePath);
+        chosen = parseCountryChoice(cookies.find((cookie) => cookie.name === name)?.value);
+        if (chosen) {
+            break;
+        }
+    }
+    return { country: chosen ?? detected, chosen, choiceFromParam: undefined };
+}
+
+/**
+ * Cookie persisting, or clearing, the country chosen through the URL for a site.
+ */
+export function getVisitorCountryResponseCookie({
+    siteBasePath,
+    country,
+    headers,
+}: {
+    siteBasePath: string;
+    country: string | undefined;
+    headers: Headers;
+}): ResponseCookie {
+    return {
+        name: getVisitorCountryCookieName(siteBasePath),
+        value: country ?? '',
+        options: {
+            path: '/',
+            // Inside an embed, a Lax cookie would be dropped as third-party.
+            ...(headers.get('sec-fetch-dest') === 'iframe'
+                ? getVisitorCookieCrossSiteOptions(headers)
+                : { sameSite: 'lax' as const, secure: IS_SECURE }),
+            maxAge: country ? VISITOR_COUNTRY_COOKIE_MAX_AGE : 0,
+        },
+    };
+}
+
+/**
+ * Handler for the visitor country middleware route, read by the country picker. Static routes are
+ * shared across countries, so they can't render the visitor's countries themselves.
+ */
+export function serveVisitorCountryRequest(
+    request: NextRequest,
+    siteRequestURL: URL | NextRequest['nextUrl']
+) {
+    const { chosen } = getVisitorCountryData({
+        cookies: request.cookies.getAll(),
+        headers: request.headers,
+        url: siteRequestURL,
+    });
+    return NextResponse.json(
+        { detected: getVisitorCountry(request) ?? null, chosen: chosen ?? null },
+        { headers: { 'cache-control': 'private, no-store' } }
+    );
 }
 
 /**
@@ -440,6 +548,9 @@ export function normalizeVisitorURL(url: URL): URL {
     const withoutVisitorParamsURL = new URL(url);
     if (url.searchParams.has(VISITOR_AUTH_PARAM)) {
         withoutVisitorParamsURL.searchParams.delete(VISITOR_AUTH_PARAM);
+    }
+    if (url.searchParams.has(VISITOR_COUNTRY_PARAM)) {
+        withoutVisitorParamsURL.searchParams.delete(VISITOR_COUNTRY_PARAM);
     }
 
     for (const [urlParam] of url.searchParams.entries()) {

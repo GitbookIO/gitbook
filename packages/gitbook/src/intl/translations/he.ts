@@ -207,4 +207,11 @@ export const he: TranslationLanguage = {
     auth_expired_description: 'התחילו את ההתחברות מחדש מהיישום.',
     auth_error_invalid_request: 'בקשה לא חוקית. התחילו מחדש מהיישום.',
     auth_error_failed: 'לא הצלחנו להשלים את ההרשאה. ייתכן שתוקף הבקשה פג — התחילו מחדש מהיישום.',
+    country_picker_label: 'מדינה: ${1}',
+    country_picker_automatic: 'אוטומטי',
+    country_picker_automatic_detected: 'אוטומטי (${1})',
+    country_picker_auto_hint: 'אוטומטי',
+    country_picker_search: 'חיפוש מדינה',
+    country_picker_no_results: 'לא נמצאו מדינות',
+    country_picker_other: 'אחרות',
 };

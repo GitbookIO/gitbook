@@ -212,4 +212,11 @@ export const et: TranslationLanguage = {
     auth_error_invalid_request: 'Vigane päring. Palun alustage rakendusest uuesti.',
     auth_error_failed:
         'Autoriseerimist ei saanud lõpule viia. Päring võis aeguda — palun alustage rakendusest uuesti.',
+    country_picker_label: 'Riik: ${1}',
+    country_picker_automatic: 'Automaatne',
+    country_picker_automatic_detected: 'Automaatne (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Otsi riiki',
+    country_picker_no_results: 'Riike ei leitud',
+    country_picker_other: 'Muud',
 };

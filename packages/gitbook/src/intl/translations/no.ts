@@ -213,4 +213,11 @@ export const no: TranslationLanguage = {
     auth_error_invalid_request: 'Ugyldig forespørsel. Start på nytt fra programmet.',
     auth_error_failed:
         'Vi kunne ikke fullføre autorisasjonen. Forespørselen kan ha utløpt — start på nytt fra programmet.',
+    country_picker_label: 'Land: ${1}',
+    country_picker_automatic: 'Automatisk',
+    country_picker_automatic_detected: 'Automatisk (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Søk etter land',
+    country_picker_no_results: 'Fant ingen land',
+    country_picker_other: 'Andre',
 };

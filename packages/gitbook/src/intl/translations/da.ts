@@ -211,4 +211,11 @@ export const da: TranslationLanguage = {
     auth_error_invalid_request: 'Ugyldig anmodning. Start venligst forfra fra programmet.',
     auth_error_failed:
         'Vi kunne ikke fuldføre autorisationen. Anmodningen kan være udløbet — start venligst forfra fra programmet.',
+    country_picker_label: 'Land: ${1}',
+    country_picker_automatic: 'Automatisk',
+    country_picker_automatic_detected: 'Automatisk (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Søg efter land',
+    country_picker_no_results: 'Ingen lande fundet',
+    country_picker_other: 'Andre',
 };

@@ -212,4 +212,11 @@ export const pt: TranslationLanguage = {
     auth_error_invalid_request: 'Pedido inválido. Comece novamente a partir da aplicação.',
     auth_error_failed:
         'Não foi possível concluir a autorização. O pedido pode ter expirado — comece novamente a partir da aplicação.',
+    country_picker_label: 'País: ${1}',
+    country_picker_automatic: 'Automático',
+    country_picker_automatic_detected: 'Automático (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Pesquisar país',
+    country_picker_no_results: 'Nenhum país encontrado',
+    country_picker_other: 'Outros',
 };

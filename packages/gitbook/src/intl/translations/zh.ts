@@ -205,4 +205,11 @@ export const zh: TranslationLanguage = {
     auth_expired_description: '请从应用重新开始登录。',
     auth_error_invalid_request: '请求无效。请从应用重新开始。',
     auth_error_failed: '我们无法完成授权。请求可能已过期 — 请从应用重新开始。',
+    country_picker_label: '国家/地区：${1}',
+    country_picker_automatic: '自动',
+    country_picker_automatic_detected: '自动（${1}）',
+    country_picker_auto_hint: '自动',
+    country_picker_search: '搜索国家/地区',
+    country_picker_no_results: '未找到国家/地区',
+    country_picker_other: '其他',
 };

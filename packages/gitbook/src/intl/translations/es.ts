@@ -214,4 +214,11 @@ export const es: TranslationLanguage = {
     auth_error_invalid_request: 'Solicitud no válida. Vuelve a empezar desde la aplicación.',
     auth_error_failed:
         'No hemos podido completar la autorización. La solicitud puede haber caducado: vuelve a empezar desde la aplicación.',
+    country_picker_label: 'País: ${1}',
+    country_picker_automatic: 'Automático',
+    country_picker_automatic_detected: 'Automático (${1})',
+    country_picker_auto_hint: 'auto',
+    country_picker_search: 'Buscar país',
+    country_picker_no_results: 'No se encontraron países',
+    country_picker_other: 'Otros',
 };

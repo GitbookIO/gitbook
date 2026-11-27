@@ -211,4 +211,11 @@ export const hi: TranslationLanguage = {
     auth_error_invalid_request: 'अमान्य अनुरोध। कृपया ऐप्लिकेशन से फिर से शुरू करें।',
     auth_error_failed:
         'हम प्राधिकरण पूरा नहीं कर सके। अनुरोध की अवधि समाप्त हो सकती है — कृपया ऐप्लिकेशन से फिर से शुरू करें।',
+    country_picker_label: 'देश: ${1}',
+    country_picker_automatic: 'स्वचालित',
+    country_picker_automatic_detected: 'स्वचालित (${1})',
+    country_picker_auto_hint: 'स्वतः',
+    country_picker_search: 'देश खोजें',
+    country_picker_no_results: 'कोई देश नहीं मिला',
+    country_picker_other: 'अन्य',
 };

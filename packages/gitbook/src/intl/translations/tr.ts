@@ -211,4 +211,11 @@ export const tr: TranslationLanguage = {
     auth_error_invalid_request: 'Geçersiz istek. Lütfen uygulamadan yeniden başlayın.',
     auth_error_failed:
         'Yetkilendirmeyi tamamlayamadık. İsteğin süresi dolmuş olabilir — lütfen uygulamadan yeniden başlayın.',
+    country_picker_label: 'Ülke: ${1}',
+    country_picker_automatic: 'Otomatik',
+    country_picker_automatic_detected: 'Otomatik (${1})',
+    country_picker_auto_hint: 'otomatik',
+    country_picker_search: 'Ülke ara',
+    country_picker_no_results: 'Ülke bulunamadı',
+    country_picker_other: 'Diğer',
 };

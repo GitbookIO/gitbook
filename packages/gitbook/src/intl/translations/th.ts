@@ -207,4 +207,11 @@ export const th: TranslationLanguage = {
     auth_error_invalid_request: 'คำขอไม่ถูกต้อง โปรดเริ่มอีกครั้งจากแอปพลิเคชัน',
     auth_error_failed:
         'เราไม่สามารถดำเนินการอนุญาตให้เสร็จสิ้นได้ คำขออาจหมดอายุแล้ว — โปรดเริ่มอีกครั้งจากแอปพลิเคชัน',
+    country_picker_label: 'ประเทศ: ${1}',
+    country_picker_automatic: 'อัตโนมัติ',
+    country_picker_automatic_detected: 'อัตโนมัติ (${1})',
+    country_picker_auto_hint: 'อัตโนมัติ',
+    country_picker_search: 'ค้นหาประเทศ',
+    country_picker_no_results: 'ไม่พบประเทศ',
+    country_picker_other: 'อื่นๆ',
 };

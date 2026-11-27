@@ -209,4 +209,11 @@ export const ar: TranslationLanguage = {
     auth_error_invalid_request: 'طلب غير صالح. يرجى البدء من جديد من التطبيق.',
     auth_error_failed:
         'لم نتمكن من إكمال التفويض. قد تكون صلاحية الطلب قد انتهت — يرجى البدء من جديد من التطبيق.',
+    country_picker_label: 'البلد: ${1}',
+    country_picker_automatic: 'تلقائي',
+    country_picker_automatic_detected: 'تلقائي (${1})',
+    country_picker_auto_hint: 'تلقائي',
+    country_picker_search: 'ابحث عن بلد',
+    country_picker_no_results: 'لم يتم العثور على أي بلد',
+    country_picker_other: 'أخرى',
 };
