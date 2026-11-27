@@ -109,7 +109,7 @@
     },
     "packages/gitbook": {
       "name": "gitbook",
-      "version": "0.29.0",
+      "version": "0.30.0",
       "dependencies": {
         "@base-ui/react": "catalog:",
         "@cloudflare/workers-types": "^4.20251011.0",
