@@ -503,6 +503,7 @@ async function serveSiteRequest(requestURL: URL, request: NextRequest, match: UR
                 siteRequestURL,
                 siteId: siteURLData.site,
                 urlMode: mode,
+                canonicalURL: siteURLData.canonicalUrl,
             });
         }
 

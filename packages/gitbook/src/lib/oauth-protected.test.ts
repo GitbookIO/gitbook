@@ -80,6 +80,66 @@ describe('OAuth protected resources flow', () => {
             expect(res.headers.get('Content-Type')).toBe('text/plain; charset=utf-8');
             expect(res.headers.get('Cache-Control')).toBe('no-store');
         });
+
+        describe('on a site served through the proxy', () => {
+            const proxyURL = 'https://proxy.gitbook.site/sites/site_123';
+            const publicURL = 'https://www.acme.org/docs';
+
+            it('should advertise the public URL as the resource', async () => {
+                const metadataPath = '/.well-known/oauth-protected-resource/~gitbook/mcp/auth';
+                const res = handleUnauthedOAuthProtectedResourceRequest({
+                    siteRequestURL: new URL(`${proxyURL}${metadataPath}`),
+                    siteURLData: {
+                        target: 'external',
+                        redirect: 'https://login.acme.org/oauth2',
+                        site: 'site_123',
+                        canonicalUrl: `${publicURL}${metadataPath}`,
+                    },
+                    urlMode: 'url-host',
+                });
+
+                const json = await res.json();
+                expect(json).toEqual({
+                    resource: `${publicURL}/~gitbook/mcp/auth`,
+                    authorization_servers: ['https://sites.gitbook.com/oauth2/v1/site_123'],
+                });
+            });
+
+            it('should point the challenge at the metadata on the public URL', () => {
+                const res = handleUnauthedOAuthProtectedResourceRequest({
+                    siteRequestURL: new URL(`${proxyURL}/~gitbook/mcp`),
+                    siteURLData: {
+                        target: 'external',
+                        redirect: 'https://login.acme.org/oauth2',
+                        site: 'site_123',
+                        canonicalUrl: `${publicURL}/~gitbook/mcp`,
+                    },
+                    urlMode: 'url-host',
+                });
+
+                expect(res.status).toBe(401);
+                expect(res.headers.get('WWW-Authenticate')).toBe(
+                    `Bearer realm="mcp", resource_metadata="${publicURL}/.well-known/oauth-protected-resource/~gitbook/mcp"`
+                );
+            });
+
+            it('should advertise the proxy URL when the public URL is missing', async () => {
+                const res = handleUnauthedOAuthProtectedResourceRequest({
+                    siteRequestURL: new URL(
+                        `${proxyURL}/.well-known/oauth-protected-resource/~gitbook/mcp`
+                    ),
+                    siteURLData: {
+                        target: 'external',
+                        redirect: 'https://login.acme.org/oauth2',
+                        site: 'site_123',
+                    },
+                    urlMode: 'url-host',
+                });
+
+                const json = await res.json();
+                expect(json).toMatchObject({ resource: `${proxyURL}/~gitbook/mcp` });
+            });
+        });
     });
 
     describe('createOAuthProtectedResourceMetadataResponse', () => {
