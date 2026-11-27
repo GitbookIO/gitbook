@@ -5,6 +5,7 @@ import type { SearchRecordResult, SearchSpaceResult } from '@gitbook/api';
 import type { OrderedComputedResult, SearchSiteContentScope } from './search-types';
 import { getEmbeddableLinker } from '@/lib/embeddable-linker';
 import { createSiteLinker } from '@/lib/links';
+import { removeTrailingSlash } from '@/lib/paths';
 import {
     type DirectSearchProps,
     computePublishedSearchResults,
@@ -157,7 +158,7 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
         let pass = state;
         const { apiURL, organizationId, siteId, proxyURL } = directSearch;
         const usingProxy = useProxy;
-        let url = `${apiURL}/v1/orgs/${organizationId}/sites/${siteId}/search`;
+        let url = `${removeTrailingSlash(apiURL)}/v1/orgs/${organizationId}/sites/${siteId}/search`;
         if (usingProxy) {
             url = proxyURL;
         }

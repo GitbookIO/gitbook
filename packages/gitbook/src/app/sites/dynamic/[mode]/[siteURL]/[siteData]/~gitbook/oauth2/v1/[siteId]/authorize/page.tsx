@@ -1,13 +1,9 @@
 import { cookies, headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
-import {
-    type RouteLayoutParams,
-    getDynamicSiteContext,
-    getSiteURLDataFromParams,
-} from '@/app/utils';
+import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
 import { ConsentError, ConsentScreen } from '@/components/SiteOAuthConsent';
-import { withLeadingSlash, withTrailingSlash } from '@/lib/paths';
+import { getSiteRequestURLFromMiddleware } from '@/lib/middleware';
 import { SiteOAuthConsentError, startSiteOAuthConsent } from '@/lib/site-oauth';
 import { getVisitorToken } from '@/lib/visitors';
 
@@ -33,17 +29,11 @@ export default async function Page(props: {
     }
 
     const { context } = await getDynamicSiteContext(params);
-    const siteBasePath = withTrailingSlash(
-        withLeadingSlash(getSiteURLDataFromParams(params).siteBasePath)
-    );
-    const authorizeURL = new URL(
-        `${siteBasePath}~gitbook/oauth2/v1/${siteId}/authorize`,
-        context.linker.toAbsoluteURL('/')
-    );
+    // Proxied sites scope the visitor cookie to the proxy's URL, not the site's public one.
     const visitorToken = getVisitorToken({
         cookies: (await cookies()).getAll(),
         headers: await headers(),
-        url: authorizeURL,
+        url: await getSiteRequestURLFromMiddleware(),
     });
     const jwtToken = visitorToken?.token;
     const interactionId = searchParams.gb_oauth_state;
