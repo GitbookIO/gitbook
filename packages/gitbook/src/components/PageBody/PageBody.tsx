@@ -4,6 +4,7 @@ import {
     SiteInsightsDisplayContext,
 } from '@gitbook/api';
 
+import { AIChatPageBar } from '../AIChat';
 import { DocumentViewSkeleton } from '../DocumentView';
 import { PaginatedUpdatesBody } from '../DocumentView/PaginatedUpdates';
 import { UpdatesPagination } from '../DocumentView/UpdatesPagination';
@@ -20,6 +21,7 @@ import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
 import { PreservePageLayout } from './PreservePageLayout';
 import { MAIN_CONTENT_ID } from '@/components/layout';
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import type { GitBookSiteContext } from '@/lib/context';
@@ -80,6 +82,12 @@ export async function PageBody(props: {
         ).length > 0;
 
     const pageHasToc = page.layout.tableOfContents && hasVisibleTOCItems;
+
+    // Landing pages hide the table of contents, so it doubles as the "content page" signal.
+    const withAIPageBar =
+        pageHasToc &&
+        insightsDisplayContext === SiteInsightsDisplayContext.Site &&
+        isAIChatEnabled(customization.ai?.mode);
 
     let content = <PageBodyBlankslate page={page} context={context} />;
     if (document && !isNodeEmpty(document)) {
@@ -190,6 +198,8 @@ export async function PageBody(props: {
                         ) : null}
                     </div>
                 ) : null}
+
+                {withAIPageBar ? <AIChatPageBar /> : null}
             </main>
 
             <TrackPageViewEvent displayContext={insightsDisplayContext} />
