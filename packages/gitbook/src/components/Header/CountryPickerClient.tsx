@@ -18,11 +18,7 @@ import {
     parseCountryChoice,
 } from '@/lib/countries';
 import { type ClassValue, tcls } from '@/lib/tailwind';
-import {
-    type SiteRegions,
-    VISITOR_COUNTRY_COOKIE,
-    VISITOR_COUNTRY_COOKIE_MAX_AGE,
-} from '@/lib/visitor-country';
+import { type SiteRegions, VISITOR_COUNTRY_PARAM } from '@/lib/visitor-country';
 
 /** An entry of the picker. An empty value is the automatic choice. */
 type CountryOption = { value: string; label: string; flag?: string };
@@ -68,10 +64,12 @@ function fetchVisitorCountries(url: string): Promise<VisitorCountries | null> {
 }
 
 /**
- * The visitor's detected and chosen countries, or null until they are known.
+ * The visitor's detected and chosen countries: undefined while loading, null if they couldn't be fetched.
  */
-function useVisitorCountries(url: string): VisitorCountries | null {
-    const [countries, setCountries] = React.useState<VisitorCountries | null>(null);
+function useVisitorCountries(url: string): VisitorCountries | null | undefined {
+    const [countries, setCountries] = React.useState<VisitorCountries | null | undefined>(
+        undefined
+    );
     React.useEffect(() => {
         let cancelled = false;
         fetchVisitorCountries(url).then((result) => {
@@ -86,22 +84,6 @@ function useVisitorCountries(url: string): VisitorCountries | null {
     return countries;
 }
 
-/**
- * Store the country the visitor chose, or clear it to go back to the detected one.
- */
-function setVisitorCountryCookie(country: string | undefined) {
-    const isSecure = window.location.protocol === 'https:';
-    // Inside a cross-site embed, a Lax cookie would be dropped as third-party.
-    const isCrossSiteFrame = isSecure && window.self !== window.top;
-    const attributes = [
-        'Path=/',
-        `Max-Age=${country ? VISITOR_COUNTRY_COOKIE_MAX_AGE : 0}`,
-        ...(isCrossSiteFrame ? ['SameSite=None', 'Partitioned'] : ['SameSite=Lax']),
-        ...(isSecure ? ['Secure'] : []),
-    ];
-    document.cookie = `${VISITOR_COUNTRY_COOKIE}=${encodeURIComponent(country ?? '')}; ${attributes.join('; ')}`;
-}
-
 export function CountryPickerClient(props: {
     locale: string;
     regions: SiteRegions;
@@ -113,6 +95,7 @@ export function CountryPickerClient(props: {
     const language = useLanguage();
     // Fetched rather than rendered, so static routes stay shared across countries.
     const visitorCountries = useVisitorCountries(visitorCountryURL);
+    const isLoading = visitorCountries === undefined;
     const chosen = visitorCountries?.chosen;
     const detected = visitorCountries?.detected;
     const detectedName = detected ? getCountryName(detected, locale) : undefined;
@@ -173,9 +156,10 @@ export function CountryPickerClient(props: {
         if (!option || country === chosen) {
             return;
         }
-        setVisitorCountryCookie(country);
-        // A full navigation runs the middleware again, so the content follows the new country.
-        window.location.reload();
+        // The middleware stores the choice in the site's cookie, then redirects to the URL without the param.
+        const url = new URL(window.location.href);
+        url.searchParams.set(VISITOR_COUNTRY_PARAM, country ?? '');
+        window.location.assign(url);
     };
 
     return (
@@ -202,19 +186,30 @@ export function CountryPickerClient(props: {
                         trailing={<ToggleChevron />}
                         className={tcls('group/dropdown bg-tint-base', className)}
                         aria-label={tString(language, 'country_picker_label', buttonLabel)}
+                        aria-busy={isLoading || undefined}
                     >
                         <span className="button-content">
-                            {currentCountry && currentName ? (
-                                <span aria-hidden className="me-1.5">
-                                    {getCountryFlag(currentCountry)}
-                                </span>
-                            ) : null}
-                            {buttonLabel}
-                            {!chosen && currentName ? (
-                                <span className="ms-1.5 text-xs text-tint-subtle">
-                                    {tString(language, 'country_picker_auto_hint')}
-                                </span>
-                            ) : null}
+                            {isLoading ? (
+                                // Until the countries are known, so the label doesn't flash "Automatic".
+                                <span
+                                    aria-hidden
+                                    className="inline-block h-3 w-24 animate-[pulse_2s_infinite] rounded-sm bg-tint-solid/2 align-middle circular-corners:rounded-2xl"
+                                />
+                            ) : (
+                                <>
+                                    {currentCountry && currentName ? (
+                                        <span aria-hidden className="me-1.5">
+                                            {getCountryFlag(currentCountry)}
+                                        </span>
+                                    ) : null}
+                                    {buttonLabel}
+                                    {!chosen && currentName ? (
+                                        <span className="ms-1.5 text-xs text-tint-subtle">
+                                            {tString(language, 'country_picker_auto_hint')}
+                                        </span>
+                                    ) : null}
+                                </>
+                            )}
                         </span>
                     </Button>
                 }

@@ -11,12 +11,15 @@ import {
     getChunkedResponseCookies,
 } from './chunked-cookies';
 import { normalizeCountryCode, parseCountryChoice } from './countries';
-import { VISITOR_COUNTRY_COOKIE, VISITOR_COUNTRY_COOKIE_MAX_AGE } from './visitor-country';
+import { withLeadingSlash, withTrailingSlash } from './paths';
+import {
+    VISITOR_COUNTRY_COOKIE,
+    VISITOR_COUNTRY_COOKIE_MAX_AGE,
+    VISITOR_COUNTRY_PARAM,
+} from './visitor-country';
 
 const VISITOR_AUTH_PARAM = 'jwt_token';
 const VISITOR_PARAM_PREFIX = 'visitor.';
-// Outside `visitor.*`, which carries the adaptive schema's unsigned claims.
-const VISITOR_COUNTRY_PARAM = 'gitbook.country';
 export const VISITOR_TOKEN_COOKIE = 'gitbook-visitor-token';
 const VISITOR_UNSIGNED_CLAIMS_PREFIX = 'gitbook-visitor-public';
 const IS_SECURE = process.env.NODE_ENV === 'production';
@@ -170,9 +173,20 @@ export type VisitorCountryData = {
     country: string | undefined;
     /** Country the visitor chose in the country picker. */
     chosen: string | undefined;
-    /** Cookie persisting a choice passed in the URL. */
-    responseCookie: ResponseCookie | undefined;
+    /** Choice passed in the URL, to persist once the site's base path is known. */
+    choiceFromParam: { country: string | undefined } | undefined;
 };
+
+/**
+ * Get the name of the country cookie for a site. Scoped to the site so that sites sharing a host
+ * keep their own choice.
+ */
+export function getVisitorCountryCookieName(siteBasePath: string): string {
+    return getPathScopedCookieName(
+        VISITOR_COUNTRY_COOKIE,
+        withTrailingSlash(withLeadingSlash(siteBasePath))
+    );
+}
 
 /**
  * Get the visitor's country: the one chosen through the `gitbook.country` param or else the
@@ -191,7 +205,7 @@ export function getVisitorCountryData({
 
     // The revalidation worker pins the country it forwards.
     if (isRevalidationRequest(headers)) {
-        return { country: detected, chosen: undefined, responseCookie: undefined };
+        return { country: detected, chosen: undefined, choiceFromParam: undefined };
     }
 
     const fromParam = url.searchParams.get(VISITOR_COUNTRY_PARAM);
@@ -201,36 +215,60 @@ export function getVisitorCountryData({
         return {
             country: chosenFromParam ?? detected,
             chosen: chosenFromParam,
-            responseCookie: {
-                name: VISITOR_COUNTRY_COOKIE,
-                value: chosenFromParam ?? '',
-                options: {
-                    path: '/',
-                    // Inside an embed, a Lax cookie would be dropped as third-party.
-                    ...(headers.get('sec-fetch-dest') === 'iframe'
-                        ? getVisitorCookieCrossSiteOptions(headers)
-                        : { sameSite: 'lax' as const, secure: IS_SECURE }),
-                    maxAge: chosenFromParam ? VISITOR_COUNTRY_COOKIE_MAX_AGE : 0,
-                },
-            },
+            choiceFromParam: { country: chosenFromParam },
         };
     }
 
-    const chosen = parseCountryChoice(
-        cookies.find((cookie) => cookie.name === VISITOR_COUNTRY_COOKIE)?.value
-    );
-    return { country: chosen ?? detected, chosen, responseCookie: undefined };
+    // The site isn't resolved yet, so the most specific base path with a choice wins.
+    let chosen: string | undefined;
+    for (const basePath of getUrlBasePathCombinations(url)) {
+        const name = getVisitorCountryCookieName(basePath);
+        chosen = parseCountryChoice(cookies.find((cookie) => cookie.name === name)?.value);
+        if (chosen) {
+            break;
+        }
+    }
+    return { country: chosen ?? detected, chosen, choiceFromParam: undefined };
+}
+
+/**
+ * Cookie persisting, or clearing, the country chosen through the URL for a site.
+ */
+export function getVisitorCountryResponseCookie({
+    siteBasePath,
+    country,
+    headers,
+}: {
+    siteBasePath: string;
+    country: string | undefined;
+    headers: Headers;
+}): ResponseCookie {
+    return {
+        name: getVisitorCountryCookieName(siteBasePath),
+        value: country ?? '',
+        options: {
+            path: '/',
+            // Inside an embed, a Lax cookie would be dropped as third-party.
+            ...(headers.get('sec-fetch-dest') === 'iframe'
+                ? getVisitorCookieCrossSiteOptions(headers)
+                : { sameSite: 'lax' as const, secure: IS_SECURE }),
+            maxAge: country ? VISITOR_COUNTRY_COOKIE_MAX_AGE : 0,
+        },
+    };
 }
 
 /**
  * Handler for the visitor country middleware route, read by the country picker. Static routes are
  * shared across countries, so they can't render the visitor's countries themselves.
  */
-export function serveVisitorCountryRequest(request: NextRequest) {
+export function serveVisitorCountryRequest(
+    request: NextRequest,
+    siteRequestURL: URL | NextRequest['nextUrl']
+) {
     const { chosen } = getVisitorCountryData({
         cookies: request.cookies.getAll(),
         headers: request.headers,
-        url: request.nextUrl,
+        url: siteRequestURL,
     });
     return NextResponse.json(
         { detected: getVisitorCountry(request) ?? null, chosen: chosen ?? null },

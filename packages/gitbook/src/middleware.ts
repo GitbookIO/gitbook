@@ -81,6 +81,7 @@ import {
     getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
     getVisitorCountryData,
+    getVisitorCountryResponseCookie,
     getVisitorData,
     getVisitorType,
     isRevalidationRequest,
@@ -350,7 +351,7 @@ async function serveSiteRequest(requestURL: URL, request: NextRequest, match: UR
         return serveVisitorClaimsDataRequest(request, siteRequestURL);
     }
     if (siteRequestURL.pathname.endsWith(`/${VISITOR_COUNTRY_PATH}`)) {
-        return serveVisitorCountryRequest(request);
+        return serveVisitorCountryRequest(request, siteRequestURL);
     }
 
     //
@@ -413,9 +414,6 @@ async function serveSiteRequest(requestURL: URL, request: NextRequest, match: UR
                   visitorParamsCookie,
               ]
             : [];
-        if (visitorCountry.responseCookie) {
-            cookies.push(visitorCountry.responseCookie);
-        }
 
         //
         // Handle redirects
@@ -483,6 +481,17 @@ async function serveSiteRequest(requestURL: URL, request: NextRequest, match: UR
             }
 
             return createRedirectResponse(siteURLData.redirect);
+        }
+
+        if (visitorCountry.choiceFromParam) {
+            cookies.push(
+                getVisitorCountryResponseCookie({
+                    // Proxied requests can't read back a cookie scoped to the resolved base path.
+                    siteBasePath: getVisitorAuthBasePath(siteRequestURL, siteURLData),
+                    country: visitorCountry.choiceFromParam.country,
+                    headers: request.headers,
+                })
+            );
         }
 
         // Handles OAuth protected resource metadata for non-VA adaptive content sites.

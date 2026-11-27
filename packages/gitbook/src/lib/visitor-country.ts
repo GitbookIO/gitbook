@@ -4,6 +4,9 @@ import type { PublishedContentSite, SiteCustomizationSettings } from '@gitbook/a
 export const VISITOR_COUNTRY_COOKIE = 'gitbook-visitor-country';
 export const VISITOR_COUNTRY_COOKIE_MAX_AGE = 365 * 24 * 60 * 60;
 
+/** URL param choosing the visitor's country, outside `visitor.*` which carries unsigned claims. */
+export const VISITOR_COUNTRY_PARAM = 'gitbook.country';
+
 /** Middleware route returning the visitor's detected and chosen countries. */
 export const VISITOR_COUNTRY_PATH = '~gitbook/visitor/country';
 

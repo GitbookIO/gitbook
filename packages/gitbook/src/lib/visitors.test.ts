@@ -2,6 +2,7 @@ import { describe, expect, it } from 'bun:test';
 import type { JwtPayload } from 'jwt-decode';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getVisitorAuthBasePath } from './data/visitor';
 import {
     type ResponseCookies,
     getResponseCookiesForVisitorAuth,
@@ -9,7 +10,9 @@ import {
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
     getVisitorCountry,
+    getVisitorCountryCookieName,
     getVisitorCountryData,
+    getVisitorCountryResponseCookie,
     getVisitorToken,
     getVisitorType,
     getVisitorUnsignedClaims,
@@ -720,7 +723,7 @@ describe('getVisitorCountryData', () => {
         'x-gitbook-country': 'DE',
     });
     const detectedHeaders = () => new Headers({ 'x-open-next-country': 'FR' });
-    const countryCookie = { name: 'gitbook-visitor-country', value: 'JP' };
+    const countryCookie = { name: getVisitorCountryCookieName('/docs/'), value: 'JP' };
 
     it('sends the detected country without a choice', () => {
         expect(
@@ -729,39 +732,73 @@ describe('getVisitorCountryData', () => {
                 headers: detectedHeaders(),
                 url: new URL('https://example.com/docs'),
             })
-        ).toEqual({ country: 'FR', chosen: undefined, responseCookie: undefined });
+        ).toEqual({ country: 'FR', chosen: undefined, choiceFromParam: undefined });
     });
 
-    it('reads the country from the gitbook.country param and persists it in a cookie', () => {
-        const data = getVisitorCountryData({
-            cookies: [countryCookie],
-            headers: detectedHeaders(),
-            url: new URL('https://example.com/docs?gitbook.country=us'),
-        });
-
-        expect(data.country).toBe('US');
-        expect(data.chosen).toBe('US');
-        expect(data.responseCookie).toMatchObject({
-            name: 'gitbook-visitor-country',
-            value: 'US',
-            options: { path: '/', sameSite: 'lax', maxAge: 365 * 24 * 60 * 60 },
-        });
+    it('reads the country from the gitbook.country param', () => {
+        expect(
+            getVisitorCountryData({
+                cookies: [countryCookie],
+                headers: detectedHeaders(),
+                url: new URL('https://example.com/docs?gitbook.country=us'),
+            })
+        ).toEqual({ country: 'US', chosen: 'US', choiceFromParam: { country: 'US' } });
     });
 
     it('clears the choice with an empty gitbook.country param', () => {
-        const data = getVisitorCountryData({
-            cookies: [countryCookie],
-            headers: detectedHeaders(),
-            url: new URL('https://example.com/docs?gitbook.country='),
-        });
+        expect(
+            getVisitorCountryData({
+                cookies: [countryCookie],
+                headers: detectedHeaders(),
+                url: new URL('https://example.com/docs?gitbook.country='),
+            })
+        ).toEqual({ country: 'FR', chosen: undefined, choiceFromParam: { country: undefined } });
+    });
 
-        expect(data.country).toBe('FR');
-        expect(data.chosen).toBeUndefined();
-        expect(data.responseCookie).toMatchObject({
-            name: 'gitbook-visitor-country',
-            value: '',
-            options: { maxAge: 0 },
-        });
+    it("ignores another site's choice on the same host", () => {
+        expect(
+            getVisitorCountryData({
+                cookies: [{ name: getVisitorCountryCookieName('/other/'), value: 'JP' }],
+                headers: detectedHeaders(),
+                url: new URL('https://example.com/docs/page'),
+            }).chosen
+        ).toBeUndefined();
+    });
+
+    it('skips an invalid choice for a more specific base path', () => {
+        expect(
+            getVisitorCountryData({
+                cookies: [
+                    { name: getVisitorCountryCookieName('/docs/'), value: 'XX' },
+                    { name: getVisitorCountryCookieName('/'), value: 'US' },
+                ],
+                headers: detectedHeaders(),
+                url: new URL('https://example.com/docs/page'),
+            }).chosen
+        ).toBe('US');
+    });
+
+    it('reads back the choice written for a proxied site', () => {
+        const url = new URL('https://proxy.gitbook.site/site/site_abc/docs/page');
+        const basePath = getVisitorAuthBasePath(url, { siteBasePath: '/docs/' });
+
+        expect(
+            getVisitorCountryData({
+                cookies: [{ name: getVisitorCountryCookieName(basePath), value: 'JP' }],
+                headers: detectedHeaders(),
+                url,
+            }).chosen
+        ).toBe('JP');
+    });
+
+    it('prefers the choice of the most specific base path', () => {
+        expect(
+            getVisitorCountryData({
+                cookies: [{ name: getVisitorCountryCookieName('/'), value: 'US' }, countryCookie],
+                headers: detectedHeaders(),
+                url: new URL('https://example.com/docs/page'),
+            }).chosen
+        ).toBe('JP');
     });
 
     it('replaces the detected country with the one from the cookie', () => {
@@ -771,7 +808,7 @@ describe('getVisitorCountryData', () => {
                 headers: detectedHeaders(),
                 url: new URL('https://example.com/docs'),
             })
-        ).toEqual({ country: 'JP', chosen: 'JP', responseCookie: undefined });
+        ).toEqual({ country: 'JP', chosen: 'JP', choiceFromParam: undefined });
     });
 
     it('uses the chosen country when none is detected', () => {
@@ -789,11 +826,11 @@ describe('getVisitorCountryData', () => {
         (value) => {
             expect(
                 getVisitorCountryData({
-                    cookies: [{ name: 'gitbook-visitor-country', value }],
+                    cookies: [{ name: getVisitorCountryCookieName('/docs/'), value }],
                     headers: detectedHeaders(),
                     url: new URL('https://example.com/docs'),
                 })
-            ).toEqual({ country: 'FR', chosen: undefined, responseCookie: undefined });
+            ).toEqual({ country: 'FR', chosen: undefined, choiceFromParam: undefined });
 
             const fromParam = getVisitorCountryData({
                 cookies: [],
@@ -814,7 +851,7 @@ describe('getVisitorCountryData', () => {
                 headers: detectedHeaders(),
                 url: new URL('https://example.com/docs?gitbook.country=Europe'),
             })
-        ).toEqual({ country: 'JP', chosen: 'JP', responseCookie: undefined });
+        ).toEqual({ country: 'JP', chosen: 'JP', choiceFromParam: undefined });
     });
 
     it('ignores the param and cookie on revalidation requests', () => {
@@ -824,7 +861,7 @@ describe('getVisitorCountryData', () => {
                 headers: revalidationHeaders,
                 url: new URL('https://example.com/docs?gitbook.country=US'),
             })
-        ).toEqual({ country: 'DE', chosen: undefined, responseCookie: undefined });
+        ).toEqual({ country: 'DE', chosen: undefined, choiceFromParam: undefined });
     });
 
     it('leaves visitor.country to the unsigned claims', () => {
@@ -847,16 +884,46 @@ describe('getVisitorCountryData', () => {
     });
 });
 
+describe('getVisitorCountryResponseCookie', () => {
+    it('persists the choice in a cookie scoped to the site', () => {
+        expect(
+            getVisitorCountryResponseCookie({
+                siteBasePath: '/docs/',
+                country: 'US',
+                headers: new Headers(),
+            })
+        ).toMatchObject({
+            name: getVisitorCountryCookieName('/docs/'),
+            value: 'US',
+            options: { path: '/', sameSite: 'lax', maxAge: 365 * 24 * 60 * 60 },
+        });
+    });
+
+    it('clears the choice', () => {
+        expect(
+            getVisitorCountryResponseCookie({
+                siteBasePath: '/docs/',
+                country: undefined,
+                headers: new Headers(),
+            })
+        ).toMatchObject({ value: '', options: { maxAge: 0 } });
+    });
+
+    it('names the cookie the same with or without slashes around the base path', () => {
+        expect(getVisitorCountryCookieName('docs')).toBe(getVisitorCountryCookieName('/docs/'));
+    });
+});
+
 describe('serveVisitorCountryRequest', () => {
     it('returns the detected and chosen countries without caching', async () => {
         const request = new NextRequest('https://example.com/docs/~gitbook/visitor/country', {
             headers: {
                 'x-open-next-country': 'fr',
-                cookie: 'gitbook-visitor-country=JP',
+                cookie: `${getVisitorCountryCookieName('/docs/')}=JP`,
             },
         });
 
-        const response = serveVisitorCountryRequest(request);
+        const response = serveVisitorCountryRequest(request, request.nextUrl);
 
         expect(response.headers.get('cache-control')).toBe('private, no-store');
         expect(JSON.parse(await response.text())).toEqual({ detected: 'FR', chosen: 'JP' });
