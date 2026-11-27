@@ -122,6 +122,7 @@ export async function CodeBlock(
         inlineExprVariables: variables,
         mode: context.mode,
         themes,
+        staticAssetsURL: getAssetURL(''),
         embedded,
         ...getCommentKeyProp(context, block.key),
     };

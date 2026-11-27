@@ -15,8 +15,9 @@ export function ClientPlainCodeBlock(props: {
     syntax: string;
     mode?: DocumentContext['mode'];
     themes?: CustomizationThemedCodeTheme;
+    staticAssetsURL: string;
 }) {
-    const { code, syntax, mode = 'default', themes } = props;
+    const { code, syntax, mode = 'default', themes, staticAssetsURL } = props;
     const id = useId();
 
     const block = convertCodeStringToBlock({ key: id, code, syntax });
@@ -28,6 +29,7 @@ export function ClientPlainCodeBlock(props: {
             inlineExprVariables={{}}
             mode={mode}
             themes={themes}
+            staticAssetsURL={staticAssetsURL}
         />
     );
 }

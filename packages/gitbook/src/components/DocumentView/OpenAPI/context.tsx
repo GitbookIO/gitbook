@@ -166,6 +166,7 @@ export function getOpenAPIBlockClientProps(args: {
     return {
         ...serializable,
         mode: props.context.mode,
+        staticAssetsURL: getAssetURL(''),
         codeTheme:
             context && 'customization' in context
                 ? context.customization.styling.codeTheme.openapi

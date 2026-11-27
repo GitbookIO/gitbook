@@ -12,6 +12,13 @@
     "observability": {
         "enabled": false,
     },
+    // Lets the server read Shiki grammars and themes without a network hop.
+    // run_worker_first keeps every request going to the worker, as before.
+    "assets": {
+        "directory": "../../.open-next/assets",
+        "binding": "ASSETS",
+        "run_worker_first": true,
+    },
     "vars": {
         "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
     },
