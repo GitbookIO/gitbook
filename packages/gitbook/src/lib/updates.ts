@@ -1,6 +1,7 @@
 import type {
     DocumentBlock,
     DocumentBlockUpdate,
+    DocumentBlockUpdates,
     DocumentInline,
     JSONDocument,
     Revision,
@@ -29,6 +30,21 @@ export type UpdatesPageRange = {
     end: number;
     isClamped: boolean;
 };
+
+export type UpdatesPaginationSkipReason =
+    | 'multiple-updates-blocks'
+    | 'nested-updates-block'
+    | 'non-update-entries';
+
+export type UpdatesPaginationEligibility =
+    | { status: 'eligible'; block: DocumentBlockUpdates; updates: DocumentBlockUpdate[] }
+    | { status: 'below-threshold' }
+    | {
+          status: 'skipped';
+          reason: UpdatesPaginationSkipReason;
+          totalUpdates: number;
+          updatesBlocks: number;
+      };
 
 /** Attribute on `<html>` with the active filter's tag slugs, space-separated (e.g. `"a b"`). */
 export const UPDATES_TAG_FILTER_ATTR = 'data-updates-tag-filter';
@@ -117,38 +133,100 @@ export function getDocumentFilterableTags(
     return tags;
 }
 
-export function countDocumentUpdates(document: JSONDocument): number {
-    return getDocumentUpdates(document).length;
+/**
+ * Pagination only slices a document with a single top-level `updates` block made of more than
+ * `UPDATES_PAGINATION_THRESHOLD` direct `update` entries.
+ */
+export function getUpdatesPaginationEligibility(
+    document: JSONDocument
+): UpdatesPaginationEligibility {
+    let topLevelBlock: DocumentBlockUpdates | undefined;
+    let topLevelBlockCount = 0;
+    let totalUpdates = 0;
+
+    for (const block of document.nodes) {
+        if (block.type !== 'updates') {
+            continue;
+        }
+        topLevelBlock ??= block;
+        topLevelBlockCount++;
+        totalUpdates += block.nodes.length;
+    }
+
+    if (!topLevelBlock || totalUpdates <= UPDATES_PAGINATION_THRESHOLD) {
+        return { status: 'below-threshold' };
+    }
+
+    if (topLevelBlockCount > 1) {
+        return {
+            status: 'skipped',
+            reason: 'multiple-updates-blocks',
+            totalUpdates,
+            updatesBlocks: topLevelBlockCount,
+        };
+    }
+
+    const updates: DocumentBlockUpdate[] = [];
+    for (const entry of topLevelBlock.nodes) {
+        if (entry.type !== 'update') {
+            return {
+                status: 'skipped',
+                reason: 'non-update-entries',
+                totalUpdates,
+                updatesBlocks: 1,
+            };
+        }
+        updates.push(entry);
+    }
+
+    const allUpdatesBlocks = getBlocksByType(document, 'updates');
+    if (allUpdatesBlocks.length > 1) {
+        let allUpdatesCount = 0;
+        for (const updatesBlock of allUpdatesBlocks) {
+            allUpdatesCount += updatesBlock.nodes.length;
+        }
+        return {
+            status: 'skipped',
+            reason: 'nested-updates-block',
+            totalUpdates: allUpdatesCount,
+            updatesBlocks: allUpdatesBlocks.length,
+        };
+    }
+
+    return { status: 'eligible', block: topLevelBlock, updates };
 }
 
 export function paginateUpdatesDocument(
     document: JSONDocument,
     revision: Revision | undefined,
     { page, tags }: { page: number; tags?: string[] }
-): { document: JSONDocument; pagination: UpdatesPageRange | null } {
-    const updates = getDocumentUpdates(document);
-    if (updates.length <= UPDATES_PAGINATION_THRESHOLD) {
-        return { document, pagination: null };
+): {
+    document: JSONDocument;
+    pagination: UpdatesPageRange | null;
+    eligibility: UpdatesPaginationEligibility;
+} {
+    const eligibility = getUpdatesPaginationEligibility(document);
+    if (eligibility.status !== 'eligible') {
+        return { document, pagination: null, eligibility };
     }
 
-    const matching = filterUpdates(updates, document, revision, tags);
+    const matching = filterUpdates(eligibility.updates, document, revision, tags);
     const pagination = getUpdatesPageRange(page, matching.length);
-    const slice = new Set(matching.slice(pagination.start - 1, pagination.end));
+    const entries = matching.slice(pagination.start - 1, pagination.end);
     const nodes: JSONDocument['nodes'] = [];
 
     for (const block of document.nodes) {
-        if (block.type !== 'updates') {
+        if (block !== eligibility.block) {
             nodes.push(block);
             continue;
         }
 
-        const entries = block.nodes.filter((entry) => entry.type === 'update' && slice.has(entry));
         if (entries.length > 0) {
             nodes.push({ ...block, nodes: entries });
         }
     }
 
-    return { document: { ...document, nodes }, pagination };
+    return { document: { ...document, nodes }, pagination, eligibility };
 }
 
 export function getUpdatesPageRange(requestedPage: number, totalItems: number): UpdatesPageRange {
@@ -175,7 +253,12 @@ export function findUpdateAnchorPage(
     revision: Revision | undefined,
     { anchor, tags }: { anchor: string; tags?: string[] }
 ): { found: true; page: number; clearTags: boolean } | { found: false } {
-    const updates = getDocumentUpdates(document);
+    const eligibility = getUpdatesPaginationEligibility(document);
+    if (eligibility.status !== 'eligible') {
+        return { found: false };
+    }
+
+    const { updates } = eligibility;
     const index = updates.findIndex((update) =>
         hasMoreThan(update, (node) => matchesUpdateAnchor(node, anchor), 0)
     );
@@ -207,22 +290,6 @@ function matchesUpdateAnchor(node: DocumentBlock | DocumentInline, anchor: strin
         return true;
     }
     return false;
-}
-
-function getDocumentUpdates(document: JSONDocument): DocumentBlockUpdate[] {
-    const updates: DocumentBlockUpdate[] = [];
-    for (const block of document.nodes) {
-        if (block.type !== 'updates') {
-            continue;
-        }
-
-        for (const entry of block.nodes) {
-            if (entry.type === 'update') {
-                updates.push(entry);
-            }
-        }
-    }
-    return updates;
 }
 
 function filterUpdates(

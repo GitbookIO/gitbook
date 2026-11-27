@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'bun:test';
 
 import {
+    type DocumentBlockHeading,
+    type DocumentBlockParagraph,
+    type DocumentBlockUpdate,
+    type DocumentBlockUpdates,
     DocumentTextColor,
     type JSONDocument,
     type Revision,
@@ -10,8 +14,9 @@ import {
 import { getRevisionTags, resolveBlockTags, resolveTag } from './tags';
 import {
     UPDATES_TAG_FILTER_CAP,
-    countDocumentUpdates,
+    type UpdatesPaginationEligibility,
     findUpdateAnchorPage,
+    getUpdatesPaginationEligibility,
     paginateUpdatesDocument,
     parseUpdatesPageParam,
     getDocumentFilterableTags,
@@ -97,61 +102,117 @@ describe('normalizeUpdatesFilterTags', () => {
 });
 
 describe('updates pagination', () => {
-    it('keeps a 50-entry document intact and paginates 51 entries across two blocks', () => {
-        const short = createUpdatesDocument(Array.from({ length: 50 }, () => []));
-        expect(paginateUpdatesDocument(short, undefined, { page: 2 })).toEqual({
-            document: short,
-            pagination: null,
-        });
-        expect(paginateUpdatesDocument(short, undefined, { page: 2 }).document).toBe(short);
-
-        const long = createUpdatesDocument(
-            Array.from({ length: 51 }, () => []),
-            25
-        );
-        expect(countDocumentUpdates(long)).toBe(51);
-        for (const [page, start, end, blockTypes] of [
-            [1, 1, 20, ['updates', 'paragraph']],
-            [2, 21, 40, ['updates', 'paragraph', 'updates']],
-            [3, 41, 51, ['paragraph', 'updates']],
-        ] as const) {
-            const result = paginateUpdatesDocument(long, undefined, { page });
-            expect(result.pagination).toEqual({
-                page,
-                totalPages: 3,
-                totalItems: 51,
-                pageSize: 20,
-                start,
-                end,
-                isClamped: false,
-            });
-            expect(getUpdateIds(result.document)).toEqual(
-                Array.from({ length: end - start + 1 }, (_, i) => `update-${start + i}`)
-            );
-            expect(result.document.nodes.map((block) => block.type)).toEqual([...blockTypes]);
-        }
-    });
-
-    it('keeps the first and seventh slices of a 260-entry changelog to 20 entries each', () => {
-        const document = createUpdatesDocument(
-            Array.from({ length: 260 }, () => []),
-            135
-        );
+    it('paginates a single top-level updates block and keeps the surrounding blocks', () => {
+        const document = createDocument([
+            createHeading('intro'),
+            createParagraph(),
+            createUpdatesBlock(createUpdateEntries(260)),
+            createParagraph(),
+        ]);
         for (const [page, start] of [
             [1, 1],
             [7, 121],
         ] as const) {
             const result = paginateUpdatesDocument(document, undefined, { page });
-            expect(result.pagination).toMatchObject({
+            expect(result.pagination).toEqual({
                 page,
                 totalPages: 13,
+                totalItems: 260,
+                pageSize: 20,
                 start,
                 end: start + 19,
+                isClamped: false,
             });
             expect(getUpdateIds(result.document)).toEqual(
                 Array.from({ length: 20 }, (_, i) => `update-${start + i}`)
             );
+            expect(result.document.nodes.map((block) => block.type)).toEqual([
+                'heading-1',
+                'paragraph',
+                'updates',
+                'paragraph',
+            ]);
         }
+    });
+
+    it('keeps 50 entries intact and paginates 51', () => {
+        const short = createDocument([createUpdatesBlock(createUpdateEntries(50))]);
+        expect(getUpdatesPaginationEligibility(short)).toEqual({ status: 'below-threshold' });
+        const shortResult = paginateUpdatesDocument(short, undefined, { page: 2 });
+        expect(shortResult.pagination).toBeNull();
+        expect(shortResult.document).toBe(short);
+
+        const long = createDocument([createUpdatesBlock(createUpdateEntries(51))]);
+        const eligibility = getUpdatesPaginationEligibility(long);
+        expect(eligibility.status).toBe('eligible');
+        if (eligibility.status === 'eligible') {
+            expect(eligibility.updates).toHaveLength(51);
+        }
+        const result = paginateUpdatesDocument(long, undefined, { page: 3 });
+        expect(result.pagination).toMatchObject({ page: 3, totalPages: 3, start: 41, end: 51 });
+        expect(getUpdateIds(result.document)).toEqual(
+            Array.from({ length: 11 }, (_, i) => `update-${41 + i}`)
+        );
+    });
+
+    it.each([
+        [25, 26],
+        [60, 10],
+    ])('does not paginate two top-level updates blocks of %i and %i entries', (first, second) => {
+        const entries = createUpdateEntries(first + second);
+        const document = createDocument([
+            createUpdatesBlock(entries.slice(0, first)),
+            createParagraph(),
+            createUpdatesBlock(entries.slice(first)),
+        ]);
+        expectNotPaginated(document, {
+            status: 'skipped',
+            reason: 'multiple-updates-blocks',
+            totalUpdates: first + second,
+            updatesBlocks: 2,
+        });
+    });
+
+    it('does not paginate when another updates block is nested inside a container', () => {
+        const entries = createUpdateEntries(62);
+        const document = createDocument([
+            createUpdatesBlock(entries.slice(0, 60)),
+            wrapInIf(createUpdatesBlock(entries.slice(60))),
+        ]);
+        expectNotPaginated(document, {
+            status: 'skipped',
+            reason: 'nested-updates-block',
+            totalUpdates: 62,
+            updatesBlocks: 2,
+        });
+    });
+
+    it('does not paginate an updates block that is only nested', () => {
+        const document = createDocument([wrapInIf(createUpdatesBlock(createUpdateEntries(60)))]);
+        expectNotPaginated(document, { status: 'below-threshold' });
+    });
+
+    it('does not paginate an updates block with non-update entries', () => {
+        const entries = createUpdateEntries(60);
+        const document = createDocument([
+            createUpdatesBlock([
+                ...entries.slice(0, 30),
+                {
+                    object: 'block',
+                    type: 'if',
+                    data: { expression: 'visitor.claims.beta' },
+                    isVoid: false,
+                    nodes: entries.slice(30, 32),
+                },
+                ...entries.slice(32),
+            ]),
+        ]);
+        expectNotPaginated(document, {
+            status: 'skipped',
+            reason: 'non-update-entries',
+            totalUpdates: 59,
+            updatesBlocks: 1,
+        });
     });
 
     it('filters by any selected tag before calculating page bounds and clamps to the last match', () => {
@@ -167,8 +228,7 @@ describe('updates pagination', () => {
                     return ['even'];
                 }
                 return [];
-            }),
-            30
+            })
         );
 
         const result = paginateUpdatesDocument(document, revision, {
@@ -184,7 +244,6 @@ describe('updates pagination', () => {
             isClamped: true,
         });
         expect(getUpdateIds(result.document)).toEqual(['update-61']);
-        expect(countDocumentUpdates(document)).toBe(61);
     });
 
     it('finds a nested anchor on the filtered page or clears a filter that excludes it', () => {
@@ -195,8 +254,7 @@ describe('updates pagination', () => {
                     return ['fixes'];
                 }
                 return [];
-            }),
-            26
+            })
         );
         expect(
             findUpdateAnchorPage(document, revision, { anchor: 'update-43', tags: ['fixes'] })
@@ -263,45 +321,68 @@ function getUpdateIds(document: JSONDocument) {
     });
 }
 
-function createUpdatesDocument(entryTags: string[][], splitAt?: number): JSONDocument {
-    const entries = entryTags.map((tags, index) => ({
-        object: 'block' as const,
-        type: 'update' as const,
+function expectNotPaginated(document: JSONDocument, eligibility: UpdatesPaginationEligibility) {
+    expect(getUpdatesPaginationEligibility(document)).toEqual(eligibility);
+    const result = paginateUpdatesDocument(document, undefined, { page: 2 });
+    expect(result).toEqual({
+        document,
+        pagination: null,
+        eligibility,
+    });
+    expect(result.document).toBe(document);
+    expect(findUpdateAnchorPage(document, undefined, { anchor: 'update-1' })).toEqual({
+        found: false,
+    });
+}
+
+function createUpdatesDocument(entryTags: string[][]): JSONDocument {
+    return createDocument([createUpdatesBlock(createUpdateEntries(entryTags.length, entryTags))]);
+}
+
+function createDocument(nodes: JSONDocument['nodes']): JSONDocument {
+    return { object: 'document', data: { schemaVersion: 2 }, nodes };
+}
+
+function createUpdateEntries(count: number, entryTags: string[][] = []): DocumentBlockUpdate[] {
+    return Array.from({ length: count }, (_, index) => ({
+        object: 'block',
+        type: 'update',
         data: {
             date: '2026-05-01',
-            tags: tags.map((tag) => ({ kind: 'tag' as const, tag })),
+            tags: (entryTags[index] ?? []).map((tag) => ({ kind: 'tag', tag })),
         },
-        isVoid: false as const,
-        nodes: [
-            {
-                object: 'block' as const,
-                type: 'heading-1' as const,
-                meta: { id: `update-${index + 1}` },
-                data: {},
-                isVoid: false as const,
-                nodes: [],
-            },
-        ],
+        isVoid: false,
+        nodes: [createHeading(`update-${index + 1}`)],
     }));
-    const updates = (nodes: typeof entries) => ({
-        object: 'block' as const,
-        type: 'updates' as const,
-        data: { format: 'full' as const },
-        isVoid: false as const,
-        nodes,
-    });
-    const nodes: JSONDocument['nodes'] = [updates(entries)];
-    if (splitAt !== undefined) {
-        nodes.splice(
-            0,
-            1,
-            updates(entries.slice(0, splitAt)),
-            { object: 'block', type: 'paragraph', data: {}, isVoid: false, nodes: [] },
-            updates(entries.slice(splitAt))
-        );
-    }
+}
 
-    return { object: 'document', data: { schemaVersion: 2 }, nodes };
+function createUpdatesBlock(nodes: DocumentBlockUpdates['nodes']): DocumentBlockUpdates {
+    return { object: 'block', type: 'updates', data: { format: 'full' }, isVoid: false, nodes };
+}
+
+function wrapInIf(block: DocumentBlockUpdates): JSONDocument['nodes'][number] {
+    return {
+        object: 'block',
+        type: 'if',
+        data: { expression: 'visitor.claims.beta' },
+        isVoid: false,
+        nodes: [block],
+    };
+}
+
+function createHeading(id: string): DocumentBlockHeading {
+    return {
+        object: 'block',
+        type: 'heading-1',
+        meta: { id },
+        data: {},
+        isVoid: false,
+        nodes: [],
+    };
+}
+
+function createParagraph(): DocumentBlockParagraph {
+    return { object: 'block', type: 'paragraph', data: {}, isVoid: false, nodes: [] };
 }
 
 function createTag(slug: string, label: string): RevisionTag {
