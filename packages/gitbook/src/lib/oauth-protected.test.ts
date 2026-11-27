@@ -98,7 +98,8 @@ describe('OAuth protected resources flow', () => {
                     urlMode: 'url-host',
                 });
 
-                expect(await res.json()).toEqual({
+                const json = await res.json();
+                expect(json).toEqual({
                     resource: `${publicURL}/~gitbook/mcp/auth`,
                     authorization_servers: ['https://sites.gitbook.com/oauth2/v1/site_123'],
                 });
@@ -135,7 +136,8 @@ describe('OAuth protected resources flow', () => {
                     urlMode: 'url-host',
                 });
 
-                expect(await res.json()).toMatchObject({ resource: `${proxyURL}/~gitbook/mcp` });
+                const json = await res.json();
+                expect(json).toMatchObject({ resource: `${proxyURL}/~gitbook/mcp` });
             });
         });
     });
