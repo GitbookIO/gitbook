@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import type { PublishedContentRedirect } from '@gitbook/api';
 
 import { GITBOOK_OAUTH_SERVER_URL, GITBOOK_URL } from './env';
+import { isProxyRequest } from './proxy';
 
 type OAuthProtectedResource = {
     /** Endpoint of the protected resource */
@@ -38,13 +39,12 @@ export function createOAuthProtectedResourceMetadataResponse(args: {
     siteRequestURL: URL;
     siteId: string;
     urlMode: 'url' | 'url-host';
+    /** Public URL of the request, which differs from the request URL on proxied sites. */
+    canonicalURL?: string;
 }) {
-    const { siteRequestURL, urlMode, siteId } = args;
+    const { siteId } = args;
 
-    const resourceUrl =
-        urlMode === 'url-host'
-            ? siteRequestURL
-            : new URL(`/url/${siteRequestURL.host}${siteRequestURL.pathname}`, GITBOOK_URL);
+    const resourceUrl = getPublicResourceURL(args);
 
     const protectedResourceMetadata = {
         resource: resourceUrl.toString().replace(OAUTH_PROTECTED_RESOURCE_METADATA_PATH, ''),
@@ -58,10 +58,15 @@ export function createOAuthProtectedResourceMetadataResponse(args: {
  */
 export function handleUnauthedOAuthProtectedResourceRequest(args: {
     siteRequestURL: URL;
-    siteURLData: Extract<PublishedContentRedirect, { target: 'external' }>;
+    // `canonicalUrl` is newer than the API types this app is built with, and missing from
+    // responses cached before it.
+    siteURLData: Extract<PublishedContentRedirect, { target: 'external' }> & {
+        canonicalUrl?: string;
+    };
     urlMode: 'url' | 'url-host';
 }) {
     const { siteRequestURL, urlMode, siteURLData } = args;
+    const canonicalURL = siteURLData.canonicalUrl;
 
     // When the request is for the protected resource metadata return the info relative to the site.
     if (isOAuthProtectedResourceMetadataRequest(siteRequestURL)) {
@@ -69,6 +74,7 @@ export function handleUnauthedOAuthProtectedResourceRequest(args: {
             siteRequestURL,
             siteId: siteURLData.site,
             urlMode,
+            canonicalURL,
         });
     }
 
@@ -76,6 +82,7 @@ export function handleUnauthedOAuthProtectedResourceRequest(args: {
     return createOAuthProtectedResourceUnauthResponse({
         siteRequestURL,
         urlMode,
+        canonicalURL,
     });
 }
 
@@ -85,8 +92,10 @@ export function handleUnauthedOAuthProtectedResourceRequest(args: {
 export function createOAuthProtectedResourceUnauthResponse(args: {
     siteRequestURL: URL;
     urlMode: 'url' | 'url-host';
+    /** Public URL of the request, which differs from the request URL on proxied sites. */
+    canonicalURL?: string;
 }) {
-    const { siteRequestURL, urlMode } = args;
+    const { siteRequestURL } = args;
 
     const matched = getMatchedProtectedResourceEndpoint(siteRequestURL);
     if (!matched) {
@@ -95,10 +104,7 @@ export function createOAuthProtectedResourceUnauthResponse(args: {
         );
     }
 
-    const baseUrl =
-        urlMode === 'url-host'
-            ? siteRequestURL
-            : new URL(`/url/${siteRequestURL.host}${siteRequestURL.pathname}`, GITBOOK_URL);
+    const baseUrl = getPublicResourceURL(args);
 
     const resourceMetadataUrl = baseUrl
         .toString()
@@ -178,4 +184,27 @@ function getMatchedProtectedMetadataEndpoint(siteRequestURL: URL | NextRequest['
 function getOAuthProtectedResourceMetadataPath(endpoint: string) {
     const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
     return `${OAUTH_PROTECTED_RESOURCE_METADATA_PATH}${normalizedEndpoint}`;
+}
+
+/**
+ * Get the URL clients use to reach the requested resource.
+ */
+function getPublicResourceURL(args: {
+    siteRequestURL: URL;
+    urlMode: 'url' | 'url-host';
+    canonicalURL?: string;
+}): URL {
+    const { siteRequestURL, urlMode, canonicalURL } = args;
+
+    if (urlMode === 'url') {
+        return new URL(`/url/${siteRequestURL.host}${siteRequestURL.pathname}`, GITBOOK_URL);
+    }
+
+    // A proxied site's request URL is the proxy's (`/sites/site_xxx/...`), but MCP clients connect
+    // to its public URL and reject metadata naming another resource.
+    if (isProxyRequest(siteRequestURL) && canonicalURL) {
+        return new URL(canonicalURL);
+    }
+
+    return siteRequestURL;
 }
