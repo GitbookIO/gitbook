@@ -3,10 +3,10 @@ import { afterEach, describe, expect, it, spyOn } from 'bun:test';
 import { SEARCH_FALLBACK_HEADER, createSearchPassStore } from './search-pass-store';
 import type { DirectSearchProps } from '@/lib/search-results';
 
-const endpoint = 'https://api.gitbook.com/v1/orgs/org_1/sites/site_1/search';
+const endpoint = 'https://api.gitbook.com/cache/v1/orgs/org_1/sites/site_1/search';
 const proxyURL = '/~gitbook/search-direct/orgs/org_1/sites/site_1';
 const directSearch: DirectSearchProps = {
-    apiURL: 'https://api.gitbook.com',
+    apiURL: 'https://api.gitbook.com/cache/',
     organizationId: 'org_1',
     siteId: 'site_1',
     proxyURL,
