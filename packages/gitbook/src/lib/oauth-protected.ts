@@ -58,11 +58,7 @@ export function createOAuthProtectedResourceMetadataResponse(args: {
  */
 export function handleUnauthedOAuthProtectedResourceRequest(args: {
     siteRequestURL: URL;
-    // `canonicalUrl` is newer than the API types this app is built with, and missing from
-    // responses cached before it.
-    siteURLData: Extract<PublishedContentRedirect, { target: 'external' }> & {
-        canonicalUrl?: string;
-    };
+    siteURLData: Extract<PublishedContentRedirect, { target: 'external' }>;
     urlMode: 'url' | 'url-host';
 }) {
     const { siteRequestURL, urlMode, siteURLData } = args;
