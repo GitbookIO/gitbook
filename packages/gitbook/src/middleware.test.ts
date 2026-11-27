@@ -4,8 +4,15 @@ import * as nextHeaders from 'next/headers';
 import { NextRequest } from 'next/server';
 
 import { middleware } from './middleware';
+import { getVisitorAuthBasePath } from '@/lib/data/visitor';
 import { GITBOOK_API_URL } from '@/lib/env';
+import { MiddlewareHeaders } from '@/lib/middleware';
 import { removeTrailingSlash } from '@/lib/paths';
+import {
+    getVisitorAuthCookieName,
+    getVisitorAuthCookieValue,
+    getVisitorToken,
+} from '@/lib/visitors';
 
 const PATH = '/~gitbook/search-direct/orgs/org_1/sites/site-1';
 const PASS_HEADER = 'x-gitbook-search-pass';
@@ -216,4 +223,60 @@ describe('Updates page middleware', () => {
             expect(destination.search).toBe(search);
         }
     );
+});
+
+describe('Site OAuth consent middleware', () => {
+    it('should forward a request URL that finds the visitor cookie on a proxied site', async () => {
+        const consentPath = '/~gitbook/oauth2/v1/site_1/authorize';
+        const proxyURL = new URL(`https://proxy.gitbook.site/sites/site_1${consentPath}`);
+        const siteBasePath = '/dna/docs/';
+        fetchSpy.mockResolvedValueOnce(
+            Response.json({
+                site: 'site_1',
+                siteSpace: 'variant',
+                space: 'space',
+                organization: 'org',
+                apiToken: 'content-token',
+                pathname: consentPath.slice(1),
+                basePath: siteBasePath,
+                siteBasePath,
+                canonicalUrl: `https://docs.example.com/dna/docs${consentPath}`,
+                complete: true,
+            })
+        );
+
+        // The cookie is scoped the way the middleware stores the token from a proxied login callback.
+        const cookieBasePath = getVisitorAuthBasePath(proxyURL, { siteBasePath });
+        const cookieName = getVisitorAuthCookieName(cookieBasePath);
+        const cookieValue = getVisitorAuthCookieValue(cookieBasePath, 'visitor-jwt');
+        const request = new NextRequest(`https://origin.example.com/ignored?gb_oauth_state=abc`, {
+            headers: {
+                'x-gitbook-url': `${proxyURL}?gb_oauth_state=abc`,
+                'x-gitbook-url-signature': 'internal',
+                cookie: `${cookieName}=${encodeURIComponent(cookieValue)}`,
+            },
+        });
+        const cookiesSpy = spyOn(nextHeaders, 'cookies').mockResolvedValue(
+            RequestCookiesAdapter.seal(request.cookies)
+        );
+        let response;
+        try {
+            response = await middleware(request);
+        } finally {
+            cookiesSpy.mockRestore();
+        }
+
+        expect(response.headers.get('x-middleware-rewrite')).not.toBeNull();
+        const forwardedURL = response.headers.get(
+            `x-middleware-request-${MiddlewareHeaders.SiteRequestURL}`
+        );
+        expect(forwardedURL).toBe(proxyURL.toString());
+        expect(
+            getVisitorToken({
+                cookies: request.cookies.getAll(),
+                headers: new Headers(),
+                url: new URL(forwardedURL!),
+            })
+        ).toMatchObject({ source: 'visitor-auth-cookie', token: 'visitor-jwt' });
+    });
 });

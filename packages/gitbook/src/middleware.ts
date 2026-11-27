@@ -603,6 +603,10 @@ async function serveSiteRequest(requestURL: URL, request: NextRequest, match: UR
             MiddlewareHeaders.SiteURL,
             `${siteCanonicalURL.origin}${siteURLData.basePath}`
         );
+        requestHeaders.set(
+            MiddlewareHeaders.SiteRequestURL,
+            `${siteRequestURL.origin}${siteRequestURL.pathname}`
+        );
         requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(stableSiteURLData));
 
         // Preview of customization/theme.

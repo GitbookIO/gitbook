@@ -16,6 +16,12 @@ export enum MiddlewareHeaders {
     SiteURL = 'x-gitbook-site-url',
 
     /**
+     * The URL the site was requested at, without query params. Unlike the site URL, it is the
+     * proxy's URL for proxied sites, which visitor cookies are scoped to.
+     */
+    SiteRequestURL = 'x-gitbook-site-request-url',
+
+    /**
      * The data associated with the URL.
      */
     SiteURLData = 'x-gitbook-site-url-data',
@@ -85,6 +91,20 @@ export async function getSiteURLFromMiddleware(): Promise<string> {
     }
 
     return siteURL;
+}
+
+/**
+ * Get the URL the site was requested at from the middleware headers.
+ * This function should only be called in a server action or a dynamic route.
+ */
+export async function getSiteRequestURLFromMiddleware(): Promise<URL> {
+    const headersList = await headers();
+    const siteRequestURL = headersList.get(MiddlewareHeaders.SiteRequestURL);
+    if (!siteRequestURL) {
+        throw new Error('Site request URL is not set by the middleware');
+    }
+
+    return new URL(siteRequestURL);
 }
 
 /**
