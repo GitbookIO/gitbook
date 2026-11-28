@@ -74,6 +74,14 @@ export const GITBOOK_OAUTH_SERVER_URL =
     process.env.GITBOOK_OAUTH_SERVER_URL || 'https://sites.gitbook.com/oauth2/v1';
 
 /**
+ * URL to the GitBook API OAuth server, used to sign in GitBook users (not site visitors).
+ * Defaults to the `oauth.` host next to the app (app.gitbook.com -> oauth.gitbook.com).
+ */
+export const GITBOOK_API_OAUTH_URL =
+    process.env.GITBOOK_API_OAUTH_URL ||
+    GITBOOK_APP_URL.replace('://app.', '://oauth.').replace(/\/$/, '');
+
+/**
  * Base URL for GitBook preview requests.
  */
 export const GITBOOK_PREVIEW_BASE_URL =
